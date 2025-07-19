@@ -86,6 +86,11 @@
               "text": "Context Menu",
               "link": "/tree/context",
               "i18n": "menu.tree.context"
+            },
+            {
+              "text": "TreePanel",
+              "link": "/tree/panel",
+              "i18n": "menu.tree.panel"
             }
           ]
         },
