@@ -10,8 +10,10 @@ import { Router } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { FirebaseAuthService } from '../../../core/auth/firebase-auth.service';
+import { Auth, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
 import { StartupService } from '@core';
+import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
+import { ReuseTabService } from '@delon/abc/reuse-tab';
 
 @Component({
   selector: 'app-google-auth',
@@ -39,8 +41,10 @@ import { StartupService } from '@core';
 export class GoogleAuthComponent {
   private readonly router = inject(Router);
   private readonly message = inject(NzMessageService);
-  private readonly firebaseAuth = inject(FirebaseAuthService);
+  private readonly auth = inject(Auth);
   private readonly startupService = inject(StartupService);
+  private readonly tokenService = inject(DA_SERVICE_TOKEN);
+  private readonly reuseTabService = inject(ReuseTabService, { optional: true });
 
   loading = false;
 
@@ -48,19 +52,42 @@ export class GoogleAuthComponent {
     this.loading = true;
 
     try {
-      const user = (await this.firebaseAuth.loginWithGoogle().toPromise()) || null;
+      const provider = new GoogleAuthProvider();
+      const credential = await signInWithPopup(this.auth, provider);
+      const user = credential.user;
 
-      if (user) {
-        this.message.success('登入成功！');
+      // 設定 @delon/auth token
+      const tokenData = {
+        token: user.uid,
+        name: user.displayName || user.email || 'Anonymous',
+        email: user.email || '',
+        id: user.uid,
+        time: +new Date(),
+        role: 'user',
+        permissions: ['dashboard'],
+        expired: +new Date() + 1000 * 60 * 60 * 24 * 7 // 7天過期
+      };
 
-        // 重新載入啟動服務
-        this.startupService.load().subscribe(() => {
-          this.router.navigateByUrl('/');
-        });
-      }
+      console.log('Google 登入成功，設定 token:', tokenData);
+      this.tokenService.set(tokenData);
+
+      this.message.success('Google 登入成功！');
+
+      // 清空路由复用信息
+      this.reuseTabService?.clear();
+
+      // 重新載入啟動服務
+      this.startupService.load().subscribe(() => {
+        // 導航到適當頁面
+        let url = this.tokenService.referrer?.url || '/';
+        if (url.includes('/passport')) {
+          url = '/';
+        }
+        this.router.navigateByUrl(url);
+      });
     } catch (error) {
       console.error('Google 登入失敗:', error);
-      this.message.error('登入失敗，請稍後再試');
+      this.message.error('Google 登入失敗，請稍後再試');
     } finally {
       this.loading = false;
     }

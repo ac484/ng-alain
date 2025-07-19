@@ -1,5 +1,5 @@
 <div class="alain-default__content-title">
-  <h1> 路由守卫 </h1>
+  <h1> 路由守卫 (整合 Firebase) </h1>
 </div>
 <nz-space-compact>
   <button nz-button [routerLink]="['/delon/guard/leave']">
@@ -23,6 +23,17 @@
   </button>
   <button nz-button [routerLink]="['/delon/guard/admin']">
     <span>需要管理员</span>
+  </button>
+</nz-space-compact>
+<nz-space-compact class="ml-sm">
+  <button nz-button (click)="loadFirebaseUserRole()">
+    <span>載入 Firebase 權限</span>
+  </button>
+  <button nz-button (click)="updateFirebaseUserRole('admin')">
+    <span>設為 Admin</span>
+  </button>
+  <button nz-button (click)="updateFirebaseUserRole('user')">
+    <span>設為 User</span>
   </button>
 </nz-space-compact>
 <p class="mb-lg">当前ACL信息：{{ data | json }}</p>

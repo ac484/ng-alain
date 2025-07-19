@@ -6,12 +6,9 @@
  */
 
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { FirebaseAuthService } from '../../../core/auth/firebase-auth.service';
-import { StartupService } from '@core';
 import { EmailLoginModalComponent } from './email-login-modal.component';
 
 @Component({
@@ -22,11 +19,8 @@ import { EmailLoginModalComponent } from './email-login-modal.component';
   styles: []
 })
 export class EmailLoginComponent {
-  private readonly router = inject(Router);
   private readonly message = inject(NzMessageService);
   private readonly modalService = inject(NzModalService);
-  private readonly firebaseAuth = inject(FirebaseAuthService);
-  private readonly startupService = inject(StartupService);
 
   loading = false;
 
@@ -44,7 +38,7 @@ export class EmailLoginComponent {
       });
 
       modalRef.afterClose.subscribe(result => {
-        if (result) {
+        if (result && result.success) {
           // 用戶成功登入或註冊
           this.message.success('操作成功！');
         }

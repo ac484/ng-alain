@@ -64,7 +64,7 @@ import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { Observable, zip, catchError, map, of } from 'rxjs';
 
 import { I18NService } from '../i18n/i18n.service';
-import { FirebaseAuthService } from '../auth/firebase-auth.service';
+import { Auth, User, onAuthStateChanged } from '@angular/fire/auth';
 
 /**
  * 應用程式啟動提供者
@@ -112,7 +112,7 @@ export class StartupService {
   private i18n = inject<I18NService>(ALAIN_I18N_TOKEN); // 國際化服務
 
   // 注入 Firebase 認證服務
-  private firebaseAuth = inject(FirebaseAuthService); // Firebase 認證服務
+  private auth = inject(Auth); // Firebase 認證服務
 
   /**
    * 載入應用程式啟動資料
@@ -162,7 +162,7 @@ export class StartupService {
       this.i18n.loadLangData(defaultLang), // 載入語言包資料
       this.httpClient.get('./assets/tmp/app-data.json'), // 載入應用程式配置
       // 如果有有效 token，獲取 Firebase 用戶資訊
-      hasValidToken ? this.firebaseAuth.getCurrentUser() : of(null)
+      hasValidToken ? this.getFirebaseUser() : of(null)
     ).pipe(
       // 錯誤處理：接收其他攔截器後產生的異常訊息
       catchError(res => {
@@ -211,5 +211,31 @@ export class StartupService {
         this.titleService.suffix = appData.app.name;
       })
     );
+  }
+
+  /**
+   * 獲取 Firebase 用戶資訊
+   */
+  private getFirebaseUser(): Observable<any> {
+    return new Observable(observer => {
+      const unsubscribe = onAuthStateChanged(this.auth, (user: User | null) => {
+        if (user) {
+          const firebaseUser = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            emailVerified: user.emailVerified,
+            role: 'user',
+            permissions: ['dashboard']
+          };
+          observer.next(firebaseUser);
+        } else {
+          observer.next(null);
+        }
+        observer.complete();
+      });
+      return () => unsubscribe();
+    });
   }
 }
