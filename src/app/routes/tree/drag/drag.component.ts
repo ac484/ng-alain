@@ -95,8 +95,8 @@ export class TreeDragComponent {
 
   constructor(private message: NzMessageService) {}
 
-  onExpandChange(expandedKeys: string[]): void {
-    this.expandedKeys = expandedKeys;
+  onExpandChange(event: any): void {
+    this.expandedKeys = event.keys;
   }
 
   onDragStart(event: any): void {

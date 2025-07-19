@@ -131,8 +131,8 @@ export class TreeContextComponent {
 
   constructor(private message: NzMessageService) {}
 
-  onExpandChange(expandedKeys: string[]): void {
-    this.expandedKeys = expandedKeys;
+  onExpandChange(event: any): void {
+    this.expandedKeys = event.keys;
   }
 
   onNodeClick(event: any): void {
