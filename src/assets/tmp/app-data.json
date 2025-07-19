@@ -60,7 +60,7 @@
         {
           "text": "Tree",
           "i18n": "menu.tree",
-          "icon": "anticon-cluster",
+          "icon": "anticon-fork",
           "children": [
             {
               "text": "Tree List",
@@ -113,6 +113,41 @@
               "text": "Workspace Settings",
               "link": "/workspace/settings",
               "i18n": "menu.workspace.settings"
+            },
+            {
+              "text": "Calendar",
+              "link": "/workspace/calendar",
+              "i18n": "menu.workspace.calendar"
+            },
+            {
+              "text": "Task Management",
+              "link": "/workspace/task",
+              "i18n": "menu.workspace.task"
+            },
+            {
+              "text": "Memos",
+              "link": "/workspace/memos",
+              "i18n": "menu.workspace.memos"
+            },
+            {
+              "text": "Inspection",
+              "link": "/workspace/inspection",
+              "i18n": "menu.workspace.inspection"
+            },
+            {
+              "text": "Daily Log",
+              "link": "/workspace/daily-log",
+              "i18n": "menu.workspace.daily-log"
+            },
+            {
+              "text": "Overview",
+              "link": "/workspace/overview",
+              "i18n": "menu.workspace.overview"
+            },
+            {
+              "text": "Timeline",
+              "link": "/workspace/timeline",
+              "i18n": "menu.workspace.timeline"
             }
           ]
         }

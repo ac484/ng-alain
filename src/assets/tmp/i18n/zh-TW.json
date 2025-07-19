@@ -24,6 +24,8 @@
   "menu.workspace.list": "工作區列表",
   "menu.workspace.create": "建立工作區",
   "menu.workspace.settings": "工作區設定",
+  "menu.workspace.calendar": "日曆",
+  "menu.workspace.task": "任務管理",
   "menu.main": "主導航",
   "menu.dashboard": "儀錶盤",
   "menu.dashboard.v1": "默認頁",

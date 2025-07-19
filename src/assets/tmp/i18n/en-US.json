@@ -14,6 +14,8 @@
   "menu.workspace.list": "Workspace List",
   "menu.workspace.create": "Create Workspace",
   "menu.workspace.settings": "Workspace Settings",
+  "menu.workspace.calendar": "Calendar",
+  "menu.workspace.task": "Task Management",
   "menu.dashboard": "Dashboard",
   "menu.dashboard.v1": "Default",
   "menu.dashboard.analysis": "Analysis",

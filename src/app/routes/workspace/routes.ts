@@ -24,6 +24,14 @@ export default [
         loadComponent: () => import('./settings/settings.component').then(m => m.WorkspaceSettingsComponent)
       },
       {
+        path: 'calendar',
+        loadComponent: () => import('./calendar/calendar.component').then(m => m.WorkspaceCalendarComponent)
+      },
+      {
+        path: 'task',
+        loadComponent: () => import('./task/task.component').then(m => m.WorkspaceTaskComponent)
+      },
+      {
         path: '',
         redirectTo: 'list',
         pathMatch: 'full'
