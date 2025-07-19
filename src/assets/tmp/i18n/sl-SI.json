@@ -128,7 +128,6 @@
   "app.login.message-invalid-credentials": "Nnapačno uporabniško ime ali geslo",
   "app.login.message-invalid-verification-code": "Napačna verifikacijska koda",
   "app.login.tab-login-credentials": "Začetnice",
-  "app.login.tab-login-mobile": "Mobilna številka",
   "app.login.remember-me": "Opomni me",
   "app.login.forgot-password": "Pozabljeno geslo?",
   "app.login.sign-in-with": "Prijavi se kot",

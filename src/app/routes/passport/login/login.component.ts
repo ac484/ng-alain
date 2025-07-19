@@ -2,7 +2,7 @@
  * NG-ALAIN 用戶登入元件
  *
  * 功能：提供用戶登入表單
- * 模式：帳號密碼、手機驗證碼
+ * 模式：帳號密碼
  * 支援：第三方社交登入
  */
 
@@ -21,7 +21,6 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzTabChangeEvent, NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { AnonymousLoginComponent } from '../anonymous-login/anonymous-login.component';
 import { EmailLoginComponent } from '../email-login';
@@ -39,7 +38,6 @@ import { finalize } from 'rxjs';
     ReactiveFormsModule,
     I18nPipe,
     NzCheckboxModule,
-    NzTabsModule,
     NzAlertModule,
     NzFormModule,
     NzInputModule,
@@ -64,57 +62,20 @@ export class UserLoginComponent implements OnDestroy {
   form = inject(FormBuilder).nonNullable.group({
     userName: ['', [Validators.required, Validators.pattern(/^(admin|user)$/)]],
     password: ['', [Validators.required, Validators.pattern(/^(ng-alain\.com)$/)]],
-    mobile: ['', [Validators.required, Validators.pattern(/^1\d{10}$/)]],
-    captcha: ['', [Validators.required]],
     remember: [true]
   });
   error = '';
-  type = 0;
   loading = false;
-
-  count = 0;
-  interval$: any;
-
-  switch({ index }: NzTabChangeEvent): void {
-    this.type = index!;
-  }
-
-  getCaptcha(): void {
-    const mobile = this.form.controls.mobile;
-    if (mobile.invalid) {
-      mobile.markAsDirty({ onlySelf: true });
-      mobile.updateValueAndValidity({ onlySelf: true });
-      return;
-    }
-    this.count = 59;
-    this.interval$ = setInterval(() => {
-      this.count -= 1;
-      if (this.count <= 0) {
-        clearInterval(this.interval$);
-      }
-    }, 1000);
-  }
 
   submit(): void {
     this.error = '';
-    if (this.type === 0) {
-      const { userName, password } = this.form.controls;
-      userName.markAsDirty();
-      userName.updateValueAndValidity();
-      password.markAsDirty();
-      password.updateValueAndValidity();
-      if (userName.invalid || password.invalid) {
-        return;
-      }
-    } else {
-      const { mobile, captcha } = this.form.controls;
-      mobile.markAsDirty();
-      mobile.updateValueAndValidity();
-      captcha.markAsDirty();
-      captcha.updateValueAndValidity();
-      if (mobile.invalid || captcha.invalid) {
-        return;
-      }
+    const { userName, password } = this.form.controls;
+    userName.markAsDirty();
+    userName.updateValueAndValidity();
+    password.markAsDirty();
+    password.updateValueAndValidity();
+    if (userName.invalid || password.invalid) {
+      return;
     }
 
     // 默认配置中对所有HTTP请求都会强制 [校验](https://ng-alain.com/auth/getting-started) 用户 Token
@@ -125,7 +86,6 @@ export class UserLoginComponent implements OnDestroy {
       .post(
         '/login/account',
         {
-          type: this.type,
           userName: this.form.value.userName,
           password: this.form.value.password
         },
@@ -203,8 +163,6 @@ export class UserLoginComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.interval$) {
-      clearInterval(this.interval$);
-    }
+    // 移除手機號相關的清理邏輯
   }
 }

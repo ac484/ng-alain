@@ -131,7 +131,6 @@
   "app.login.message-invalid-credentials": "Λάθος όνομα χρήστη ή κωδικός πρόσβασης（admin/ant.design）",
   "app.login.message-invalid-verification-code": "Μη έγκυρος κωδικός επιβεβαίωσης",
   "app.login.tab-login-credentials": "Στοιχεία σύνδεσης",
-  "app.login.tab-login-mobile": "Αριθμός κινητού",
   "app.login.remember-me": "Να με θυμάσαι",
   "app.login.forgot-password": "Ξέχασα τον κωδικό μου",
   "app.login.sign-in-with": "Σύνδεση με",

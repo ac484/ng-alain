@@ -132,7 +132,6 @@
   "app.login.message-invalid-credentials": "Nevažeće korisničko ime ili lozinka ",
   "app.login.message-invalid-verification-code": "Nevažeći kontrolni kôd",
   "app.login.tab-login-credentials": "Vjerodajnice",
-  "app.login.tab-login-mobile": "Broj mobitela",
   "app.login.remember-me": "Zapamti me",
   "app.login.forgot-password": "Zaboravili ste zaporku?",
   "app.login.sign-in-with": "Prijava sa",
