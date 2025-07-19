@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 系統配置集合
+    match /system/{configType}/{definitions}/{docId} {
+      // 只有管理員可以讀寫系統配置
+      allow read, write: if request.auth != null &&
+        hasRole(request.auth.uid, 'admin');
+    }
+
+    // 用戶集合
+    match /users/{userId} {
+      // 用戶可以讀取自己的資料
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || hasRole(request.auth.uid, 'admin'));
+
+      // 用戶可以更新自己的基本資料
+      allow update: if request.auth != null &&
+        request.auth.uid == userId &&
+        !('roles' in resource.data.diff(request.resource.data).affectedKeys()) &&
+        !('permissions' in resource.data.diff(request.resource.data).affectedKeys());
+
+      // 只有管理員可以管理用戶權限
+      allow write: if request.auth != null &&
+        hasRole(request.auth.uid, 'admin');
+
+      // 用戶子集合
+      match /{subcollection}/{docId} {
+        // 用戶可以管理自己的子集合資料
+        allow read, write: if request.auth != null &&
+          (request.auth.uid == userId || hasRole(request.auth.uid, 'admin'));
+      }
+    }
+
+    // 內容集合
+    match /content/{contentType}/{definitions}/{docId} {
+      // 文章讀取權限
+      allow read: if request.auth != null &&
+        (contentType == 'posts' || contentType == 'categories');
+
+      // 文章寫入權限
+      allow create: if request.auth != null &&
+        (hasPermission(request.auth.uid, 'post:write') || hasRole(request.auth.uid, 'admin'));
+
+      allow update, delete: if request.auth != null &&
+        (resource.data.authorId == request.auth.uid ||
+         hasPermission(request.auth.uid, 'post:write') ||
+         hasRole(request.auth.uid, 'admin'));
+    }
+
+    // 輔助函數：檢查用戶角色
+    function hasRole(userId: string, role: string): bool {
+      return exists(/databases/$(database)/documents/users/$(userId)) &&
+             role in get(/databases/$(database)/documents/users/$(userId)).data.roles;
+    }
+
+    // 輔助函數：檢查用戶權限
+    function hasPermission(userId: string, permission: string): bool {
+      return exists(/databases/$(database)/documents/users/$(userId)) &&
+             permission in get(/databases/$(database)/documents/users/$(userId)).data.permissions;
+    }
+  }
+}
