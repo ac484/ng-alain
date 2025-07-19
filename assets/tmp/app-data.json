@@ -125,6 +125,11 @@
               "i18n": "menu.delon.acl"
             },
             {
+              "text": "ACL 管理",
+              "link": "/delon/acl-admin",
+              "i18n": "menu.delon.acl-admin"
+            },
+            {
               "text": "Route Guard",
               "link": "/delon/guard",
               "i18n": "menu.delon.guard"
