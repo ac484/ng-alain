@@ -107,7 +107,13 @@ export const routes: Routes = [
       { path: 'pro', loadChildren: () => import('./pro/routes').then(m => m.routes) },
 
       // 合約管理模組 - 懶載入
-      { path: 'contract', loadChildren: () => import('./contract/routes').then(m => m.default) }
+      { path: 'contract', loadChildren: () => import('./contract/routes').then(m => m.default) },
+
+      // 樹狀結構模組 - 懶載入
+      { path: 'tree', loadChildren: () => import('./tree/routes').then(m => m.default) },
+
+      // 工作區模組 - 懶載入
+      { path: 'workspace', loadChildren: () => import('./workspace/routes').then(m => m.default) }
     ]
   },
 
