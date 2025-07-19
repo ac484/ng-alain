@@ -44,7 +44,7 @@ interface TreeNode {
           <div class="tree-panel" [class.collapsed]="isCollapsed">
             <div class="panel-header">
               <h4 *ngIf="!isCollapsed">樹狀結構</h4>
-              <span nz-icon nzType="apartment" *ngIf="isCollapsed"></span>
+              <span nz-icon nzType="cluster" *ngIf="isCollapsed"></span>
             </div>
 
             <div class="panel-content" *ngIf="!isCollapsed">
@@ -179,12 +179,12 @@ export class TreePanelComponent {
     {
       title: '專案管理',
       key: '0-0',
-      icon: 'anticon-folder',
+      icon: 'anticon-cluster',
       children: [
         {
           title: '前端開發',
           key: '0-0-0',
-          icon: 'anticon-code',
+          icon: 'anticon-node-index',
           children: [
             { title: 'Angular 專案', key: '0-0-0-0', isLeaf: true, icon: 'anticon-html5' },
             { title: 'React 專案', key: '0-0-0-1', isLeaf: true, icon: 'anticon-code' },
@@ -194,7 +194,7 @@ export class TreePanelComponent {
         {
           title: '後端開發',
           key: '0-0-1',
-          icon: 'anticon-database',
+          icon: 'anticon-tree',
           children: [
             { title: 'Node.js API', key: '0-0-1-0', isLeaf: true, icon: 'anticon-api' },
             { title: 'Python 服務', key: '0-0-1-1', isLeaf: true, icon: 'anticon-code' }
@@ -203,7 +203,7 @@ export class TreePanelComponent {
         {
           title: '設計資源',
           key: '0-0-2',
-          icon: 'anticon-picture',
+          icon: 'anticon-branches',
           children: [
             { title: 'UI 設計稿', key: '0-0-2-0', isLeaf: true, icon: 'anticon-file-image' },
             { title: '圖標資源', key: '0-0-2-1', isLeaf: true, icon: 'anticon-picture' }
@@ -214,12 +214,12 @@ export class TreePanelComponent {
     {
       title: '文檔管理',
       key: '0-1',
-      icon: 'anticon-file-text',
+      icon: 'anticon-branches',
       children: [
         {
           title: '技術文檔',
           key: '0-1-0',
-          icon: 'anticon-book',
+          icon: 'anticon-node-index',
           children: [
             { title: 'API 文檔', key: '0-1-0-0', isLeaf: true, icon: 'anticon-file-text' },
             { title: '使用手冊', key: '0-1-0-1', isLeaf: true, icon: 'anticon-file-text' }
@@ -228,7 +228,7 @@ export class TreePanelComponent {
         {
           title: '會議記錄',
           key: '0-1-1',
-          icon: 'anticon-calendar',
+          icon: 'anticon-tree',
           children: [
             { title: '週會記錄', key: '0-1-1-0', isLeaf: true, icon: 'anticon-calendar' },
             { title: '專案會議', key: '0-1-1-1', isLeaf: true, icon: 'anticon-calendar' }
@@ -275,12 +275,12 @@ export class TreePanelComponent {
       {
         title: '專案管理',
         key: '0-0',
-        icon: 'anticon-folder',
+        icon: 'anticon-cluster',
         children: [
           {
             title: '前端開發',
             key: '0-0-0',
-            icon: 'anticon-code',
+            icon: 'anticon-node-index',
             children: [
               { title: 'Angular 專案', key: '0-0-0-0', isLeaf: true, icon: 'anticon-html5' },
               { title: 'React 專案', key: '0-0-0-1', isLeaf: true, icon: 'anticon-code' },
@@ -290,7 +290,7 @@ export class TreePanelComponent {
           {
             title: '後端開發',
             key: '0-0-1',
-            icon: 'anticon-database',
+            icon: 'anticon-tree',
             children: [
               { title: 'Node.js API', key: '0-0-1-0', isLeaf: true, icon: 'anticon-api' },
               { title: 'Python 服務', key: '0-0-1-1', isLeaf: true, icon: 'anticon-code' }
@@ -299,7 +299,7 @@ export class TreePanelComponent {
           {
             title: '設計資源',
             key: '0-0-2',
-            icon: 'anticon-picture',
+            icon: 'anticon-branches',
             children: [
               { title: 'UI 設計稿', key: '0-0-2-0', isLeaf: true, icon: 'anticon-file-image' },
               { title: '圖標資源', key: '0-0-2-1', isLeaf: true, icon: 'anticon-picture' }
@@ -310,12 +310,12 @@ export class TreePanelComponent {
       {
         title: '文檔管理',
         key: '0-1',
-        icon: 'anticon-file-text',
+        icon: 'anticon-branches',
         children: [
           {
             title: '技術文檔',
             key: '0-1-0',
-            icon: 'anticon-book',
+            icon: 'anticon-node-index',
             children: [
               { title: 'API 文檔', key: '0-1-0-0', isLeaf: true, icon: 'anticon-file-text' },
               { title: '使用手冊', key: '0-1-0-1', isLeaf: true, icon: 'anticon-file-text' }
@@ -324,7 +324,7 @@ export class TreePanelComponent {
           {
             title: '會議記錄',
             key: '0-1-1',
-            icon: 'anticon-calendar',
+            icon: 'anticon-tree',
             children: [
               { title: '週會記錄', key: '0-1-1-0', isLeaf: true, icon: 'anticon-calendar' },
               { title: '專案會議', key: '0-1-1-1', isLeaf: true, icon: 'anticon-calendar' }

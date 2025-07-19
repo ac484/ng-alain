@@ -60,7 +60,7 @@
         {
           "text": "Tree",
           "i18n": "menu.tree",
-          "icon": "anticon-apartment",
+          "icon": "anticon-cluster",
           "children": [
             {
               "text": "Tree List",
