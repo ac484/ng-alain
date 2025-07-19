@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { Auth, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
 import { StartupService } from '@core';
 import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
@@ -19,22 +20,34 @@ import { FirebaseUserService } from '../../../core/firebase/firebase-user.servic
 @Component({
   selector: 'app-google-auth',
   standalone: true,
-  imports: [NzButtonModule, NzIconModule],
+  imports: [NzButtonModule, NzIconModule, NzToolTipModule],
   template: `
-    <button nz-button nzType="primary" nzSize="large" (click)="loginWithGoogle()" [nzLoading]="loading" class="google-login-btn">
-      <nz-icon nzType="google" nzTheme="outline"></nz-icon>
-    </button>
+    <i
+      nz-tooltip
+      nzTooltipTitle="Google 登入"
+      (click)="loginWithGoogle()"
+      nz-icon
+      nzType="google"
+      class="icon"
+      [class.loading]="loading"
+    ></i>
   `,
   styles: [
     `
-      .google-login-btn {
-        width: 100%;
-        height: 40px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
+      .icon {
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        transition: color 0.3s;
+      }
+
+      .icon:hover {
+        color: #1890ff;
+      }
+
+      .icon.loading {
+        color: #d9d9d9;
+        cursor: not-allowed;
       }
     `
   ]
