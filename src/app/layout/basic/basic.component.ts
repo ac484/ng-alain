@@ -37,6 +37,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 import { HeaderClearStorageComponent } from './widgets/clear-storage.component';
 import { HeaderFullScreenComponent } from './widgets/fullscreen.component';
+import { HeaderGoogleDocsComponent } from './widgets/google-docs-view.component';
 import { HeaderI18nComponent } from './widgets/i18n.component';
 import { HeaderIconComponent } from './widgets/icon.component';
 import { HeaderNotifyComponent } from './widgets/notify.component';
@@ -72,6 +73,9 @@ import { HeaderUserComponent } from './widgets/user.component';
       </layout-default-header-item>
       <layout-default-header-item direction="right" hidden="mobile">
         <header-task />
+      </layout-default-header-item>
+      <layout-default-header-item direction="right" hidden="mobile">
+        <header-google-docs />
       </layout-default-header-item>
       <layout-default-header-item direction="right" hidden="mobile">
         <header-icon />
@@ -138,6 +142,7 @@ import { HeaderUserComponent } from './widgets/user.component';
     HeaderSearchComponent,
     HeaderNotifyComponent,
     HeaderTaskComponent,
+    HeaderGoogleDocsComponent,
     HeaderIconComponent,
     HeaderRTLComponent,
     HeaderI18nComponent,
