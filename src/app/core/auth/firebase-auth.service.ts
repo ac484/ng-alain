@@ -12,6 +12,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  signInAnonymously,
   signOut,
   onAuthStateChanged,
   UserCredential
@@ -56,6 +57,13 @@ export class FirebaseAuthService {
     return from(signInWithPopup(this.auth, provider)).pipe(
       switchMap((credential: UserCredential) => this.getUserWithPermissions(credential.user))
     );
+  }
+
+  /**
+   * 匿名登入
+   */
+  loginAnonymously(): Observable<FirebaseUser> {
+    return from(signInAnonymously(this.auth)).pipe(switchMap((credential: UserCredential) => this.getUserWithPermissions(credential.user)));
   }
 
   /**
