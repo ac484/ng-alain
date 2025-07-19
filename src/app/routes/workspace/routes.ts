@@ -32,6 +32,26 @@ export default [
         loadComponent: () => import('./task/task.component').then(m => m.WorkspaceTaskComponent)
       },
       {
+        path: 'overview',
+        loadComponent: () => import('./overview/overview.component').then(m => m.WorkspaceOverviewComponent)
+      },
+      {
+        path: 'timeline',
+        loadComponent: () => import('./timeline/timeline.component').then(m => m.WorkspaceTimelineComponent)
+      },
+      {
+        path: 'memos',
+        loadComponent: () => import('./memos/memos.component').then(m => m.WorkspaceMemosComponent)
+      },
+      {
+        path: 'inspection',
+        loadComponent: () => import('./inspection/inspection.component').then(m => m.WorkspaceInspectionComponent)
+      },
+      {
+        path: 'daily-log',
+        loadComponent: () => import('./daily-log/daily-log.component').then(m => m.WorkspaceDailyLogComponent)
+      },
+      {
         path: '',
         redirectTo: 'list',
         pathMatch: 'full'
