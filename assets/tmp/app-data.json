@@ -130,6 +130,21 @@
               "i18n": "menu.delon.acl-admin"
             },
             {
+              "text": "ACL Users",
+              "link": "/delon/acl-users",
+              "i18n": "menu.delon.acl-users"
+            },
+            {
+              "text": "ACL Roles",
+              "link": "/delon/acl-roles",
+              "i18n": "menu.delon.acl-roles"
+            },
+            {
+              "text": "ACL Permissions",
+              "link": "/delon/acl-permissions",
+              "i18n": "menu.delon.acl-permissions"
+            },
+            {
               "text": "Route Guard",
               "link": "/delon/guard",
               "i18n": "menu.delon.guard"
