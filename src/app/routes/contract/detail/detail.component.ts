@@ -35,6 +35,8 @@ interface PaymentRound {
   amount: number;
   status: 'paid' | 'pending';
   date: Date;
+  paymentStatus: 'draft' | 'submitted' | 'reviewing' | 'invoiced' | 'completed';
+  progress: number;
 }
 
 interface ContractChange {
@@ -87,8 +89,11 @@ interface ContractChange {
             <tr>
               <th>輪次</th>
               <th>金額</th>
-              <th>狀態</th>
+              <th>進度</th>
+              <th>請款狀態</th>
+              <th>付款狀態</th>
               <th>日期</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody>
@@ -96,11 +101,31 @@ interface ContractChange {
               <td>{{ payment.round }}</td>
               <td>{{ payment.amount | currency: 'TWD' : 'symbol' : '1.0-0' }}</td>
               <td>
+                <nz-progress [nzPercent]="payment.progress" [nzSize]="'small'" [nzShowInfo]="false"> </nz-progress>
+                <span style="font-size: 12px; color: #666;">{{ payment.progress }}%</span>
+              </td>
+              <td>
+                <nz-tag [nzColor]="getPaymentStatusColor(payment.paymentStatus)">
+                  {{ getPaymentStatusText(payment.paymentStatus) }}
+                </nz-tag>
+              </td>
+              <td>
                 <nz-tag [nzColor]="payment.status === 'paid' ? 'success' : 'processing'">
                   {{ payment.status === 'paid' ? '已付款' : '待付款' }}
                 </nz-tag>
               </td>
               <td>{{ payment.date | date: 'yyyy-MM-dd' }}</td>
+              <td>
+                <button
+                  nz-button
+                  nzType="primary"
+                  nzSize="small"
+                  (click)="managePayment(payment)"
+                  [disabled]="payment.paymentStatus === 'completed'"
+                >
+                  請款管理
+                </button>
+              </td>
             </tr>
           </tbody>
         </nz-table>
@@ -223,5 +248,46 @@ export class ContractDetailComponent implements OnInit {
   addChange(): void {
     // 追加追減功能
     this.router.navigate(['/contract/change', this.contract?.id]);
+  }
+
+  getPaymentStatusColor(status?: string): string {
+    switch (status) {
+      case 'draft':
+        return 'default';
+      case 'submitted':
+        return 'processing';
+      case 'reviewing':
+        return 'warning';
+      case 'invoiced':
+        return 'blue';
+      case 'completed':
+        return 'success';
+      default:
+        return 'default';
+    }
+  }
+
+  getPaymentStatusText(status?: string): string {
+    switch (status) {
+      case 'draft':
+        return '草稿';
+      case 'submitted':
+        return '送出';
+      case 'reviewing':
+        return '審查';
+      case 'invoiced':
+        return '開票';
+      case 'completed':
+        return '完成';
+      default:
+        return '未知';
+    }
+  }
+
+  managePayment(payment: PaymentRound): void {
+    // 請款管理功能
+    this.router.navigate(['/contract/payment', this.contract?.id], {
+      queryParams: { round: payment.round }
+    });
   }
 }

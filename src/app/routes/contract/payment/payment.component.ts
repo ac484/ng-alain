@@ -11,6 +11,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { HttpClient } from '@angular/common/http';
 
@@ -19,6 +21,8 @@ interface PaymentRound {
   amount: number;
   status: 'paid' | 'pending';
   date: Date;
+  paymentStatus: 'draft' | 'submitted' | 'reviewing' | 'invoiced' | 'completed';
+  progress: number;
 }
 
 @Component({
@@ -35,7 +39,9 @@ interface PaymentRound {
     NzButtonModule,
     NzCardModule,
     NzTableModule,
-    NzTagModule
+    NzTagModule,
+    NzProgressModule,
+    NzSpaceModule
   ],
   template: `
     <nz-card title="合約請款">
@@ -56,7 +62,9 @@ interface PaymentRound {
             <tr>
               <th>輪次</th>
               <th>金額</th>
-              <th>狀態</th>
+              <th>進度</th>
+              <th>請款狀態</th>
+              <th>付款狀態</th>
               <th>日期</th>
               <th>操作</th>
             </tr>
@@ -66,15 +74,59 @@ interface PaymentRound {
               <td>{{ payment.round }}</td>
               <td>{{ payment.amount | currency: 'TWD' : 'symbol' : '1.0-0' }}</td>
               <td>
+                <nz-progress [nzPercent]="payment.progress" [nzSize]="'small'" [nzShowInfo]="false"> </nz-progress>
+                <span style="font-size: 12px; color: #666;">{{ payment.progress }}%</span>
+              </td>
+              <td>
+                <nz-tag [nzColor]="getPaymentStatusColor(payment.paymentStatus)">
+                  {{ getPaymentStatusText(payment.paymentStatus) }}
+                </nz-tag>
+              </td>
+              <td>
                 <nz-tag [nzColor]="payment.status === 'paid' ? 'success' : 'processing'">
                   {{ payment.status === 'paid' ? '已付款' : '待付款' }}
                 </nz-tag>
               </td>
               <td>{{ payment.date | date: 'yyyy-MM-dd' }}</td>
               <td>
-                <button nz-button nzType="primary" nzSize="small" (click)="requestPayment(payment)" [disabled]="payment.status === 'paid'">
-                  請款
-                </button>
+                <nz-space>
+                  <button
+                    nz-button
+                    nzType="primary"
+                    nzSize="small"
+                    (click)="updatePaymentStatus(payment, 'submitted')"
+                    [disabled]="payment.paymentStatus !== 'draft'"
+                  >
+                    送出
+                  </button>
+                  <button
+                    nz-button
+                    nzType="default"
+                    nzSize="small"
+                    (click)="updatePaymentStatus(payment, 'reviewing')"
+                    [disabled]="payment.paymentStatus !== 'submitted'"
+                  >
+                    審查
+                  </button>
+                  <button
+                    nz-button
+                    nzType="default"
+                    nzSize="small"
+                    (click)="updatePaymentStatus(payment, 'invoiced')"
+                    [disabled]="payment.paymentStatus !== 'reviewing'"
+                  >
+                    開票
+                  </button>
+                  <button
+                    nz-button
+                    nzType="default"
+                    nzSize="small"
+                    (click)="updatePaymentStatus(payment, 'completed')"
+                    [disabled]="payment.paymentStatus !== 'invoiced'"
+                  >
+                    完成
+                  </button>
+                </nz-space>
               </td>
             </tr>
           </tbody>
@@ -190,5 +242,52 @@ export class ContractPaymentComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/contract/detail', this.contractId]);
+  }
+
+  getPaymentStatusColor(status?: string): string {
+    switch (status) {
+      case 'draft':
+        return 'default';
+      case 'submitted':
+        return 'processing';
+      case 'reviewing':
+        return 'warning';
+      case 'invoiced':
+        return 'blue';
+      case 'completed':
+        return 'success';
+      default:
+        return 'default';
+    }
+  }
+
+  getPaymentStatusText(status?: string): string {
+    switch (status) {
+      case 'draft':
+        return '草稿';
+      case 'submitted':
+        return '送出';
+      case 'reviewing':
+        return '審查';
+      case 'invoiced':
+        return '開票';
+      case 'completed':
+        return '完成';
+      default:
+        return '未知';
+    }
+  }
+
+  updatePaymentStatus(payment: PaymentRound, newStatus: string): void {
+    // 使用 Mock API 更新請款狀態
+    this.http
+      .post(`/contract/${this.contractId}/payment-status`, {
+        round: payment.round,
+        status: newStatus
+      })
+      .subscribe(() => {
+        this.message.success(`請款狀態已更新為：${this.getPaymentStatusText(newStatus)}`);
+        this.loadContractData();
+      });
   }
 }

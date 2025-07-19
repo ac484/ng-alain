@@ -35,9 +35,30 @@ const contracts: any[] = [
     changeVersion: '1.1',
     progress: 75,
     paymentRounds: [
-      { round: 1, amount: 15000, status: 'paid', date: new Date('2024-02-15') },
-      { round: 2, amount: 20000, status: 'pending', date: new Date('2024-04-15') },
-      { round: 3, amount: 20000, status: 'pending', date: new Date('2024-06-15') }
+      {
+        round: 1,
+        amount: 10000,
+        status: 'paid',
+        date: new Date('2024-02-15'),
+        paymentStatus: 'completed',
+        progress: 10
+      },
+      {
+        round: 2,
+        amount: 20000,
+        status: 'pending',
+        date: new Date('2024-04-15'),
+        paymentStatus: 'draft',
+        progress: 20
+      },
+      {
+        round: 3,
+        amount: 20000,
+        status: 'pending',
+        date: new Date('2024-06-15'),
+        paymentStatus: 'draft',
+        progress: 20
+      }
     ],
     changes: [
       {
@@ -70,9 +91,30 @@ const contracts: any[] = [
     changeVersion: '1.0',
     progress: 0,
     paymentRounds: [
-      { round: 1, amount: 10000, status: 'pending', date: new Date('2024-03-01') },
-      { round: 2, amount: 10000, status: 'pending', date: new Date('2024-06-01') },
-      { round: 3, amount: 10000, status: 'pending', date: new Date('2024-12-31') }
+      {
+        round: 1,
+        amount: 10000,
+        status: 'pending',
+        date: new Date('2024-03-01'),
+        paymentStatus: 'draft',
+        progress: 33.33
+      },
+      {
+        round: 2,
+        amount: 10000,
+        status: 'pending',
+        date: new Date('2024-06-01'),
+        paymentStatus: 'draft',
+        progress: 33.33
+      },
+      {
+        round: 3,
+        amount: 10000,
+        status: 'pending',
+        date: new Date('2024-12-31'),
+        paymentStatus: 'draft',
+        progress: 33.34
+      }
     ],
     changes: []
   },
@@ -96,9 +138,30 @@ const contracts: any[] = [
     changeVersion: '1.0',
     progress: 0,
     paymentRounds: [
-      { round: 1, amount: 25000, status: 'pending', date: new Date('2024-04-01') },
-      { round: 2, amount: 25000, status: 'pending', date: new Date('2024-06-01') },
-      { round: 3, amount: 30000, status: 'pending', date: new Date('2024-08-31') }
+      {
+        round: 1,
+        amount: 25000,
+        status: 'pending',
+        date: new Date('2024-04-01'),
+        paymentStatus: 'draft',
+        progress: 31.25
+      },
+      {
+        round: 2,
+        amount: 25000,
+        status: 'pending',
+        date: new Date('2024-06-01'),
+        paymentStatus: 'draft',
+        progress: 31.25
+      },
+      {
+        round: 3,
+        amount: 30000,
+        status: 'pending',
+        date: new Date('2024-08-31'),
+        paymentStatus: 'draft',
+        progress: 37.5
+      }
     ],
     changes: []
   },
@@ -122,9 +185,30 @@ const contracts: any[] = [
     changeVersion: '1.0',
     progress: 0,
     paymentRounds: [
-      { round: 1, amount: 15000, status: 'pending', date: new Date('2024-03-15') },
-      { round: 2, amount: 15000, status: 'pending', date: new Date('2024-04-15') },
-      { round: 3, amount: 15000, status: 'pending', date: new Date('2024-05-15') }
+      {
+        round: 1,
+        amount: 15000,
+        status: 'pending',
+        date: new Date('2024-03-15'),
+        paymentStatus: 'draft',
+        progress: 33.33
+      },
+      {
+        round: 2,
+        amount: 15000,
+        status: 'pending',
+        date: new Date('2024-04-15'),
+        paymentStatus: 'draft',
+        progress: 33.33
+      },
+      {
+        round: 3,
+        amount: 15000,
+        status: 'pending',
+        date: new Date('2024-05-15'),
+        paymentStatus: 'draft',
+        progress: 33.34
+      }
     ],
     changes: []
   }
@@ -242,6 +326,24 @@ export const CONTRACTS = {
       if (paymentRound) {
         paymentRound.status = 'paid';
         paymentRound.date = new Date(req.body.date);
+      }
+    }
+    return { msg: 'ok' };
+  },
+
+  // 請款狀態更新
+  'POST /contract/:id/payment-status': (req: MockRequest) => {
+    const contract = getContract(req.params.id);
+    if (contract) {
+      const round = req.body.round;
+      const newStatus = req.body.status;
+      const paymentRound = contract.paymentRounds.find((p: any) => p.round === round);
+      if (paymentRound) {
+        paymentRound.paymentStatus = newStatus;
+        // 如果狀態是完成，則更新付款狀態
+        if (newStatus === 'completed') {
+          paymentRound.status = 'paid';
+        }
       }
     }
     return { msg: 'ok' };

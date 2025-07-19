@@ -109,8 +109,24 @@ export class ContractCreateComponent {
     if (this.contractForm.valid) {
       const formValue = this.contractForm.value;
 
+      // 計算請款輪次和進度
+      const totalAmount = formValue.amount;
+      const paymentRounds = this.calculatePaymentRounds(totalAmount);
+
+      const contractData = {
+        ...formValue,
+        originalAmount: totalAmount,
+        currentAmount: totalAmount,
+        changeAmount: 0,
+        version: '1.0',
+        changeVersion: '1.0',
+        progress: 0,
+        paymentRounds: paymentRounds,
+        changes: []
+      };
+
       // 使用 Mock API 創建合約
-      this.http.post('/contract', formValue).subscribe((result: any) => {
+      this.http.post('/contract', contractData).subscribe((result: any) => {
         this.message.success('合約創建成功');
         this.router.navigate(['/contract/list']);
       });
@@ -121,6 +137,31 @@ export class ContractCreateComponent {
         }
       });
     }
+  }
+
+  calculatePaymentRounds(totalAmount: number): any[] {
+    // 根據總金額計算請款輪次
+    const rounds: any[] = [];
+    const roundCount = Math.ceil(totalAmount / 50000); // 每5萬一輪
+
+    for (let i = 1; i <= roundCount; i++) {
+      const isLastRound = i === roundCount;
+      const roundAmount: number = isLastRound
+        ? totalAmount - rounds.reduce((sum: number, r: any) => sum + r.amount, 0)
+        : Math.floor(totalAmount / roundCount);
+      const progress = Math.round((roundAmount / totalAmount) * 100);
+
+      rounds.push({
+        round: i,
+        amount: roundAmount,
+        status: 'pending',
+        date: new Date(Date.now() + i * 30 * 24 * 60 * 60 * 1000), // 每輪間隔30天
+        paymentStatus: 'draft',
+        progress: progress
+      });
+    }
+
+    return rounds;
   }
 
   onCancel(): void {

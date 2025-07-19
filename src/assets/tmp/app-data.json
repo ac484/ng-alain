@@ -58,6 +58,28 @@
           ]
         },
         {
+          "text": "Tree",
+          "i18n": "menu.tree",
+          "icon": "anticon-apartment",
+          "children": [
+            {
+              "text": "Tree List",
+              "link": "/tree/list",
+              "i18n": "menu.tree.list"
+            },
+            {
+              "text": "Create Tree",
+              "link": "/tree/create",
+              "i18n": "menu.tree.create"
+            },
+            {
+              "text": "Tree Settings",
+              "link": "/tree/settings",
+              "i18n": "menu.tree.settings"
+            }
+          ]
+        },
+        {
           "text": "Workspace",
           "i18n": "menu.workspace",
           "icon": "anticon-team",
