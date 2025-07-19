@@ -24,6 +24,14 @@ export default [
         loadComponent: () => import('./settings/settings.component').then(m => m.TreeSettingsComponent)
       },
       {
+        path: 'drag',
+        loadComponent: () => import('./drag/drag.component').then(m => m.TreeDragComponent)
+      },
+      {
+        path: 'context',
+        loadComponent: () => import('./context/context.component').then(m => m.TreeContextComponent)
+      },
+      {
         path: '',
         redirectTo: 'list',
         pathMatch: 'full'
