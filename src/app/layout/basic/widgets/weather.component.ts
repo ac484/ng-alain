@@ -1,19 +1,16 @@
 /**
- * NG-ALAIN OpenWeatherMap 天氣元件
- *
- * 功能：顯示當前天氣資訊
- * 位置：Header 工具列
- * API：OpenWeatherMap (75d07b2345362f4603a113aee9c6747c)
+ * NG-ALAIN 天氣元件 - 極簡版本
+ * 使用 OpenWeatherMap 免費 API
  */
 
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { catchError, of } from 'rxjs';
+import { catchError, of, timeout, retry } from 'rxjs';
 
 interface WeatherData {
   main: {
@@ -35,7 +32,7 @@ interface WeatherData {
 @Component({
   selector: 'header-weather',
   template: `
-    <div nz-dropdown [nzDropdownMenu]="weatherMenu" nzTrigger="click" (nzVisibleChange)="onVisibleChange()">
+    <div nz-dropdown [nzDropdownMenu]="weatherMenu" nzTrigger="click">
       <div class="alain-default__nav-item">
         @if (loading) {
           <nz-spin nzSize="small"></nz-spin>
@@ -58,7 +55,7 @@ interface WeatherData {
             <div class="d-flex justify-content-between">
               <div>
                 <i nz-icon nzType="thermometer"></i>
-                <span>體感溫度: {{ Math.round(weatherData.main.feels_like) }}°C</span>
+                <span>體感: {{ Math.round(weatherData.main.feels_like) }}°C</span>
               </div>
               <div>
                 <i nz-icon nzType="cloud"></i>
@@ -69,7 +66,7 @@ interface WeatherData {
         } @else {
           <div class="p-md text-center">
             <i nz-icon nzType="cloud" class="text-grey"></i>
-            <div class="text-grey">無法獲取天氣資訊</div>
+            <div class="text-grey">{{ errorMessage || '無法獲取天氣' }}</div>
           </div>
         }
       </div>
@@ -137,22 +134,17 @@ export class HeaderWeatherComponent implements OnInit {
 
   weatherData: WeatherData | null = null;
   loading = false;
+  errorMessage = '';
   Math = Math;
 
   ngOnInit(): void {
     this.loadWeather();
   }
 
-  onVisibleChange(): void {
-    if (!this.weatherData) {
-      this.loadWeather();
-    }
-  }
-
   loadWeather(): void {
     this.loading = true;
+    this.errorMessage = '';
 
-    // 預設位置：台北市
     const lat = 25.033;
     const lon = 121.5654;
     const apiKey = '75d07b2345362f4603a113aee9c6747c';
@@ -161,9 +153,27 @@ export class HeaderWeatherComponent implements OnInit {
     this.http
       .get<WeatherData>(url)
       .pipe(
-        catchError(error => {
+        timeout(10000),
+        retry({ count: 2, delay: 1000 }),
+        catchError((error: HttpErrorResponse) => {
           console.error('天氣 API 錯誤:', error);
-          this.msg.error('無法獲取天氣資訊');
+
+          let errorMsg = '無法獲取天氣資訊';
+
+          if (error.status === 0) {
+            errorMsg = '網路連接失敗';
+          } else if (error.status === 401) {
+            errorMsg = 'API 金鑰無效';
+          } else if (error.status === 404) {
+            errorMsg = '找不到天氣資料';
+          } else if (error.status === 429) {
+            errorMsg = '請求次數已達上限';
+          } else if (error.status >= 500) {
+            errorMsg = '伺服器錯誤';
+          }
+
+          this.errorMessage = errorMsg;
+          this.msg.error(errorMsg);
           return of(null);
         })
       )
