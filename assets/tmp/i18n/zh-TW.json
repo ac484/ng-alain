@@ -17,6 +17,8 @@
   "menu.tree.list": "樹狀列表",
   "menu.tree.create": "建立樹狀結構",
   "menu.tree.settings": "樹狀設定",
+  "menu.tree.drag": "拖曳",
+  "menu.tree.context": "上下文右鍵",
   "menu.workspace": "工作區",
   "menu.workspace.list": "工作區列表",
   "menu.workspace.create": "建立工作區",

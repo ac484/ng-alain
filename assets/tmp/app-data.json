@@ -76,6 +76,16 @@
               "text": "Tree Settings",
               "link": "/tree/settings",
               "i18n": "menu.tree.settings"
+            },
+            {
+              "text": "Drag",
+              "link": "/tree/drag",
+              "i18n": "menu.tree.drag"
+            },
+            {
+              "text": "Context Menu",
+              "link": "/tree/context",
+              "i18n": "menu.tree.context"
             }
           ]
         },
