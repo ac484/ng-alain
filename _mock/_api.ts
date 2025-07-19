@@ -1,3 +1,16 @@
+/**
+ * NG-ALAIN Mock API 資料服務
+ *
+ * 此檔案提供：
+ * - 通用 API 列表的 Mock 資料
+ * - 通知和活動的 Mock API
+ * - 專案和團隊的 Mock 資料
+ * - 用於儀表板和列表頁面的資料
+ *
+ * 用於開發環境的 API 模擬
+ * 基於 @delon/mock 框架
+ */
+
 import { MockRequest, MockStatusError } from '@delon/mock';
 
 // region: mock data

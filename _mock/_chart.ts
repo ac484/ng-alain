@@ -1,3 +1,16 @@
+/**
+ * NG-ALAIN Mock 圖表資料服務
+ *
+ * 此檔案提供：
+ * - 訪問量統計的 Mock 資料
+ * - 銷售數據的 Mock API
+ * - 雷達圖和離線數據的 Mock 資料
+ * - 用於圖表元件的測試資料
+ *
+ * 用於開發環境的圖表資料模擬
+ * 基於 @delon/mock 和 mockjs 框架
+ */
+
 import { format } from 'date-fns';
 import * as Mock from 'mockjs';
 

@@ -1,3 +1,15 @@
+/**
+ * 基本個人資料頁面元件
+ *
+ * 此元件負責：
+ * - 顯示用戶的基本個人資料
+ * - 展示商品和進度追蹤資訊
+ * - 提供表格形式的資料展示
+ * - 支援資料統計和計算
+ *
+ * 基於 ng-alain 20.0.0 框架的個人資料元件
+ */
+
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { STColumn } from '@delon/abc/st';
 import { _HttpClient } from '@delon/theme';

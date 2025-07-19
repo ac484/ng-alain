@@ -1,3 +1,16 @@
+/**
+ * NG-ALAIN Mock POI 資料服務
+ *
+ * 此檔案提供：
+ * - 興趣點 (POI) 的 Mock 資料
+ * - 商家和地點的 Mock API
+ * - 地理位置相關的測試資料
+ * - 用於地圖和位置服務的資料
+ *
+ * 用於開發環境的 POI 資料模擬
+ * 基於 @delon/mock 框架
+ */
+
 export const POIS = {
   '/pois': {
     total: 2,

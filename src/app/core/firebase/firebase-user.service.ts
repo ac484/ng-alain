@@ -6,7 +6,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from '@angular/fire/firestore';
 import { User } from '@angular/fire/auth';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -82,6 +82,36 @@ export class FirebaseUserService {
           } as UserProfile;
         }
         return null;
+      })
+    );
+  }
+
+  /**
+   * 獲取所有用戶資料
+   */
+  getAllUsers(): Observable<UserProfile[]> {
+    const usersRef = collection(this.firestore, 'acl_users');
+    return from(getDocs(usersRef)).pipe(
+      map(querySnapshot => {
+        const users: UserProfile[] = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          users.push({
+            uid: data['uid'],
+            email: data['email'],
+            displayName: data['displayName'],
+            photoURL: data['photoURL'],
+            emailVerified: data['emailVerified'],
+            role: data['roles']?.[0] || 'user',
+            permissions: data['permissions'] || ['dashboard'],
+            createdAt: data['createdAt'],
+            updatedAt: data['updatedAt'],
+            lastLoginAt: data['lastLoginAt'],
+            loginMethod: data['loginMethod'],
+            isActive: data['isActive']
+          } as UserProfile);
+        });
+        return users;
       })
     );
   }

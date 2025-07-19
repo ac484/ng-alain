@@ -1,3 +1,16 @@
+/**
+ * NG-ALAIN Mock 規則資料服務
+ *
+ * 此檔案提供：
+ * - 規則列表的 Mock 資料
+ * - 規則的增刪改查 Mock API
+ * - 支援排序和篩選的資料處理
+ * - 用於表格和列表頁面的測試資料
+ *
+ * 用於開發環境的規則資料模擬
+ * 基於 @delon/mock 框架
+ */
+
 import { MockRequest } from '@delon/mock';
 
 const list: any[] = [];

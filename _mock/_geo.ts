@@ -1,3 +1,16 @@
+/**
+ * NG-ALAIN Mock 地理資料服務
+ *
+ * 此檔案提供：
+ * - 省市區的地理資料 Mock API
+ * - 用於地址選擇器的資料
+ * - 支援省級和市級資料查詢
+ * - 用於表單和篩選的地理資料
+ *
+ * 用於開發環境的地理資料模擬
+ * 基於 @delon/mock 框架
+ */
+
 import { MockRequest } from '@delon/mock';
 
 const DATA = [

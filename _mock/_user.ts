@@ -1,3 +1,16 @@
+/**
+ * NG-ALAIN Mock 用戶資料服務
+ *
+ * 此檔案提供：
+ * - 用戶列表的 Mock 資料
+ * - 用戶認證的 Mock API
+ * - 用戶權限的 Mock 資料
+ * - 支援 Firebase 認證的 Mock 邏輯
+ *
+ * 用於開發環境的 API 模擬
+ * 基於 @delon/mock 框架
+ */
+
 import { MockRequest } from '@delon/mock';
 
 const list: any[] = [];
