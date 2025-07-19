@@ -66,6 +66,8 @@ import { Observable, zip, catchError, map, of } from 'rxjs';
 import { I18NService } from '../i18n/i18n.service';
 import { Auth, User, onAuthStateChanged } from '@angular/fire/auth';
 import { FirebaseUserService } from '../firebase/firebase-user.service';
+import { FirebaseACLService } from '../firebase/firebase-acl.service';
+import { FirebaseACLInitService } from '../firebase/firebase-acl-init.service';
 
 /**
  * 應用程式啟動提供者
@@ -115,6 +117,8 @@ export class StartupService {
   // 注入 Firebase 認證服務
   private auth = inject(Auth); // Firebase 認證服務
   private firebaseUserService = inject(FirebaseUserService); // Firebase 用戶資料服務
+  private firebaseACLService = inject(FirebaseACLService); // Firebase ACL 服務
+  private firebaseACLInitService = inject(FirebaseACLInitService); // Firebase ACL 初始化服務
 
   /**
    * 載入應用程式啟動資料
@@ -159,10 +163,11 @@ export class StartupService {
 
     console.log('StartupService: 檢查 token:', hasValidToken ? '有效' : '無效');
 
-    // 並行載入語言包資料和應用程式配置
+    // 並行載入語言包資料、應用程式配置和初始化 ACL
     return zip(
       this.i18n.loadLangData(defaultLang), // 載入語言包資料
       this.httpClient.get('./assets/tmp/app-data.json'), // 載入應用程式配置
+      this.firebaseACLInitService.initializeACL(), // 初始化 ACL 資料
       // 如果有有效 token，獲取 Firebase 用戶資訊
       hasValidToken ? this.getFirebaseUser() : of(null)
     ).pipe(
@@ -174,7 +179,7 @@ export class StartupService {
         return [];
       }),
       // 處理載入成功的資料
-      map(([langData, appData, firebaseUser]: [Record<string, string>, NzSafeAny, any]) => {
+      map(([langData, appData, , firebaseUser]: [Record<string, string>, NzSafeAny, void, any]) => {
         // 1. 設定語言資料到 i18n 服務
         this.i18n.use(defaultLang, langData);
 
@@ -195,14 +200,11 @@ export class StartupService {
           this.settingService.setUser(appData.user);
         }
 
-        // 4. ACL：根據用戶權限設定
-        if (firebaseUser && firebaseUser.permissions) {
-          console.log('StartupService: 設定用戶權限:', firebaseUser.permissions);
-          this.aclService.setRole(firebaseUser.role || 'user');
-          this.aclService.setAbility(firebaseUser.permissions);
-        } else {
-          console.log('StartupService: 設定全量權限 (開發模式)');
-          this.aclService.setFull(true);
+        // 4. ACL：Firebase ACL 服務會自動處理權限設定
+        // 如果沒有用戶，設定預設權限
+        if (!firebaseUser) {
+          console.log('StartupService: 設定訪客權限');
+          this.aclService.set({ role: ['guest'], ability: ['dashboard:read'] });
         }
 
         // 5. 初始化選單資料

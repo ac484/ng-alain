@@ -17,7 +17,8 @@ export interface UserProfile {
   displayName: string | null;
   photoURL: string | null;
   emailVerified: boolean;
-  role: string;
+  role: string; // 保持向後相容，實際使用 roles[0]
+  roles?: string[]; // 新增多角色支援
   permissions: string[];
   createdAt?: any;
   updatedAt?: any;
@@ -36,7 +37,7 @@ export class FirebaseUserService {
    * 儲存或更新用戶資料
    */
   saveUser(user: User, loginMethod: 'email' | 'google' | 'anonymous'): Observable<void> {
-    const userRef = doc(this.firestore, 'users', user.uid);
+    const userRef = doc(this.firestore, 'acl_users', user.uid);
     const now = serverTimestamp();
 
     const userData = {
@@ -45,7 +46,7 @@ export class FirebaseUserService {
       displayName: user.displayName,
       photoURL: user.photoURL,
       emailVerified: user.emailVerified,
-      role: 'user',
+      roles: ['user'],
       permissions: ['dashboard'],
       lastLoginAt: now,
       updatedAt: now,
@@ -60,7 +61,7 @@ export class FirebaseUserService {
    * 獲取用戶資料
    */
   getUserProfile(uid: string): Observable<UserProfile | null> {
-    const userRef = doc(this.firestore, 'users', uid);
+    const userRef = doc(this.firestore, 'acl_users', uid);
     return from(getDoc(userRef)).pipe(
       map(userDoc => {
         if (userDoc.exists()) {
@@ -71,7 +72,7 @@ export class FirebaseUserService {
             displayName: data['displayName'],
             photoURL: data['photoURL'],
             emailVerified: data['emailVerified'],
-            role: data['role'] || 'user',
+            role: data['roles']?.[0] || 'user', // 保持向後相容
             permissions: data['permissions'] || ['dashboard'],
             createdAt: data['createdAt'],
             updatedAt: data['updatedAt'],
@@ -89,7 +90,7 @@ export class FirebaseUserService {
    * 更新用戶資料
    */
   updateUserProfile(uid: string, updates: Partial<UserProfile>): Observable<void> {
-    const userRef = doc(this.firestore, 'users', uid);
+    const userRef = doc(this.firestore, 'acl_users', uid);
     const updateData = {
       ...updates,
       updatedAt: serverTimestamp()

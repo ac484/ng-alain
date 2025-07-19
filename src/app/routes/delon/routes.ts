@@ -9,6 +9,7 @@ import { Routes } from '@angular/router';
 import { aclCanActivate } from '@delon/acl';
 
 import { ACLComponent } from './acl/acl.component';
+import { ACLAdminComponent } from './acl-admin/acl-admin.component';
 import { CacheComponent } from './cache/cache.component';
 import { DownFileComponent } from './downfile/downfile.component';
 import { DelonFormComponent } from './form/form.component';
@@ -29,6 +30,12 @@ export const routes: Routes = [
   { path: 'util', component: UtilComponent },
   { path: 'print', component: PrintComponent },
   { path: 'acl', component: ACLComponent },
+  {
+    path: 'acl-admin',
+    component: ACLAdminComponent,
+    canActivate: [aclCanActivate],
+    data: { guard: 'admin' }
+  },
   {
     path: 'guard',
     component: GuardComponent,
