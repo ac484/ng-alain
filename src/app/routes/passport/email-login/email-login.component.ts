@@ -9,8 +9,10 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { FirebaseAuthService } from '../../../core/auth/firebase-auth.service';
 import { StartupService } from '@core';
+import { EmailLoginModalComponent } from './email-login-modal.component';
 
 @Component({
   selector: 'app-email-login',
@@ -22,6 +24,7 @@ import { StartupService } from '@core';
 export class EmailLoginComponent {
   private readonly router = inject(Router);
   private readonly message = inject(NzMessageService);
+  private readonly modalService = inject(NzModalService);
   private readonly firebaseAuth = inject(FirebaseAuthService);
   private readonly startupService = inject(StartupService);
 
@@ -31,11 +34,21 @@ export class EmailLoginComponent {
     this.loading = true;
 
     try {
-      // 這裡可以彈出郵箱輸入框或導航到郵箱登入頁面
-      this.message.info('郵箱登入功能開發中...');
+      const modalRef = this.modalService.create({
+        nzTitle: '郵箱登入/註冊',
+        nzContent: EmailLoginModalComponent,
+        nzWidth: 400,
+        nzFooter: null,
+        nzClosable: true,
+        nzMaskClosable: false
+      });
 
-      // 示例：導航到郵箱登入頁面
-      // this.router.navigateByUrl('/passport/email-login-form');
+      modalRef.afterClose.subscribe(result => {
+        if (result) {
+          // 用戶成功登入或註冊
+          this.message.success('操作成功！');
+        }
+      });
     } catch (error) {
       console.error('郵箱登入失敗:', error);
       this.message.error('登入失敗，請稍後再試');

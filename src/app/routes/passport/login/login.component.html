@@ -75,7 +75,7 @@
   <i nz-tooltip nzTooltipTitle="in fact Github via redirect" (click)="open('github')" nz-icon nzType="taobao-circle"
     class="icon"></i>
   <i (click)="open('weibo', 'window')" nz-icon nzType="weibo-circle" class="icon"></i>
-  <nz-icon nzType="google" nzTheme="outline" class="icon"></nz-icon>
+  <nz-icon nzType="google" nzTheme="outline" class="icon" (click)="loginWithGoogle()"></nz-icon>
   <app-anonymous-login></app-anonymous-login>
   <app-email-login></app-email-login>
   <a class="register" routerLink="/passport/register">{{ 'app.login.signup' | i18n }}</a>

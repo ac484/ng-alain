@@ -10,12 +10,15 @@ import {
   Auth,
   User,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
   signInAnonymously,
   signOut,
   onAuthStateChanged,
-  UserCredential
+  UserCredential,
+  sendEmailVerification,
+  sendPasswordResetEmail
 } from '@angular/fire/auth';
 import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
 import { _HttpClient } from '@delon/theme';
@@ -47,6 +50,25 @@ export class FirebaseAuthService {
     return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(
       switchMap((credential: UserCredential) => this.getUserWithPermissions(credential.user))
     );
+  }
+
+  /**
+   * 使用 Email/Password 註冊
+   */
+  registerWithEmail(email: string, password: string): Observable<FirebaseUser> {
+    return from(createUserWithEmailAndPassword(this.auth, email, password)).pipe(
+      switchMap((credential: UserCredential) => {
+        // 發送郵箱驗證
+        return from(sendEmailVerification(credential.user)).pipe(switchMap(() => this.getUserWithPermissions(credential.user)));
+      })
+    );
+  }
+
+  /**
+   * 發送密碼重置郵箱
+   */
+  sendPasswordReset(email: string): Observable<void> {
+    return from(sendPasswordResetEmail(this.auth, email));
   }
 
   /**

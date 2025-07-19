@@ -25,6 +25,7 @@ import { NzTabChangeEvent, NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { AnonymousLoginComponent } from '../anonymous-login/anonymous-login.component';
 import { EmailLoginComponent } from '../email-login/email-login.component';
+import { FirebaseAuthService } from '../../../core/auth/firebase-auth.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -58,6 +59,7 @@ export class UserLoginComponent implements OnDestroy {
   private readonly startupSrv = inject(StartupService);
   private readonly http = inject(_HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly firebaseAuth = inject(FirebaseAuthService);
 
   form = inject(FormBuilder).nonNullable.group({
     userName: ['', [Validators.required, Validators.pattern(/^(admin|user)$/)]],
@@ -197,6 +199,27 @@ export class UserLoginComponent implements OnDestroy {
       this.socialService.login(url, '/', {
         type: 'href'
       });
+    }
+  }
+
+  async loginWithGoogle(): Promise<void> {
+    try {
+      const user = await this.firebaseAuth.loginWithGoogle().toPromise();
+      if (user) {
+        // 清空路由复用信息
+        this.reuseTabService?.clear();
+
+        // 重新获取 StartupService 内容
+        this.startupSrv.load().subscribe(() => {
+          let url = this.tokenService.referrer!.url || '/';
+          if (url.includes('/passport')) {
+            url = '/';
+          }
+          this.router.navigateByUrl(url);
+        });
+      }
+    } catch (error) {
+      console.error('Google 登入失敗:', error);
     }
   }
 
