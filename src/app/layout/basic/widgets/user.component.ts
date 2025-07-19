@@ -5,7 +5,6 @@
  * 位置：Header 工具列
  * 選項：個人中心、設定、登出
  */
-
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DA_SERVICE_TOKEN } from '@delon/auth';
@@ -14,9 +13,6 @@ import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { FirebaseAuthService } from '../../../core/auth/firebase-auth.service';
-import { StartupService } from '@core';
 
 @Component({
   selector: 'header-user',
@@ -54,35 +50,12 @@ export class HeaderUserComponent {
   private readonly settings = inject(SettingsService);
   private readonly router = inject(Router);
   private readonly tokenService = inject(DA_SERVICE_TOKEN);
-  private readonly message = inject(NzMessageService);
-  private readonly firebaseAuth = inject(FirebaseAuthService);
-  private readonly startupService = inject(StartupService);
-
   get user(): User {
     return this.settings.user;
   }
 
-  async logout(): Promise<void> {
-    try {
-      // 使用 Firebase 登出
-      await this.firebaseAuth.logout().toPromise();
-
-      // 清空 ng-alain token
-      this.tokenService.clear();
-
-      this.message.success('登出成功！');
-
-      // 重新載入啟動服務
-      this.startupService.load().subscribe(() => {
-        this.router.navigateByUrl(this.tokenService.login_url!);
-      });
-    } catch (error) {
-      console.error('登出失敗:', error);
-      this.message.error('登出失敗，請稍後再試');
-
-      // 即使 Firebase 登出失敗，也要清空本地 token
-      this.tokenService.clear();
-      this.router.navigateByUrl(this.tokenService.login_url!);
-    }
+  logout(): void {
+    this.tokenService.clear();
+    this.router.navigateByUrl(this.tokenService.login_url!);
   }
 }

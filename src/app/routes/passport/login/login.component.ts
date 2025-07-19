@@ -202,19 +202,39 @@ export class UserLoginComponent implements OnDestroy {
     }
   }
 
+  /**
+   * Google 登入處理
+   *
+   * 功能：
+   * - 使用 Firebase Google 認證
+   * - 透過 @delon/auth 標準流程設定 token
+   * - 重新載入啟動服務
+   * - 導航到適當頁面
+   */
   async loginWithGoogle(): Promise<void> {
     try {
+      console.log('開始 Google 登入...');
+
+      // 使用 Firebase 認證服務（已整合 @delon/auth）
       const user = await this.firebaseAuth.loginWithGoogle().toPromise();
+
       if (user) {
+        console.log('Google 登入成功，用戶:', user);
+
         // 清空路由复用信息
         this.reuseTabService?.clear();
 
         // 重新获取 StartupService 内容
         this.startupSrv.load().subscribe(() => {
-          let url = this.tokenService.referrer!.url || '/';
+          console.log('啟動服務重新載入完成');
+
+          // 導航到適當頁面
+          let url = this.tokenService.referrer?.url || '/';
           if (url.includes('/passport')) {
             url = '/';
           }
+
+          console.log('導航到:', url);
           this.router.navigateByUrl(url);
         });
       }

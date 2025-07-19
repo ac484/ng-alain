@@ -58,11 +58,13 @@ import { HttpClient } from '@angular/common/http';
 import { EnvironmentProviders, Injectable, Provider, inject, provideAppInitializer } from '@angular/core';
 import { Router } from '@angular/router';
 import { ACLService } from '@delon/acl';
+import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
 import { ALAIN_I18N_TOKEN, MenuService, SettingsService, TitleService } from '@delon/theme';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
-import { Observable, zip, catchError, map } from 'rxjs';
+import { Observable, zip, catchError, map, of } from 'rxjs';
 
 import { I18NService } from '../i18n/i18n.service';
+import { FirebaseAuthService } from '../auth/firebase-auth.service';
 
 /**
  * 應用程式啟動提供者
@@ -100,6 +102,7 @@ export class StartupService {
   private settingService = inject(SettingsService); // 應用設定服務
   private aclService = inject(ACLService); // 權限控制服務
   private titleService = inject(TitleService); // 頁面標題服務
+  private tokenService = inject(DA_SERVICE_TOKEN); // Token 服務
 
   // 注入 Angular 核心服務
   private httpClient = inject(HttpClient); // HTTP 客戶端
@@ -108,6 +111,9 @@ export class StartupService {
   // 注入國際化服務
   private i18n = inject<I18NService>(ALAIN_I18N_TOKEN); // 國際化服務
 
+  // 注入 Firebase 認證服務
+  private firebaseAuth = inject(FirebaseAuthService); // Firebase 認證服務
+
   /**
    * 載入應用程式啟動資料
    *
@@ -115,7 +121,7 @@ export class StartupService {
    * - 並行載入語言包資料和應用程式配置
    * - 設定國際化語言資料
    * - 配置應用程式基本資訊
-   * - 初始化用戶資料和權限
+   * - 初始化用戶資料和權限 (整合 Firebase 認證)
    * - 設定選單和頁面標題
    *
    * 載入流程：
@@ -123,19 +129,21 @@ export class StartupService {
    * 2. 並行請求語言包和應用配置
    * 3. 設定語言資料到 i18n 服務
    * 4. 設定應用程式資訊 (站點名、描述、年份)
-   * 5. 設定用戶資訊 (姓名、頭像、郵箱)
-   * 6. 設定 ACL 權限為全量 (開發階段)
+   * 5. 設定用戶資訊 (從 Firebase 或靜態配置)
+   * 6. 設定 ACL 權限 (根據用戶權限或全量)
    * 7. 初始化選單資料
    * 8. 設定頁面標題後綴
+   *
+   * Firebase 整合：
+   * - 檢查是否有有效的 ng-alain token
+   * - 如果有 token，從 Firebase 獲取用戶資訊
+   * - 如果沒有 token，使用靜態配置
+   * - 根據用戶權限設定 ACL
    *
    * 錯誤處理：
    * - 網路請求失敗時記錄警告日誌
    * - 延遲 1 秒後重定向到 500 錯誤頁面
    * - 返回空陣列避免應用程式崩潰
-   *
-   * 注意事項：
-   * - 如果需要匿名訪問，可以添加 ALLOW_ANONYMOUS 標記
-   * - 開發階段 ACL 設為全量，生產環境需要根據實際權限設定
    *
    * @returns Observable<void> 初始化完成的 Observable
    */
@@ -143,13 +151,18 @@ export class StartupService {
     // 獲取預設語言設定
     const defaultLang = this.i18n.defaultLang;
 
-    // 如果需要匿名訪問，可以添加 ALLOW_ANONYMOUS 標記
-    // this.httpClient.get('/app', { context: new HttpContext().set(ALLOW_ANONYMOUS, this.tokenService.get()?.token ? false : true) })
+    // 檢查是否有有效的 ng-alain token
+    const token = this.tokenService.get();
+    const hasValidToken = token && token.token;
+
+    console.log('StartupService: 檢查 token:', hasValidToken ? '有效' : '無效');
 
     // 並行載入語言包資料和應用程式配置
     return zip(
       this.i18n.loadLangData(defaultLang), // 載入語言包資料
-      this.httpClient.get('./assets/tmp/app-data.json') // 載入應用程式配置
+      this.httpClient.get('./assets/tmp/app-data.json'), // 載入應用程式配置
+      // 如果有有效 token，獲取 Firebase 用戶資訊
+      hasValidToken ? this.firebaseAuth.getCurrentUser() : of(null)
     ).pipe(
       // 錯誤處理：接收其他攔截器後產生的異常訊息
       catchError(res => {
@@ -159,18 +172,36 @@ export class StartupService {
         return [];
       }),
       // 處理載入成功的資料
-      map(([langData, appData]: [Record<string, string>, NzSafeAny]) => {
+      map(([langData, appData, firebaseUser]: [Record<string, string>, NzSafeAny, any]) => {
         // 1. 設定語言資料到 i18n 服務
         this.i18n.use(defaultLang, langData);
 
         // 2. 設定應用程式資訊：包括站點名、描述、年份
         this.settingService.setApp(appData.app);
 
-        // 3. 設定用戶資訊：包括姓名、頭像、郵箱地址
-        this.settingService.setUser(appData.user);
+        // 3. 設定用戶資訊：優先使用 Firebase 用戶資訊，否則使用靜態配置
+        if (firebaseUser) {
+          console.log('StartupService: 使用 Firebase 用戶資訊:', firebaseUser);
+          this.settingService.setUser({
+            name: firebaseUser.displayName || firebaseUser.email || 'Anonymous',
+            avatar: firebaseUser.photoURL || './assets/logo-color.svg',
+            email: firebaseUser.email || '',
+            id: firebaseUser.uid
+          });
+        } else {
+          console.log('StartupService: 使用靜態用戶配置');
+          this.settingService.setUser(appData.user);
+        }
 
-        // 4. ACL：設定權限為全量 (開發階段，生產環境需要根據實際權限設定)
-        this.aclService.setFull(true);
+        // 4. ACL：根據用戶權限設定
+        if (firebaseUser && firebaseUser.permissions) {
+          console.log('StartupService: 設定用戶權限:', firebaseUser.permissions);
+          this.aclService.setRole(firebaseUser.role || 'user');
+          this.aclService.setAbility(firebaseUser.permissions);
+        } else {
+          console.log('StartupService: 設定全量權限 (開發模式)');
+          this.aclService.setFull(true);
+        }
 
         // 5. 初始化選單資料
         this.menuService.add(appData.menu);

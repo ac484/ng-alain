@@ -102,6 +102,23 @@ export const USERS = {
   'POST /user/avatar': 'ok',
   'POST /login/account': (req: MockRequest) => {
     const data = req.body;
+
+    // 支援 Firebase 認證
+    if (data.password === 'firebase-auth') {
+      // Firebase 認證用戶，直接通過
+      return {
+        msg: 'ok',
+        user: {
+          token: data.userName, // 使用 Firebase UID 作為 token
+          name: data.userName,
+          email: data.userName.includes('@') ? data.userName : `${data.userName}@firebase.com`,
+          id: data.userName,
+          time: +new Date()
+        }
+      };
+    }
+
+    // 原有的 Mock 認證邏輯
     if (!(data.userName === 'admin' || data.userName === 'user') || data.password !== 'ng-alain.com') {
       return { msg: `Invalid username or password（admin/ng-alain.com）` };
     }
