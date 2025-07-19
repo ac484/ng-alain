@@ -32,6 +32,10 @@ export default [
         loadComponent: () => import('./context/context.component').then(m => m.TreeContextComponent)
       },
       {
+        path: 'panel',
+        loadComponent: () => import('./panel/panel.component').then(m => m.TreePanelComponent)
+      },
+      {
         path: '',
         redirectTo: 'list',
         pathMatch: 'full'
