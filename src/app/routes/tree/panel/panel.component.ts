@@ -8,6 +8,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzCheckListModule } from 'ng-zorro-antd/check-list';
 
 interface TreeNode {
   title: string;
@@ -17,10 +18,26 @@ interface TreeNode {
   icon?: string;
 }
 
+interface CheckListItem {
+  key: string;
+  description: string;
+  onClick: () => void;
+}
+
 @Component({
   selector: 'app-tree-panel',
   standalone: true,
-  imports: [CommonModule, NzCardModule, NzTreeModule, NzButtonModule, NzSpaceModule, NzIconModule, NzLayoutModule, NzCollapseModule],
+  imports: [
+    CommonModule,
+    NzCardModule,
+    NzTreeModule,
+    NzButtonModule,
+    NzSpaceModule,
+    NzIconModule,
+    NzLayoutModule,
+    NzCollapseModule,
+    NzCheckListModule
+  ],
   template: `
     <nz-card title="樹狀面板功能">
       <div style="margin-bottom: 16px;">
@@ -29,6 +46,7 @@ interface TreeNode {
           <button nz-button nzType="default" (click)="collapseAll()">收合全部</button>
           <button nz-button nzType="default" (click)="resetTree()">重置</button>
           <button nz-button nzType="dashed" (click)="togglePanel()">切換面板</button>
+          <button nz-button nzType="default" (click)="toggleCheckList()">顯示任務清單</button>
         </nz-space>
       </div>
 
@@ -86,12 +104,31 @@ interface TreeNode {
                   <li>節點詳細信息顯示</li>
                   <li>響應式佈局設計</li>
                   <li>支持展開/收合操作</li>
+                  <li>任務清單功能</li>
                 </ul>
               </div>
             </div>
           </div>
         </nz-content>
       </nz-layout>
+
+      <!-- CheckList 任務清單 -->
+      <nz-check-list
+        [nzItems]="checkListItems"
+        [nzVisible]="showCheckList"
+        [nzIndex]="1"
+        [nzProgress]="true"
+        [nzTitle]="'樹狀面板操作指南'"
+        [nzFooter]="'完成所有步驟以熟悉面板功能'"
+        (nzHide)="onCheckListHide($event)"
+      >
+        <ng-template #trigger>
+          <button nz-button nzType="primary" nzSize="small">
+            <span nz-icon nzType="check-circle"></span>
+            操作指南
+          </button>
+        </ng-template>
+      </nz-check-list>
 
       <div style="margin-top: 16px; padding: 16px; background-color: #f5f5f5; border-radius: 4px;">
         <h4>面板功能說明：</h4>
@@ -100,6 +137,7 @@ interface TreeNode {
           <li>點擊樹狀節點查看詳細信息</li>
           <li>支持展開全部/收合全部操作</li>
           <li>響應式設計，適配不同螢幕尺寸</li>
+          <li>任務清單功能幫助用戶熟悉操作流程</li>
         </ul>
       </div>
     </nz-card>
@@ -242,6 +280,49 @@ export class TreePanelComponent {
   selectedKeys: string[] = [];
   currentNode: any = null;
   isCollapsed = false;
+  showCheckList = false;
+
+  // CheckList 任務項目
+  checkListItems: CheckListItem[] = [
+    {
+      key: 'step1',
+      description: '點擊左側樹狀節點查看詳細信息',
+      onClick: () => {
+        this.message.info('請點擊左側樹狀結構中的任意節點');
+      }
+    },
+    {
+      key: 'step2',
+      description: '嘗試展開和收合樹狀節點',
+      onClick: () => {
+        this.message.info('點擊節點前的箭頭圖標來展開或收合');
+      }
+    },
+    {
+      key: 'step3',
+      description: '使用「展開全部」按鈕展開所有節點',
+      onClick: () => {
+        this.expandAll();
+        this.message.success('已展開全部節點');
+      }
+    },
+    {
+      key: 'step4',
+      description: '使用「收合全部」按鈕收合所有節點',
+      onClick: () => {
+        this.collapseAll();
+        this.message.success('已收合全部節點');
+      }
+    },
+    {
+      key: 'step5',
+      description: '嘗試折疊左側面板',
+      onClick: () => {
+        this.togglePanel();
+        this.message.info('點擊面板右上角的折疊按鈕');
+      }
+    }
+  ];
 
   constructor(private message: NzMessageService) {}
 
@@ -342,6 +423,20 @@ export class TreePanelComponent {
   togglePanel(): void {
     this.isCollapsed = !this.isCollapsed;
     this.message.info(this.isCollapsed ? '面板已收合' : '面板已展開');
+  }
+
+  toggleCheckList(): void {
+    this.showCheckList = !this.showCheckList;
+    this.message.info(this.showCheckList ? '已顯示任務清單' : '已隱藏任務清單');
+  }
+
+  onCheckListHide(hide: boolean): void {
+    this.showCheckList = false;
+    if (hide) {
+      this.message.success('任務清單已隱藏，您可以在 LocalStorage 中保存此設置');
+      // 可以在此處保存到 LocalStorage
+      localStorage.setItem('tree-panel-checklist-hidden', 'true');
+    }
   }
 
   private getAllKeys(nodes: TreeNode[]): string[] {
