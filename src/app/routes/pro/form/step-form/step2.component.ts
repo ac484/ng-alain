@@ -1,3 +1,13 @@
+/**
+ * 轉賬確認元件
+ *
+ * 此元件負責：
+ * - 顯示轉賬確認頁面
+ * - 處理支付密碼驗證
+ * - 提交轉賬請求
+ * - 支援與 Redis 快取整合的安全驗證
+ */
+
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SHARED_IMPORTS } from '@shared';

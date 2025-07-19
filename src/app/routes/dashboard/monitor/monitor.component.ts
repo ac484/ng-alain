@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 監控儀表板元件
+ *
+ * 功能：系統監控頁面
+ * 圖表：水波紋、標籤雲、圓餅圖、儀表盤
+ * 特性：即時資料更新、倒數計時
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CountDownModule } from '@delon/abc/count-down';
 import { G2GaugeModule } from '@delon/chart/gauge';

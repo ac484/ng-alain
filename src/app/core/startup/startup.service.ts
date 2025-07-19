@@ -1,3 +1,29 @@
+/**
+ * NG-ALAIN 啟動服務
+ *
+ * 此服務負責：
+ * - 應用程式啟動時的初始化工作
+ * - 載入基本資料（選單、用戶資料等）
+ * - 設定國際化語言資料
+ * - 配置應用程式資訊和用戶資訊
+ * - 初始化權限控制 (ACL)
+ * - 設定頁面標題
+ *
+ * 主要功能：
+ * - 載入語言包資料
+ * - 載入應用程式配置資料
+ * - 設定全域服務配置
+ * - 處理啟動錯誤和異常
+ * - 提供應用程式初始化器
+ *
+ * 使用場景：
+ * - 應用程式啟動時自動執行
+ * - 載入必要的全域配置
+ * - 初始化用戶會話資料
+ *
+ * 基於 ng-alain 20.0.0 框架的啟動系統
+ */
+
 import { HttpClient } from '@angular/common/http';
 import { EnvironmentProviders, Injectable, Provider, inject, provideAppInitializer } from '@angular/core';
 import { Router } from '@angular/router';

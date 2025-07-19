@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 清除本地儲存元件
+ *
+ * 功能：清除瀏覽器本地儲存資料
+ * 位置：Header 工具列
+ * 觸發：點擊確認對話框
+ */
+
 import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
 import { I18nPipe } from '@delon/theme';
 import { NzIconModule } from 'ng-zorro-antd/icon';

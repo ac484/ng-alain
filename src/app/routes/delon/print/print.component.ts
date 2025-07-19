@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 列印功能元件
+ *
+ * 功能：使用 LODOP 進行列印
+ * 支援：預覽、列印、多印表機
+ * 設定：紙張大小、印表機選擇
+ */
+
 import { Component, inject } from '@angular/core';
 import { Lodop, LodopService } from '@delon/abc/lodop';
 import { SHARED_IMPORTS } from '@shared';

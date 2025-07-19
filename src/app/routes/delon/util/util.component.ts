@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 工具函數演示元件
+ *
+ * 功能：展示 Delon 工具函數
+ * 工具：format、yuan、copy
+ * 用途：開發參考和測試
+ */
+
 import { Component, inject } from '@angular/core';
 import { copy } from '@delon/util/browser';
 import { format } from '@delon/util/format';

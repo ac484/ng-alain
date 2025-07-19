@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN ST 表格元件演示
+ *
+ * 功能：展示 ST 表格元件功能
+ * 特性：分頁、排序、篩選、操作按鈕
+ * 資料：隨機用戶資料展示
+ */
+
 import { Component, OnInit, inject } from '@angular/core';
 import { FullContentModule } from '@delon/abc/full-content';
 import { STColumn } from '@delon/abc/st';

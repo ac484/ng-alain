@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 權限控制演示元件
+ *
+ * 功能：展示 ACL 權限控制
+ * 角色：全權限、角色 A、角色 B
+ * 操作：權限切換和選單更新
+ */
+
 import { Component, inject } from '@angular/core';
 import { ACLService } from '@delon/acl';
 import { MenuService } from '@delon/theme';

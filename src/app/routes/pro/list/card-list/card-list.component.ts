@@ -18,6 +18,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [...SHARED_IMPORTS, EllipsisComponent]
 })
+// Component for displaying items in a card layout
 export class ProCardListComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   private readonly msg = inject(NzMessageService);

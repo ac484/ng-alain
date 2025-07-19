@@ -1,3 +1,32 @@
+/**
+ * NG-ALAIN Token 重新整理服務
+ *
+ * 此服務負責：
+ * - 認證 Token 的自動重新整理
+ * - 處理 401 認證失敗情況
+ * - 重新附加新的 Token 到請求
+ * - 防止重複的重新整理請求
+ * - 提供兩種重新整理方式
+ *
+ * 重新整理方式：
+ * - 方式一：使用 401 狀態碼觸發重新整理
+ * - 方式二：使用 @delon/auth 的 refresh 介面
+ *
+ * 主要功能：
+ * - 自動檢測 Token 過期
+ * - 防止並發重新整理請求
+ * - 重新發起失敗的請求
+ * - 處理重新整理失敗的情況
+ * - 提供應用程式初始化器
+ *
+ * 使用場景：
+ * - 用戶會話過期處理
+ * - 自動重新整理認證
+ * - 無縫的用戶體驗
+ *
+ * 基於 ng-alain 20.0.0 框架的認證管理系統
+ */
+
 import { HttpClient, HttpHandlerFn, HttpRequest, HttpResponseBase } from '@angular/common/http';
 import { EnvironmentProviders, Injector, inject, provideAppInitializer } from '@angular/core';
 import { DA_SERVICE_TOKEN } from '@delon/auth';

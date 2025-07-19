@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 表單元件演示
+ *
+ * 功能：展示 SF 表單元件
+ * 特性：搜尋表單、表格展示
+ * 整合：SF + ST 元件組合
+ */
+
 import { Component } from '@angular/core';
 import { STColumn } from '@delon/abc/st';
 import { SFSchema } from '@delon/form';

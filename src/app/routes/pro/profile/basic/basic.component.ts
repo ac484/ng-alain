@@ -11,6 +11,7 @@ import { tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: SHARED_IMPORTS
 })
+// Component for displaying basic profile information
 export class ProProfileBaseComponent {
   private readonly http = inject(_HttpClient);
   private readonly msg = inject(NzMessageService);

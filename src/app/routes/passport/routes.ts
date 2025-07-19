@@ -1,3 +1,10 @@
+/**
+ * NG-ALAIN Passport 模組路由配置
+ *
+ * 功能：定義認證相關頁面路由
+ * 包含：登入、註冊、鎖屏、回調頁面
+ */
+
 import { Routes } from '@angular/router';
 
 import { CallbackComponent } from './callback.component';

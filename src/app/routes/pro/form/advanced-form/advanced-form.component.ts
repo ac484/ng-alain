@@ -1,3 +1,13 @@
+/**
+ * 高級表單元件
+ *
+ * 此元件負責：
+ * - 提供複雜表單功能展示
+ * - 處理動態表單項的增刪改查
+ * - 管理多分組表單的驗證和提交
+ * - 支援與 Redis 快取整合的複雜表單資料處理
+ */
+
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FooterToolbarModule } from '@delon/abc/footer-toolbar';

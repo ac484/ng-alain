@@ -13,6 +13,7 @@ import { ProBasicListEditComponent } from './edit/edit.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [...SHARED_IMPORTS, NzPaginationComponent]
 })
+// Component for displaying items in a basic list format with edit and delete actions
 export class ProBasicListComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   private readonly msg = inject(NzMessageService);

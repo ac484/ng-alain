@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 任務通知元件
+ *
+ * 功能：顯示任務和通知列表
+ * 位置：Header 工具列
+ * 內容：用戶頭像和消息預覽
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';

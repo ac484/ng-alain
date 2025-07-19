@@ -1,3 +1,10 @@
+/**
+ * NG-ALAIN Delon 模組路由配置
+ *
+ * 功能：定義 Delon 框架功能頁面路由
+ * 包含：表格、工具、權限、表單等
+ */
+
 import { Routes } from '@angular/router';
 import { aclCanActivate } from '@delon/acl';
 

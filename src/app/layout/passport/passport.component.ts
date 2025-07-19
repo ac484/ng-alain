@@ -1,3 +1,30 @@
+/**
+ * NG-ALAIN 認證佈局元件
+ *
+ * 此元件提供：
+ * - 認證頁面的專用佈局
+ * - 登入、註冊、忘記密碼等頁面
+ * - 品牌標識和標題顯示
+ * - 國際化語言切換
+ * - 全域頁腳連結
+ * - 主題切換按鈕
+ *
+ * 功能特點：
+ * - 自動清除認證 Token
+ * - 響應式設計
+ * - 品牌展示區域
+ * - 簡潔的認證流程
+ * - 支援多語言
+ *
+ * 適用頁面：
+ * - 登入頁面
+ * - 註冊頁面
+ * - 忘記密碼頁面
+ * - 鎖定頁面
+ *
+ * 基於 ng-alain 20.0.0 框架的認證佈局系統
+ */
+
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { GlobalFooterModule } from '@delon/abc/global-footer';

@@ -9,6 +9,7 @@ import { SHARED_IMPORTS } from '@shared';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [...SHARED_IMPORTS, TagSelectComponent]
 })
+// Component for displaying articles with category and owner filtering
 export class ProListArticlesComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);

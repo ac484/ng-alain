@@ -7,4 +7,5 @@ import { NzResultModule } from 'ng-zorro-antd/result';
   templateUrl: './fail.component.html',
   imports: [...SHARED_IMPORTS, NzResultModule]
 })
+// Component for displaying failed operation result
 export class ProResultFailComponent {}

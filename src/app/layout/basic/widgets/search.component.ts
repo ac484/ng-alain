@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 全域搜尋元件
+ *
+ * 功能：提供全域搜尋功能
+ * 位置：Header 工具列
+ * 特性：自動完成、防抖、熱鍵支援
+ */
+
 import {
   AfterViewInit,
   ChangeDetectionStrategy,

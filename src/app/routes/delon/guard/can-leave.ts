@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 路由離開守衛函數
+ *
+ * 功能：路由離開前確認
+ * 對話框：確認是否離開頁面
+ * 用途：防止意外離開編輯頁面
+ */
+
 import { inject } from '@angular/core';
 import { CanDeactivateFn } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';

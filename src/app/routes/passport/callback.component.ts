@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 社交登入回調元件
+ *
+ * 功能：處理第三方登入回調
+ * 支援：Auth0、GitHub、微博等
+ * 模式：模擬認證流程
+ */
+
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { SocialService } from '@delon/auth';
 import { SettingsService } from '@delon/theme';

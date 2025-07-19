@@ -1,3 +1,13 @@
+/**
+ * 個人項目元件
+ *
+ * 此元件負責：
+ * - 顯示用戶參與的項目列表
+ * - 處理項目卡片的互動
+ * - 加載項目資料
+ * - 支援與記憶體狀態整合的項目資料管理
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { _HttpClient } from '@delon/theme';
 import { SHARED_IMPORTS } from '@shared';

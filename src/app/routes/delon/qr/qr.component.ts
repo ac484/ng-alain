@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN QR Code 生成元件
+ *
+ * 功能：生成和自訂 QR Code
+ * 設定：背景色、前景色、大小、容錯等級
+ * 格式：支援多種圖片格式
+ */
+
 import { Component } from '@angular/core';
 import { SHARED_IMPORTS } from '@shared';
 import { NzQRCodeComponent } from 'ng-zorro-antd/qr-code';

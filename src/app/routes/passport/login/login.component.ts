@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 用戶登入元件
+ *
+ * 功能：提供用戶登入表單
+ * 模式：帳號密碼、手機驗證碼
+ * 支援：第三方社交登入
+ */
+
 import { HttpContext } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';

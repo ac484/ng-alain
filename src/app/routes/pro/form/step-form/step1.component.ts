@@ -1,3 +1,13 @@
+/**
+ * 轉賬填寫元件
+ *
+ * 此元件負責：
+ * - 顯示轉賬資訊填寫表單
+ * - 驗證轉賬資訊的有效性
+ * - 處理表單提交並進入下一步
+ * - 支援與記憶體狀態整合的表單資料保存
+ */
+
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SHARED_IMPORTS } from '@shared';

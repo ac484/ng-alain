@@ -9,6 +9,7 @@ import { filter } from 'rxjs';
   templateUrl: './list.component.html',
   imports: SHARED_IMPORTS
 })
+// Layout component for list views with tab navigation
 export class ProListLayoutComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly d$ = inject(DestroyRef);

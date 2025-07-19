@@ -1,3 +1,13 @@
+/**
+ * 個人中心元件
+ *
+ * 此元件負責：
+ * - 顯示用戶個人資料和統計資訊
+ * - 管理標籤和個人資訊
+ * - 整合文章、應用和項目子元件
+ * - 支援與 Redis 快取整合的用戶資料展示
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivationEnd, Router } from '@angular/router';
 import { _HttpClient } from '@delon/theme';

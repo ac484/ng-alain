@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 離開確認元件
+ *
+ * 功能：測試路由離開守衛
+ * 觸發：點擊離開按鈕
+ * 確認：離開前確認對話框
+ */
+
 import { Component } from '@angular/core';
 import { SHARED_IMPORTS } from '@shared';
 

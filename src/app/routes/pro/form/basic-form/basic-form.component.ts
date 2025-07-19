@@ -1,3 +1,13 @@
+/**
+ * 基礎表單元件
+ *
+ * 此元件負責：
+ * - 提供基本表單功能展示
+ * - 處理表單驗證和提交
+ * - 展示表單提交反饋
+ * - 支援與記憶體狀態整合的表單資料管理
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SHARED_IMPORTS } from '@shared';

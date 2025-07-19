@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 應用程式圖示選單元件
+ *
+ * 功能：顯示應用程式圖示選單
+ * 位置：Header 工具列
+ * 內容：常用應用程式快速入口
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzGridModule } from 'ng-zorro-antd/grid';

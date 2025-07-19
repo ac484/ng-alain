@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN ZIP 檔案處理元件
+ *
+ * 功能：ZIP 檔案讀取和下載
+ * 支援：URL 下載、本地檔案上傳
+ * 格式：解析 ZIP 檔案結構
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { ZipService } from '@delon/abc/zip';
 import { SHARED_IMPORTS } from '@shared';

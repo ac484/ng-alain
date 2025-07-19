@@ -1,3 +1,13 @@
+/**
+ * 轉賬服務
+ *
+ * 此服務負責：
+ * - 管理分步表單的狀態
+ * - 存儲轉賬相關資料
+ * - 提供轉賬流程的資料共享
+ * - 支援與 Redis 快取整合的資料持久化
+ */
+
 import { Injectable } from '@angular/core';
 
 @Injectable()

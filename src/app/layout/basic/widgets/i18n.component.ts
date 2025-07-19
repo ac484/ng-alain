@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 國際化語言切換元件
+ *
+ * 功能：切換應用程式語言
+ * 位置：Header 工具列
+ * 支援：多語言切換與重新載入
+ */
+
 import { ChangeDetectionStrategy, Component, Input, booleanAttribute, inject, DOCUMENT } from '@angular/core';
 import { I18NService } from '@core';
 import { ALAIN_I18N_TOKEN, I18nPipe, SettingsService } from '@delon/theme';

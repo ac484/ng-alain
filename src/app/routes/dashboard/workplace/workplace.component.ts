@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 工作台儀表板元件
+ *
+ * 功能：個人工作台頁面
+ * 內容：通知、活動、團隊、快速操作
+ * 圖表：雷達圖資料展示
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { G2RadarModule } from '@delon/chart/radar';
 import { _HttpClient } from '@delon/theme';

@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 異常觸發測試元件
+ *
+ * 功能：測試各種 HTTP 異常狀態
+ * 狀態：401、403、404、500
+ * 用途：開發測試和除錯
+ */
+
 import { Component, inject } from '@angular/core';
 import { DA_SERVICE_TOKEN } from '@delon/auth';
 import { _HttpClient } from '@delon/theme';

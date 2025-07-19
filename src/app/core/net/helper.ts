@@ -1,3 +1,35 @@
+/**
+ * NG-ALAIN 網路輔助工具函數
+ *
+ * 此檔案提供：
+ * - HTTP 狀態碼錯誤訊息對應
+ * - 路由導航輔助函數
+ * - 認證相關工具函數
+ * - 請求頭處理工具
+ * - 狀態檢查工具
+ *
+ * 主要功能：
+ * - CODEMESSAGE: HTTP 狀態碼對應的中文錯誤訊息
+ * - goTo: 路由導航函數
+ * - toLogin: 跳轉到登入頁面
+ * - getAdditionalHeaders: 獲取額外的請求頭
+ * - checkStatus: 檢查回應狀態並顯示錯誤
+ *
+ * 支援的狀態碼：
+ * - 200-299: 成功狀態
+ * - 400-499: 客戶端錯誤
+ * - 500-599: 伺服器錯誤
+ * - 特殊處理: 401 認證錯誤
+ *
+ * 使用場景：
+ * - HTTP 攔截器錯誤處理
+ * - 認證失敗處理
+ * - 國際化請求頭設定
+ * - 錯誤訊息本地化
+ *
+ * 基於 ng-alain 20.0.0 框架的網路工具系統
+ */
+
 import { HttpHeaders, HttpResponseBase } from '@angular/common/http';
 import { Injector, inject } from '@angular/core';
 import { Router } from '@angular/router';

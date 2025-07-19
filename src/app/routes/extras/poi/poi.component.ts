@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN POI 管理元件
+ *
+ * 功能：管理門店資訊列表
+ * 操作：新增、編輯、查看圖片、SKU
+ * 表格：使用 ST 表格元件
+ */
+
 import { Component, ViewChild, inject } from '@angular/core';
 import { STColumn, STComponent } from '@delon/abc/st';
 import { ModalHelper } from '@delon/theme';

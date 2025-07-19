@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN POI 編輯元件
+ *
+ * 功能：編輯門店資訊
+ * 模式：新增/編輯模式
+ * 分類：支援多級分類選擇
+ */
+
 import { Component, OnInit, inject } from '@angular/core';
 import { _HttpClient } from '@delon/theme';
 import { SHARED_IMPORTS } from '@shared';

@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 用戶選單元件
+ *
+ * 功能：顯示用戶資訊和選單
+ * 位置：Header 工具列
+ * 選項：個人中心、設定、登出
+ */
+
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DA_SERVICE_TOKEN } from '@delon/auth';

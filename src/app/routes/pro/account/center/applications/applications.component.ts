@@ -1,3 +1,13 @@
+/**
+ * 個人應用元件
+ *
+ * 此元件負責：
+ * - 顯示用戶的應用列表
+ * - 處理應用資料的格式化
+ * - 加載應用資料
+ * - 支援與記憶體狀態整合的應用資料管理
+ */
+
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { _HttpClient } from '@delon/theme';

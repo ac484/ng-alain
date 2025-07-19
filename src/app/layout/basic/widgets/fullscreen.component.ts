@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 全螢幕切換元件
+ *
+ * 功能：切換瀏覽器全螢幕模式
+ * 位置：Header 工具列
+ * 狀態：顯示當前全螢幕狀態
+ */
+
 import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
 import { I18nPipe } from '@delon/theme';
 import { NzIconModule } from 'ng-zorro-antd/icon';

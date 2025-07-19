@@ -1,3 +1,15 @@
+/**
+ * NG-ALAIN 共享 NG-ZORRO 模組
+ *
+ * 此模組負責：
+ * - 匯出 NG-ZORRO 元件庫的常用模組
+ * - 提供統一的 UI 元件集合
+ * - 確保專案中使用一致的 UI 風格
+ * - 支援與 Redis 快取和記憶體狀態管理整合的 UI 元件
+ *
+ * 基於 ng-alain 20.0.0 框架和 NG-ZORRO 元件庫
+ */
+
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';

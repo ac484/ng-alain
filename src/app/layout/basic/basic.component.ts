@@ -1,3 +1,28 @@
+/**
+ * NG-ALAIN 基本佈局元件
+ *
+ * 此元件提供：
+ * - 主要應用程式的標準佈局
+ * - 頂部導航欄和側邊欄
+ * - 用戶資訊顯示和下拉選單
+ * - 搜尋、通知、任務等小工具
+ * - 設定抽屜和主題切換
+ * - 響應式設計支援
+ *
+ * 包含的頭部小工具：
+ * - 搜尋功能
+ * - 通知中心
+ * - 任務管理
+ * - 圖示管理
+ * - RTL 支援
+ * - 國際化
+ * - 清除儲存
+ * - 全螢幕切換
+ * - 用戶管理
+ *
+ * 基於 ng-alain 20.0.0 框架的預設佈局系統
+ */
+
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { I18nPipe, SettingsService, User } from '@delon/theme';

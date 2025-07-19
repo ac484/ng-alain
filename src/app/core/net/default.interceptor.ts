@@ -1,3 +1,30 @@
+/**
+ * NG-ALAIN 預設 HTTP 攔截器
+ *
+ * 此攔截器負責：
+ * - HTTP 請求的統一處理
+ * - 請求 URL 的基礎路徑處理
+ * - 回應狀態碼的統一處理
+ * - 錯誤處理和重試機制
+ * - 認證 Token 重新整理
+ * - 跨域問題處理
+ *
+ * 主要功能：
+ * - 自動添加服務端前綴
+ * - 統一錯誤處理邏輯
+ * - 401 狀態碼的認證處理
+ * - 業務層級錯誤處理
+ * - 請求頭的自動添加
+ *
+ * 支援的狀態碼處理：
+ * - 200: 成功回應處理
+ * - 401: 認證失敗，支援 Token 重新整理
+ * - 403/404/500: 錯誤頁面跳轉
+ * - 其他: 跨域問題警告
+ *
+ * 基於 ng-alain 20.0.0 框架的 HTTP 攔截器系統
+ */
+
 import { HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest, HttpResponseBase } from '@angular/common/http';
 import { Injector, inject } from '@angular/core';
 import { IGNORE_BASE_URL } from '@delon/theme';

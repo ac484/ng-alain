@@ -1,3 +1,17 @@
+/**
+ * NG-ALAIN 應用程式根元件
+ *
+ * 此元件負責：
+ * - 應用程式的根級別配置
+ * - 路由事件監聽和處理
+ * - 預載入器控制
+ * - 標題服務管理
+ * - 模態框管理
+ * - 版本資訊顯示
+ *
+ * 基於 ng-alain 20.0.0 框架，採用 Angular 20 獨立 API 模式
+ */
+
 import { Component, OnInit, inject } from '@angular/core';
 import { NavigationEnd, NavigationError, RouteConfigLoadStart, Router, RouterOutlet } from '@angular/router';
 import { TitleService, VERSION as VERSION_ALAIN, stepPreloader } from '@delon/theme';

@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 螢幕鎖定元件
+ *
+ * 功能：提供螢幕鎖定功能
+ * 驗證：密碼解鎖
+ * 狀態：模擬鎖定狀態
+ */
+
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';

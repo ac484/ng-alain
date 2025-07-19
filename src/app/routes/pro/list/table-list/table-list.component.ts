@@ -13,6 +13,7 @@ import { map, tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: SHARED_IMPORTS
 })
+// Component for displaying data in a table format with filtering, sorting and actions
 export class ProTableListComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   private readonly msg = inject(NzMessageService);

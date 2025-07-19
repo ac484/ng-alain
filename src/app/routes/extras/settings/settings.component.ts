@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 個人設定元件
+ *
+ * 功能：提供個人資料和密碼設定
+ * 表單：個人資料、密碼修改
+ * 驗證：表單驗證和錯誤處理
+ */
+
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { SHARED_IMPORTS } from '@shared';

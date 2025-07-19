@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 儀表板 V1 元件
+ *
+ * 功能：主要儀表板頁面
+ * 圖表：時間軸、柱狀圖、迷你圖表
+ * 特性：新手引導、響應式設計
+ */
+
 import { Platform } from '@angular/cdk/platform';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject, DOCUMENT } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

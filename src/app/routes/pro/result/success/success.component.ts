@@ -9,6 +9,7 @@ import { NzStepsModule } from 'ng-zorro-antd/steps';
   templateUrl: './success.component.html',
   imports: [...SHARED_IMPORTS, NzResultModule, NzStepsModule]
 })
+// Component for displaying successful operation result
 export class ProResultSuccessComponent {
   readonly msg = inject(NzMessageService);
 }

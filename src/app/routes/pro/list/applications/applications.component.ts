@@ -18,6 +18,7 @@ interface ProListApplicationListItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [...SHARED_IMPORTS, TagSelectComponent, DecimalPipe]
 })
+// Component for displaying applications with category filtering and user statistics
 export class ProListApplicationsComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);

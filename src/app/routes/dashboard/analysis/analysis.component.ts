@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 分析儀表板元件
+ *
+ * 功能：資料分析頁面
+ * 圖表：時間軸、圓餅圖、柱狀圖、迷你圖表
+ * 特性：日期範圍篩選、銷售類型切換
+ */
+
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { STColumn } from '@delon/abc/st';

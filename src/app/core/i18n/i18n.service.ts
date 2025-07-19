@@ -1,3 +1,35 @@
+/**
+ * NG-ALAIN 國際化 (i18n) 服務
+ *
+ * 此服務負責：
+ * - 多語言支援和切換
+ * - 語言包資料載入
+ * - 日期格式本地化
+ * - 數字格式本地化
+ * - 元件庫語言配置
+ *
+ * 支援的語言：
+ * - zh-CN: 簡體中文
+ * - zh-TW: 繁體中文
+ * - en-US: 英文
+ *
+ * 主要功能：
+ * - 自動檢測瀏覽器語言
+ * - 動態載入語言包
+ * - 統一管理所有語言配置
+ * - 提供語言切換事件
+ * - 支援 Angular、ng-zorro、date-fns 本地化
+ *
+ * 技術整合：
+ * - Angular 本地化
+ * - ng-zorro-antd 國際化
+ * - date-fns 日期本地化
+ * - ng-alain 主題本地化
+ *
+ * 參考：https://ng-alain.com/docs/i18n
+ * 基於 ng-alain 20.0.0 框架的國際化系統
+ */
+
 // 请参考：https://ng-alain.com/docs/i18n
 import { Platform } from '@angular/cdk/platform';
 import { registerLocaleData } from '@angular/common';

@@ -1,3 +1,19 @@
+/**
+ * NG-ALAIN 應用程式配置檔案
+ *
+ * 此檔案負責：
+ * - Angular 應用程式的全域配置
+ * - 路由配置和功能設定
+ * - HTTP 客戶端和攔截器配置
+ * - 國際化 (i18n) 設定
+ * - ng-alain 框架配置
+ * - ng-zorro-antd 元件庫配置
+ * - 認證和權限配置
+ * - 主題和圖示配置
+ *
+ * 基於 ng-alain 20.0.0 框架，採用 Angular 20 獨立 API 模式
+ */
+
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { default as ngLang } from '@angular/common/locales/zh';
 import { ApplicationConfig, EnvironmentProviders, Provider } from '@angular/core';
@@ -26,6 +42,17 @@ import { zh_CN as zorroLang } from 'ng-zorro-antd/i18n';
 import { ICONS } from '../style-icons';
 import { ICONS_AUTO } from '../style-icons-auto';
 import { routes } from './routes/routes';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth as provideAuth_alias } from '@angular/fire/auth';
+import { getAnalytics, provideAnalytics, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider, provideAppCheck } from '@angular/fire/app-check';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { getMessaging, provideMessaging } from '@angular/fire/messaging';
+import { getPerformance, providePerformance } from '@angular/fire/performance';
+import { getStorage, provideStorage } from '@angular/fire/storage';
+import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
+import { getVertexAI, provideVertexAI } from '@angular/fire/vertexai';
 
 const defaultLang: AlainProvideLang = {
   abbr: 'zh-CN',
@@ -74,5 +101,34 @@ if (environment.api?.refreshTokenEnabled && environment.api.refreshTokenType ===
 }
 
 export const appConfig: ApplicationConfig = {
-  providers: providers
+  providers: [
+    ...providers,
+    provideFirebaseApp(() =>
+      initializeApp({
+        projectId: 'lin-in',
+        appId: '1:387803341154:web:ff4088f6444c0c27a78c3b',
+        storageBucket: 'lin-in.firebasestorage.app',
+        apiKey: 'AIzaSyCX4rENtBHJAxypxNpx5YrFU-gHZl3L2-s',
+        authDomain: 'lin-in.firebaseapp.com',
+        messagingSenderId: '387803341154',
+        measurementId: 'G-XJV1NM348D'
+      })
+    ),
+    provideAuth_alias(() => getAuth()),
+    provideAnalytics(() => getAnalytics()),
+    ScreenTrackingService,
+    UserTrackingService,
+    provideAppCheck(() => {
+      // TODO get a reCAPTCHA Enterprise here https://console.cloud.google.com/security/recaptcha?project=_
+      const provider = new ReCaptchaEnterpriseProvider('6Ld5gYgrAAAAAKVLmZSwqvTKsPAdOShDp6hNiBad');
+      return initializeAppCheck(undefined, { provider, isTokenAutoRefreshEnabled: true });
+    }),
+    provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions()),
+    provideMessaging(() => getMessaging()),
+    providePerformance(() => getPerformance()),
+    provideStorage(() => getStorage()),
+    provideRemoteConfig(() => getRemoteConfig()),
+    provideVertexAI(() => getVertexAI())
+  ]
 };

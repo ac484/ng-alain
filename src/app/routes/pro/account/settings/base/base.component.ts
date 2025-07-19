@@ -1,3 +1,13 @@
+/**
+ * 基本設定元件
+ *
+ * 此元件負責：
+ * - 管理用戶基本資料設定
+ * - 處理頭像上傳和個人資訊更新
+ * - 提供地理位置選擇功能
+ * - 支援與記憶體狀態整合的用戶資料管理
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { _HttpClient } from '@delon/theme';
 import { SHARED_IMPORTS } from '@shared';

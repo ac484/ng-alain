@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 用戶註冊元件
+ *
+ * 功能：提供用戶註冊表單
+ * 驗證：密碼強度、手機驗證碼
+ * 支援：帳號密碼註冊
+ */
+
 import { HttpContext } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';

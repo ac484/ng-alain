@@ -1,3 +1,13 @@
+/**
+ * 帳戶設定容器元件
+ *
+ * 此元件負責：
+ * - 管理帳戶設定的導航和佈局
+ * - 處理響應式設計的菜單模式切換
+ * - 整合各種帳戶設定子元件
+ * - 支援與 Redis 快取整合的用戶設定保存
+ */
+
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivationEnd, Router } from '@angular/router';

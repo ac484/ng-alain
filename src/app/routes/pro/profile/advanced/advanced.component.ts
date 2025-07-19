@@ -14,6 +14,7 @@ import { NzTabChangeEvent } from 'ng-zorro-antd/tabs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [...SHARED_IMPORTS, NzStepsModule]
 })
+// Component for displaying advanced profile information with detailed operations
 export class ProProfileAdvancedComponent implements OnInit {
   readonly msg = inject(NzMessageService);
   private readonly http = inject(_HttpClient);

@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN RTL 方向切換元件
+ *
+ * 功能：切換文字方向 (LTR/RTL)
+ * 位置：Header 工具列
+ * 支援：右到左文字排版
+ */
+
 import { UpperCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
 import { RTLService } from '@delon/theme';

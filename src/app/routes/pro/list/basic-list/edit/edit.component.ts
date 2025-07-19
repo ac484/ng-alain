@@ -9,6 +9,7 @@ import { NzModalRef } from 'ng-zorro-antd/modal';
   templateUrl: './edit.component.html',
   imports: SHARED_IMPORTS
 })
+// Component for editing items in the basic list
 export class ProBasicListEditComponent {
   private readonly modal = inject(NzModalRef);
   private readonly msgSrv = inject(NzMessageService);

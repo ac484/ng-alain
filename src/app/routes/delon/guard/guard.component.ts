@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN 權限守衛演示元件
+ *
+ * 功能：展示權限控制和路由守衛
+ * 角色：user1、admin 權限切換
+ * 路由：子路由權限控制
+ */
+
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ACLService } from '@delon/acl';

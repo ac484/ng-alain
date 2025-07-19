@@ -1,3 +1,11 @@
+/**
+ * NG-ALAIN Excel 檔案處理元件
+ *
+ * 功能：Excel 檔案匯入和匯出
+ * 支援：XLSX 格式讀寫
+ * 資料：表格資料處理和轉換
+ */
+
 import { Component, inject } from '@angular/core';
 import { STColumn } from '@delon/abc/st';
 import { XlsxService } from '@delon/abc/xlsx';

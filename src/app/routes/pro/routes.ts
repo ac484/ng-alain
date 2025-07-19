@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+// Import components for Pro module routes
 import { ProAccountCenterApplicationsComponent } from './account/center/applications/applications.component';
 import { ProAccountCenterArticlesComponent } from './account/center/articles/articles.component';
 import { ProAccountCenterComponent } from './account/center/center.component';
@@ -24,6 +25,7 @@ import { ProProfileBaseComponent } from './profile/basic/basic.component';
 import { ProResultFailComponent } from './result/fail/fail.component';
 import { ProResultSuccessComponent } from './result/success/success.component';
 
+// Define routes for Pro module
 export const routes: Routes = [
   {
     path: 'form',

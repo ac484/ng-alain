@@ -11,6 +11,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [...SHARED_IMPORTS, TagSelectComponent]
 })
+// Component for displaying projects in a list with category filtering
 export class ProListProjectsComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   readonly msg = inject(NzMessageService);
