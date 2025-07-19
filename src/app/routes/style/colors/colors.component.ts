@@ -1,3 +1,13 @@
+/**
+ * 顏色展示元件
+ *
+ * 此元件負責：
+ * - 展示應用程式的顏色系統
+ * - 提供顏色複製功能
+ * - 顯示品牌色和主題色
+ * - 支援與記憶體狀態整合的顏色管理
+ */
+
 import { Component, inject } from '@angular/core';
 import { copy } from '@delon/util/browser';
 import { SHARED_IMPORTS } from '@shared';

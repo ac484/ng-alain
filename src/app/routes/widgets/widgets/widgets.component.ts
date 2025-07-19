@@ -1,3 +1,13 @@
+/**
+ * 小部件展示元件
+ *
+ * 此元件負責：
+ * - 展示各種通用UI小部件
+ * - 提供數據圖表和統計卡片
+ * - 顯示待辦事項和互動元素
+ * - 支援與 Redis 快取整合的小部件資料
+ */
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { G2MiniAreaModule } from '@delon/chart/mini-area';
 import { G2MiniBarData, G2MiniBarModule } from '@delon/chart/mini-bar';
