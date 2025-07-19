@@ -128,7 +128,6 @@
   "app.login.message-invalid-credentials": "사용자 정보 또는 패스워드가 유효하지 않습니다.（admin/ant.design）",
   "app.login.message-invalid-verification-code": "인증 코드가 잘못되었습니다.",
   "app.login.tab-login-credentials": "계정 패스워드 로그인",
-  "app.login.tab-login-mobile": "모바일 번호 로그인",
   "app.login.remember-me": "자동 로그인",
   "app.login.forgot-password": "비밀번호를 잊어 버렸습니까?",
   "app.login.sign-in-with": "다른 방법으로 로그인",

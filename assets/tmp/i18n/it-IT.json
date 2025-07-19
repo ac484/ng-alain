@@ -132,7 +132,6 @@
   "app.login.message-invalid-credentials": "Nome utente o password non validi (admin/ant.design)",
   "app.login.message-invalid-verification-code": "Codice di verifica non valido",
   "app.login.tab-login-credentials": "Credenziali",
-  "app.login.tab-login-mobile": "Numero di cellulare",
   "app.login.remember-me": "Ricordami",
   "app.login.forgot-password": "Hai dimenticato la password?",
   "app.login.sign-in-with": "Accedi con",
