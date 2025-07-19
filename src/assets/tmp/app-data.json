@@ -31,6 +31,16 @@
               "i18n": "menu.contract.create"
             },
             {
+              "text": "Contract Detail",
+              "link": "/contract/detail",
+              "i18n": "menu.contract.detail"
+            },
+            {
+              "text": "Edit Contract",
+              "link": "/contract/edit",
+              "i18n": "menu.contract.edit"
+            },
+            {
               "text": "Contract Review",
               "link": "/contract/review",
               "i18n": "menu.contract.review"

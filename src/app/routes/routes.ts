@@ -104,7 +104,10 @@ export const routes: Routes = [
       { path: 'extras', loadChildren: () => import('./extras/routes').then(m => m.routes) },
 
       // 專業版功能模組 - 懶載入
-      { path: 'pro', loadChildren: () => import('./pro/routes').then(m => m.routes) }
+      { path: 'pro', loadChildren: () => import('./pro/routes').then(m => m.routes) },
+
+      // 合約管理模組 - 懶載入
+      { path: 'contract', loadChildren: () => import('./contract/routes').then(m => m.default) }
     ]
   },
 
