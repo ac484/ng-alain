@@ -8,6 +8,8 @@
   "menu.contract": "合約",
   "menu.contract.list": "合約列表",
   "menu.contract.create": "建立合約",
+  "menu.contract.detail": "合約詳情",
+  "menu.contract.edit": "編輯合約",
   "menu.contract.review": "合約審查",
   "menu.workspace": "工作區",
   "menu.workspace.list": "工作區列表",
