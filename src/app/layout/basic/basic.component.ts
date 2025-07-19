@@ -45,6 +45,7 @@ import { HeaderRTLComponent } from './widgets/rtl.component';
 import { HeaderSearchComponent } from './widgets/search.component';
 import { HeaderTaskComponent } from './widgets/task.component';
 import { HeaderUserComponent } from './widgets/user.component';
+import { HeaderWeatherComponent } from './widgets/weather.component';
 
 @Component({
   selector: 'layout-basic',
@@ -73,6 +74,9 @@ import { HeaderUserComponent } from './widgets/user.component';
       </layout-default-header-item>
       <layout-default-header-item direction="right" hidden="mobile">
         <header-task />
+      </layout-default-header-item>
+      <layout-default-header-item direction="right" hidden="mobile">
+        <header-weather />
       </layout-default-header-item>
       <layout-default-header-item direction="right" hidden="mobile">
         <header-google-docs />
@@ -142,6 +146,7 @@ import { HeaderUserComponent } from './widgets/user.component';
     HeaderSearchComponent,
     HeaderNotifyComponent,
     HeaderTaskComponent,
+    HeaderWeatherComponent,
     HeaderGoogleDocsComponent,
     HeaderIconComponent,
     HeaderRTLComponent,
