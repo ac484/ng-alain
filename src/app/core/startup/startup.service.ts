@@ -65,6 +65,7 @@ import { Observable, zip, catchError, map, of } from 'rxjs';
 
 import { I18NService } from '../i18n/i18n.service';
 import { Auth, User, onAuthStateChanged } from '@angular/fire/auth';
+import { FirebaseUserService } from '../firebase/firebase-user.service';
 
 /**
  * 應用程式啟動提供者
@@ -113,6 +114,7 @@ export class StartupService {
 
   // 注入 Firebase 認證服務
   private auth = inject(Auth); // Firebase 認證服務
+  private firebaseUserService = inject(FirebaseUserService); // Firebase 用戶資料服務
 
   /**
    * 載入應用程式啟動資料
@@ -220,20 +222,56 @@ export class StartupService {
     return new Observable(observer => {
       const unsubscribe = onAuthStateChanged(this.auth, (user: User | null) => {
         if (user) {
-          const firebaseUser = {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            emailVerified: user.emailVerified,
-            role: 'user',
-            permissions: ['dashboard']
-          };
-          observer.next(firebaseUser);
+          // 從 Firestore 獲取完整的用戶資料（包含權限）
+          this.firebaseUserService.getUserProfile(user.uid).subscribe({
+            next: userProfile => {
+              if (userProfile) {
+                // 使用 Firestore 中的完整用戶資料
+                const firebaseUser = {
+                  uid: userProfile.uid,
+                  email: userProfile.email,
+                  displayName: userProfile.displayName,
+                  photoURL: userProfile.photoURL,
+                  emailVerified: userProfile.emailVerified,
+                  role: userProfile.role,
+                  permissions: userProfile.permissions
+                };
+                observer.next(firebaseUser);
+              } else {
+                // 如果 Firestore 中沒有資料，使用 Firebase Auth 的基本資料
+                const firebaseUser = {
+                  uid: user.uid,
+                  email: user.email,
+                  displayName: user.displayName,
+                  photoURL: user.photoURL,
+                  emailVerified: user.emailVerified,
+                  role: 'user',
+                  permissions: ['dashboard']
+                };
+                observer.next(firebaseUser);
+              }
+              observer.complete();
+            },
+            error: error => {
+              console.error('獲取 Firestore 用戶資料失敗:', error);
+              // 發生錯誤時使用 Firebase Auth 的基本資料
+              const firebaseUser = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                emailVerified: user.emailVerified,
+                role: 'user',
+                permissions: ['dashboard']
+              };
+              observer.next(firebaseUser);
+              observer.complete();
+            }
+          });
         } else {
           observer.next(null);
+          observer.complete();
         }
-        observer.complete();
       });
       return () => unsubscribe();
     });

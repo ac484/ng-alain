@@ -17,6 +17,7 @@ import { DA_SERVICE_TOKEN } from '@delon/auth';
 import { ReuseTabService } from '@delon/abc/reuse-tab';
 import { StartupService } from '@core';
 import { Router } from '@angular/router';
+import { FirebaseUserService } from '../../../core/firebase/firebase-user.service';
 
 @Component({
   selector: 'app-email-register-form',
@@ -66,6 +67,7 @@ export class EmailRegisterFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly tokenService = inject(DA_SERVICE_TOKEN);
   private readonly reuseTabService = inject(ReuseTabService, { optional: true });
+  private readonly firebaseUserService = inject(FirebaseUserService);
 
   @Output() registerSuccess = new EventEmitter<void>();
 
@@ -102,15 +104,21 @@ export class EmailRegisterFormComponent {
       // 發送郵箱驗證
       await sendEmailVerification(user);
 
+      // 儲存用戶資料到 Firestore
+      await this.firebaseUserService.saveUser(user, 'email').toPromise();
+
+      // 獲取用戶資料（包含權限）
+      const userProfile = await this.firebaseUserService.getUserProfile(user.uid).toPromise();
+
       // 設定 @delon/auth token
       const tokenData = {
         token: user.uid,
-        name: user.displayName || user.email || 'Anonymous',
+        name: userProfile?.displayName || user.displayName || user.email || 'Anonymous',
         email: user.email || '',
         id: user.uid,
         time: +new Date(),
-        role: 'user',
-        permissions: ['dashboard'],
+        role: userProfile?.role || 'user',
+        permissions: userProfile?.permissions || ['dashboard'],
         expired: +new Date() + 1000 * 60 * 60 * 24 * 7 // 7天過期
       };
 
