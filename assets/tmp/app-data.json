@@ -125,7 +125,7 @@
               "i18n": "menu.delon.acl"
             },
             {
-              "text": "ACL 管理",
+              "text": "ACL Admin",
               "link": "/delon/acl-admin",
               "i18n": "menu.delon.acl-admin"
             },
