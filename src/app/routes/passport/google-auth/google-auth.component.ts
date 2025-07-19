@@ -19,7 +19,7 @@ import { StartupService } from '@core';
   imports: [NzButtonModule, NzIconModule],
   template: `
     <button nz-button nzType="primary" nzSize="large" (click)="loginWithGoogle()" [nzLoading]="loading" class="google-login-btn">
-      <span nz-icon nzType="google" nzTheme="outline"></span>
+      <nz-icon nzType="google" nzTheme="outline"></nz-icon>
       使用 Google 登入
     </button>
   `,

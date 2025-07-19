@@ -1,3 +1,13 @@
+/**
+ * Pro 模組路由配置
+ *
+ * 此檔案負責：
+ * - 定義 Pro 模組的路由結構
+ * - 組織專業版功能的導航路徑
+ * - 整合表單、列表、個人中心等子模組
+ * - 支援與 Redis 快取整合的路由資料管理
+ */
+
 import { Routes } from '@angular/router';
 
 // Import components for Pro module routes
