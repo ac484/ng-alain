@@ -23,6 +23,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzTabChangeEvent, NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { GoogleAuthComponent } from '../google-auth/google-auth.component';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -42,7 +43,8 @@ import { finalize } from 'rxjs';
     NzInputModule,
     NzButtonModule,
     NzToolTipModule,
-    NzIconModule
+    NzIconModule,
+    GoogleAuthComponent
   ]
 })
 export class UserLoginComponent implements OnDestroy {

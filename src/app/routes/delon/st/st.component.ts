@@ -13,11 +13,13 @@ import { G2MiniBarComponent, G2MiniBarData } from '@delon/chart/mini-bar';
 import { _HttpClient } from '@delon/theme';
 import { SHARED_IMPORTS } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 @Component({
   selector: 'app-st',
   templateUrl: './st.component.html',
-  imports: [...SHARED_IMPORTS, FullContentModule, G2MiniBarComponent]
+  imports: [...SHARED_IMPORTS, FullContentModule, G2MiniBarComponent, NzDescriptionsModule, NzTagModule]
 })
 export class STDemoComponent implements OnInit {
   readonly http = inject(_HttpClient);

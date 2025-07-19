@@ -116,6 +116,23 @@ export const USERS = {
       }
     };
   },
+  '/user/:uid/permissions': (req: MockRequest) => {
+    const uid = req.params.uid;
+    // Mock 用戶權限資料，模擬 Firestore 結構
+    const permissions = {
+      admin: {
+        role: 'admin',
+        permissions: ['read', 'write', 'delete', 'admin']
+      },
+      user: {
+        role: 'user',
+        permissions: ['read', 'write']
+      }
+    };
+
+    // 根據 UID 返回對應權限，預設為 user 權限
+    return permissions[uid as keyof typeof permissions] || permissions.user;
+  },
   'POST /register': {
     msg: 'ok'
   }
