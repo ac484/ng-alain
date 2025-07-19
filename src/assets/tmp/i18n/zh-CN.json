@@ -8,6 +8,15 @@
       "workplace": "工作台"
     }
   },
+  "menu.business": "業務",
+  "menu.contract": "合約",
+  "menu.contract.list": "合約列表",
+  "menu.contract.create": "建立合約",
+  "menu.contract.review": "合約審查",
+  "menu.workspace": "工作區",
+  "menu.workspace.list": "工作區列表",
+  "menu.workspace.create": "建立工作區",
+  "menu.workspace.settings": "工作區設定",
   "menu.search.placeholder": "搜索：员工、文件、照片等，按 F1 可触发",
   "menu.fullscreen": "全屏",
   "menu.fullscreen.exit": "退出全屏",
