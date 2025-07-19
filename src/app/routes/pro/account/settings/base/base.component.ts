@@ -13,7 +13,9 @@ import { _HttpClient } from '@delon/theme';
 import { SHARED_IMPORTS } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadComponent } from 'ng-zorro-antd/upload';
-import { zip } from 'rxjs';
+import { zip, of } from 'rxjs';
+import { FirebaseAuthService, FirebaseUser } from '@core';
+import { Auth } from '@angular/fire/auth';
 
 interface ProAccountSettingsUser {
   email: string;
@@ -49,6 +51,8 @@ export class ProAccountSettingsBaseComponent implements OnInit {
   private readonly http = inject(_HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly msg = inject(NzMessageService);
+  private readonly firebaseAuth = inject(FirebaseAuthService);
+  private readonly auth = inject(Auth);
 
   avatar = '';
   userLoading = true;
@@ -60,15 +64,63 @@ export class ProAccountSettingsBaseComponent implements OnInit {
   cities: ProAccountSettingsCity[] = [];
 
   ngOnInit(): void {
-    zip(this.http.get('/user/current'), this.http.get('/geo/province')).subscribe(
-      ([user, province]: [ProAccountSettingsUser, ProAccountSettingsCity[]]) => {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) {
+      this.msg.error('用戶未登入');
+      return;
+    }
+
+    // 從 Firebase 獲取用戶資料
+    zip(
+      this.firebaseAuth.getUserProfile(currentUser.uid),
+      this.http.get('/geo/province') // 地理位置資料仍使用 Mock API
+    ).subscribe({
+      next: ([firebaseUser, province]: [FirebaseUser | null, ProAccountSettingsCity[]]) => {
         this.userLoading = false;
-        this.user = user;
+
+        if (firebaseUser) {
+          // 將 Firebase 用戶資料轉換為 ProAccountSettingsUser 格式
+          this.user = {
+            email: firebaseUser.email || '',
+            name: firebaseUser.displayName || '',
+            profile: firebaseUser.profile || '',
+            country: firebaseUser.country || 'China',
+            address: firebaseUser.address || '',
+            phone: firebaseUser.phone || '',
+            avatar: firebaseUser.photoURL || '',
+            geographic: firebaseUser.geographic || {
+              province: { key: '' },
+              city: { key: '' }
+            }
+          };
+        } else {
+          // 如果沒有 Firebase 資料，使用預設值
+          this.user = {
+            email: currentUser.email || '',
+            name: currentUser.displayName || '',
+            profile: '',
+            country: 'China',
+            address: '',
+            phone: '',
+            avatar: currentUser.photoURL || '',
+            geographic: {
+              province: { key: '' },
+              city: { key: '' }
+            }
+          };
+        }
+
         this.provinces = province;
-        this.choProvince(user.geographic.province.key, false);
+        this.choProvince(this.user.geographic.province.key, false);
+        this.cdr.detectChanges();
+      },
+      error: error => {
+        console.error('載入用戶資料失敗:', error);
+        this.msg.error('載入用戶資料失敗');
+        this.userLoading = false;
         this.cdr.detectChanges();
       }
-    );
+    });
   }
 
   choProvince(pid: string, cleanCity = true): void {
@@ -84,7 +136,35 @@ export class ProAccountSettingsBaseComponent implements OnInit {
   // #endregion
 
   save(): boolean {
-    this.msg.success(JSON.stringify(this.user));
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) {
+      this.msg.error('用戶未登入');
+      return false;
+    }
+
+    // 更新 Firebase 用戶資料
+    const updates: Partial<FirebaseUser> = {
+      displayName: this.user.name,
+      email: this.user.email,
+      profile: this.user.profile,
+      country: this.user.country,
+      address: this.user.address,
+      phone: this.user.phone,
+      geographic: this.user.geographic
+    };
+
+    this.firebaseAuth.updateUserProfile(updates).subscribe({
+      next: () => {
+        this.msg.success('用戶資料更新成功！');
+        // 重新載入用戶資料
+        this.ngOnInit();
+      },
+      error: error => {
+        console.error('更新用戶資料失敗:', error);
+        this.msg.error('更新用戶資料失敗');
+      }
+    });
+
     return false;
   }
 }
