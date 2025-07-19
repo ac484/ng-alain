@@ -19,7 +19,9 @@ const contracts: any[] = [
     id: '1',
     title: '網站開發合約',
     client: 'ABC公司',
-    amount: 50000,
+    originalAmount: 50000,
+    currentAmount: 55000,
+    changeAmount: 5000,
     status: 'approved',
     startDate: new Date('2024-01-15'),
     endDate: new Date('2024-06-15'),
@@ -28,13 +30,33 @@ const contracts: any[] = [
     updateDate: new Date('2024-01-22'),
     reviewer: '張經理',
     reviewDate: new Date('2024-01-22'),
-    comments: '合約內容完整，符合公司規範'
+    comments: '合約內容完整，符合公司規範',
+    version: '1.0',
+    changeVersion: '1.1',
+    progress: 75,
+    paymentRounds: [
+      { round: 1, amount: 15000, status: 'paid', date: new Date('2024-02-15') },
+      { round: 2, amount: 20000, status: 'pending', date: new Date('2024-04-15') },
+      { round: 3, amount: 20000, status: 'pending', date: new Date('2024-06-15') }
+    ],
+    changes: [
+      {
+        id: 1,
+        type: '追加',
+        description: '增加手機版適配功能',
+        amount: 5000,
+        date: new Date('2024-03-01'),
+        version: '1.1'
+      }
+    ]
   },
   {
     id: '2',
     title: '系統維護合約',
     client: 'XYZ企業',
-    amount: 30000,
+    originalAmount: 30000,
+    currentAmount: 30000,
+    changeAmount: 0,
     status: 'pending',
     startDate: new Date('2024-02-01'),
     endDate: new Date('2024-12-31'),
@@ -43,13 +65,24 @@ const contracts: any[] = [
     updateDate: new Date('2024-01-20'),
     reviewer: null,
     reviewDate: null,
-    comments: null
+    comments: null,
+    version: '1.0',
+    changeVersion: '1.0',
+    progress: 0,
+    paymentRounds: [
+      { round: 1, amount: 10000, status: 'pending', date: new Date('2024-03-01') },
+      { round: 2, amount: 10000, status: 'pending', date: new Date('2024-06-01') },
+      { round: 3, amount: 10000, status: 'pending', date: new Date('2024-12-31') }
+    ],
+    changes: []
   },
   {
     id: '3',
     title: '手機應用開發合約',
     client: 'DEF科技',
-    amount: 80000,
+    originalAmount: 80000,
+    currentAmount: 80000,
+    changeAmount: 0,
     status: 'draft',
     startDate: new Date('2024-03-01'),
     endDate: new Date('2024-08-31'),
@@ -58,13 +91,24 @@ const contracts: any[] = [
     updateDate: new Date('2024-01-25'),
     reviewer: null,
     reviewDate: null,
-    comments: null
+    comments: null,
+    version: '1.0',
+    changeVersion: '1.0',
+    progress: 0,
+    paymentRounds: [
+      { round: 1, amount: 25000, status: 'pending', date: new Date('2024-04-01') },
+      { round: 2, amount: 25000, status: 'pending', date: new Date('2024-06-01') },
+      { round: 3, amount: 30000, status: 'pending', date: new Date('2024-08-31') }
+    ],
+    changes: []
   },
   {
     id: '4',
     title: '資料庫優化合約',
     client: 'GHI銀行',
-    amount: 45000,
+    originalAmount: 45000,
+    currentAmount: 45000,
+    changeAmount: 0,
     status: 'rejected',
     startDate: new Date('2024-02-15'),
     endDate: new Date('2024-05-15'),
@@ -73,7 +117,16 @@ const contracts: any[] = [
     updateDate: new Date('2024-01-21'),
     reviewer: '李經理',
     reviewDate: new Date('2024-01-21'),
-    comments: '預算超出公司標準，需要重新評估'
+    comments: '預算超出公司標準，需要重新評估',
+    version: '1.0',
+    changeVersion: '1.0',
+    progress: 0,
+    paymentRounds: [
+      { round: 1, amount: 15000, status: 'pending', date: new Date('2024-03-15') },
+      { round: 2, amount: 15000, status: 'pending', date: new Date('2024-04-15') },
+      { round: 3, amount: 15000, status: 'pending', date: new Date('2024-05-15') }
+    ],
+    changes: []
   }
 ];
 
@@ -178,6 +231,49 @@ export const CONTRACTS = {
 
   // 審查合約
   'POST /contract/:id/review': (req: MockRequest) => reviewContract(req.params.id, req.body),
+
+  // 請款
+  'POST /contract/:id/payment': (req: MockRequest) => {
+    const contract = getContract(req.params.id);
+    if (contract) {
+      // 更新請款狀態
+      const round = req.body.round;
+      const paymentRound = contract.paymentRounds.find((p: any) => p.round === round);
+      if (paymentRound) {
+        paymentRound.status = 'paid';
+        paymentRound.date = new Date(req.body.date);
+      }
+    }
+    return { msg: 'ok' };
+  },
+
+  // 合約變更
+  'POST /contract/:id/change': (req: MockRequest) => {
+    const contract = getContract(req.params.id);
+    if (contract) {
+      const newChange = {
+        id: contract.changes.length + 1,
+        type: req.body.type,
+        description: req.body.description,
+        amount: req.body.amount,
+        date: new Date(req.body.date),
+        version: req.body.version
+      };
+
+      contract.changes.push(newChange);
+      contract.changeVersion = req.body.version;
+
+      // 更新金額
+      if (req.body.type === '追加') {
+        contract.changeAmount += req.body.amount;
+        contract.currentAmount += req.body.amount;
+      } else {
+        contract.changeAmount -= req.body.amount;
+        contract.currentAmount -= req.body.amount;
+      }
+    }
+    return { msg: 'ok' };
+  },
 
   // 刪除合約
   'DELETE /contract/:id': (req: MockRequest) => deleteContract(req.params.id)

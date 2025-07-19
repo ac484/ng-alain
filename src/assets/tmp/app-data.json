@@ -44,6 +44,16 @@
               "text": "Contract Review",
               "link": "/contract/review",
               "i18n": "menu.contract.review"
+            },
+            {
+              "text": "Contract Payment",
+              "link": "/contract/payment/1",
+              "i18n": "menu.contract.payment"
+            },
+            {
+              "text": "Contract Change",
+              "link": "/contract/change/1",
+              "i18n": "menu.contract.change"
             }
           ]
         },

@@ -38,6 +38,16 @@ export default [
         path: 'detail/:id',
         loadComponent: () => import('./detail/detail.component').then(m => m.ContractDetailComponent),
         data: { title: '合約詳情' }
+      },
+      {
+        path: 'payment/:id',
+        loadComponent: () => import('./payment/payment.component').then(m => m.ContractPaymentComponent),
+        data: { title: '合約請款' }
+      },
+      {
+        path: 'change/:id',
+        loadComponent: () => import('./change/change.component').then(m => m.ContractChangeComponent),
+        data: { title: '合約追加追減' }
       }
     ]
   }

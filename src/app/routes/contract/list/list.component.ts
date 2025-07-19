@@ -12,10 +12,13 @@ interface Contract {
   id: string;
   title: string;
   client: string;
-  amount: number;
+  originalAmount: number;
+  currentAmount: number;
+  changeAmount: number;
   status: 'draft' | 'pending' | 'approved' | 'rejected';
   createDate: Date;
   dueDate: Date;
+  progress: number;
 }
 
 @Component({
@@ -42,7 +45,9 @@ export class ContractListComponent implements OnInit {
   columns: STColumn[] = [
     { title: '合約標題', index: 'title' },
     { title: '客戶', index: 'client' },
-    { title: '金額', index: 'amount', type: 'currency' },
+    { title: '原始金額', index: 'originalAmount', type: 'currency' },
+    { title: '變更金額', index: 'changeAmount', type: 'currency' },
+    { title: '現行金額', index: 'currentAmount', type: 'currency' },
     {
       title: '狀態',
       index: 'status',
@@ -55,6 +60,7 @@ export class ContractListComponent implements OnInit {
         rejected: { text: '已拒絕', color: 'error' }
       }
     },
+    { title: '進度', index: 'progress', type: 'number', format: (item: any) => `${item.progress}%` },
     { title: '建立日期', index: 'createDate', type: 'date' },
     { title: '到期日期', index: 'dueDate', type: 'date' },
     { title: '操作', buttons: [{ text: '操作' }] }
