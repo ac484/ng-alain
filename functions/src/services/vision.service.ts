@@ -62,9 +62,11 @@ export class VisionService {
 
       if (result.responses && result.responses.length > 0) {
         for (const response of result.responses) {
-          if (response.fullTextAnnotation) {
-            allText += response.fullTextAnnotation.text || '';
-            pageCount += response.fullTextAnnotation.pages?.length || 0;
+          // 使用 any 類型來處理複雜的 API 響應結構
+          const responseAny = response as any;
+          if (responseAny.fullTextAnnotation) {
+            allText += responseAny.fullTextAnnotation.text || '';
+            pageCount += responseAny.fullTextAnnotation.pages?.length || 0;
           }
         }
       }

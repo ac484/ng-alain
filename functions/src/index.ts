@@ -1,4 +1,5 @@
 import * as functions from 'firebase-functions';
+import { Request, Response } from 'express';
 import { OcrService } from './services/ocr.service';
 import cors from 'cors';
 
