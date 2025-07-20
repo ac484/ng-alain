@@ -262,7 +262,6 @@ export class WorkspaceTimelineComponent {
       user: ['', [Validators.required]]
     });
 
-    // 初始化示例時間線事件
     this.initializeSampleEvents();
   }
 

@@ -16,7 +16,6 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
 
 interface WorkspaceStats {
   totalProjects: number;
@@ -51,8 +50,7 @@ interface RecentActivity {
     NzProgressModule,
     NzListModule,
     NzTagModule,
-    NzAvatarModule,
-    NzBadgeModule
+    NzAvatarModule
   ],
   template: `
     <div class="workspace-overview">

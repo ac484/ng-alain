@@ -43,7 +43,6 @@ interface CalendarEvent {
     NzInputModule,
     NzDatePickerModule,
     NzSelectModule,
-
     ReactiveFormsModule
   ],
   template: `
@@ -55,7 +54,7 @@ interface CalendarEvent {
         </button>
       </ng-template>
 
-      <nz-calendar [nzFullscreen]="false" (nzSelectChange)="onDateSelect($event)" (nzPanelChange)="onPanelChange($event)">
+      <nz-calendar [nzFullscreen]="false" (nzSelectChange)="onDateSelect($event)">
         <ul *nzDateCell="let date" class="events">
           <ng-container *ngFor="let event of getEventsForDate(date)">
             <li [class]="'event-' + event.type" (click)="viewEvent(event)">
@@ -175,7 +174,6 @@ export class WorkspaceCalendarComponent {
       description: ['']
     });
 
-    // 初始化示例事件
     this.initializeSampleEvents();
   }
 
@@ -208,10 +206,6 @@ export class WorkspaceCalendarComponent {
 
   onDateSelect(date: Date): void {
     console.log('選擇日期:', date);
-  }
-
-  onPanelChange(change: { date: Date; mode: string }): void {
-    console.log('面板變更:', change);
   }
 
   getEventsForDate(date: Date): CalendarEvent[] {

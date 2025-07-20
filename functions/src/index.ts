@@ -1,32 +1,53 @@
 /**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ * Firebase Functions - PDF OCR服務
  */
 
-import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+import { setGlobalOptions } from 'firebase-functions';
+import { onRequest } from 'firebase-functions/https';
+import * as admin from 'firebase-admin';
+import { OcrController } from './controllers/ocr.controller';
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+// 初始化Firebase Admin
+admin.initializeApp();
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+// 設置全局選項
+setGlobalOptions({
+  maxInstances: 10,
+  memory: '1GiB',
+  timeoutSeconds: 540
+});
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// 創建OCR控制器實例
+const ocrController = new OcrController();
+
+/**
+ * PDF OCR文字提取API
+ *
+ * 使用方式:
+ * POST /pdfOcr
+ * Content-Type: application/json
+ *
+ * Body:
+ * {
+ *   "fileData": "base64編碼的PDF文件",
+ *   "fileName": "document.pdf",
+ *   "language": "zh-TW",
+ *   "includeTextBlocks": true
+ * }
+ *
+ * 或者:
+ * {
+ *   "fileUrl": "https://example.com/document.pdf",
+ *   "fileName": "document.pdf"
+ * }
+ */
+export const pdfOcr = onRequest(
+  {
+    maxInstances: 5,
+    memory: '1GiB',
+    timeoutSeconds: 540
+  },
+  async (request, response) => {
+    await ocrController.handlePdfOcr(request, response);
+  }
+);

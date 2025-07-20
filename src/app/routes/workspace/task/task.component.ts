@@ -218,7 +218,6 @@ export class WorkspaceTaskComponent {
       dueDate: [null, [Validators.required]]
     });
 
-    // 初始化示例任務
     this.initializeSampleTasks();
   }
 
