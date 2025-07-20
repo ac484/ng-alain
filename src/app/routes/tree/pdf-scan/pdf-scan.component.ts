@@ -120,7 +120,7 @@ import { OcrService, OcrResult } from '../../../core/services/ocr.service';
                     <nz-statistic nzTitle="頁數" [nzValue]="ocrResult.pages" nzSuffix="頁"> </nz-statistic>
                   </div>
                   <div nz-col nzSpan="8" *ngIf="ocrResult.confidence">
-                    <nz-statistic nzTitle="信心度" [nzValue]="ocrResult.confidence * 100" [nzPrecision]="1" nzSuffix="%"> </nz-statistic>
+                    <nz-statistic nzTitle="信心度" [nzValue]="(ocrResult.confidence * 100).toFixed(1)" nzSuffix="%"> </nz-statistic>
                   </div>
                 </div>
 
@@ -250,7 +250,7 @@ export class TreePdfScanComponent implements OnInit {
   private readonly message = inject(NzMessageService);
 
   // 表單和狀態
-  optionsForm: FormGroup;
+  optionsForm!: FormGroup;
   fileList: NzUploadFile[] = [];
   selectedFile: File | null = null;
   loading = false;
