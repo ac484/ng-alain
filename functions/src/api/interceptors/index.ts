@@ -20,6 +20,11 @@ export const interceptors: Array<(req: Request, res: Response, next: NextFunctio
 
   bodyParser.urlencoded({ extended: false }),
   bodyParser.json(),
+  // Raw body parser for binary data (like OCR buffer)
+  bodyParser.raw({
+    type: 'application/octet-stream',
+    limit: '50mb' // Increase limit for large files
+  }),
 
   // Setting default values
   (req, res, next) => {

@@ -76,7 +76,8 @@ export class OcrController {
 
   private async extractFromBuffer(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.body || !Buffer.isBuffer(req.body)) {
+      // Check if we have raw buffer data
+      if (!req.body || req.body.length === 0) {
         res.status(400).json({
           success: false,
           error: 'Buffer data is required'
@@ -84,7 +85,10 @@ export class OcrController {
         return;
       }
 
-      const result = await this.ocrService.processBuffer(req.body);
+      // Ensure we have a Buffer (raw body parser should provide this)
+      const buffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body);
+
+      const result = await this.ocrService.processBuffer(buffer);
 
       res.status(200).json({
         success: true,
