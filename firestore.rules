@@ -1,34 +1,9 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 用戶資料 - 用戶只能讀寫自己的資料
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // ACL 用戶權限 - 用戶只能讀取自己的權限，管理員可以修改
-    match /acl_users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null &&
-        (request.auth.uid == userId ||
-         exists(/databases/$(database)/documents/acl_users/$(request.auth.uid)) &&
-         get(/databases/$(database)/documents/acl_users/$(request.auth.uid)).data.roles.hasAny(['admin']));
-    }
-
-    // ACL 角色定義 - 所有認證用戶可讀，管理員可寫
-    match /acl_roles/{roleId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        exists(/databases/$(database)/documents/acl_users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/acl_users/$(request.auth.uid)).data.roles.hasAny(['admin']);
-    }
-
-    // ACL 權限定義 - 所有認證用戶可讀，管理員可寫
-    match /acl_permissions/{permissionId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null &&
-        exists(/databases/$(database)/documents/acl_users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/acl_users/$(request.auth.uid)).data.roles.hasAny(['admin']);
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

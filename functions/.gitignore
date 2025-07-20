@@ -1,10 +1,16 @@
+.idea/*
+src/environment/*
+node_modules/*
+dist/*
+
 # Compiled JavaScript files
-lib/**/*.js
-lib/**/*.js.map
+dist/**/*.js
+dist/**/*.js.map
 
 # TypeScript v1 declaration files
 typings/
 
 # Node.js dependency directory
 node_modules/
-*.local
+
+*-debug.log

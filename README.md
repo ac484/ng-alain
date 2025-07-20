@@ -1,90 +1,281 @@
-<p align="center">
-  <a href="https://ng-alain.com">
-    <img width="100" src="https://ng-alain.com/assets/img/logo-color.svg">
-  </a>
-</p>
+# Complete Firebase Cloud Functions TypeScript Example
 
-<h1 align="center">NG-ALAIN</h1>
+A Node.js REST API example for Firebase,
+built with TypeScript, Express, Firebase Authentication, Firebase Admin SDK, and Firestore.
+It also handles Event Triggers (2nd gen) so all your code is organized.
+This project fits well to be used as a template for the creation of new servers.
 
-<div align="center">
-  Out-of-box UI solution for enterprise applications, Let developers focus on business.
+The main aspects of this sample are:
 
-  [![CI](https://github.com/ng-alain/ng-alain/actions/workflows/ci.yml/badge.svg)](https://github.com/ng-alain/ng-alain/actions/workflows/ci.yml)
-  [![Dependency Status](https://david-dm.org/ng-alain/ng-alain/status.svg?style=flat-square)](https://david-dm.org/ng-alain/ng-alain)
-  [![GitHub Release Date](https://img.shields.io/github/release-date/ng-alain/ng-alain.svg?style=flat-square)](https://github.com/ng-alain/ng-alain/releases)
-  [![NPM version](https://img.shields.io/npm/v/ng-alain.svg?style=flat-square)](https://www.npmjs.com/package/ng-alain)
-  [![prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://prettier.io/)
-  [![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square)](https://github.com/ng-alain/ng-alain/blob/master/LICENSE)
-  [![Gitter](https://img.shields.io/gitter/room/ng-alain/ng-alain.svg?style=flat-square)](https://gitter.im/ng-alain/ng-alain)
-  [![ng-zorro-vscode](https://img.shields.io/badge/ng--zorro-VSCODE-brightgreen.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=cipchk.ng-zorro-vscode)
-  [![ng-alain-vscode](https://img.shields.io/badge/ng--alain-VSCODE-brightgreen.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=cipchk.ng-alain-vscode)
+-  **An API HTTP Trigger:**
+ 
+   - A well-organized API under the `api` folder
+   - Access Control: Reject user access by simply choosing what user roles can access a specific path or easily check the claims with a custom `request` object in the Request Handler
+   - Reject a request anywhere by throwing `new HttpResponseError(status, codeString, message)`
+- **Events Triggers (2nd gen):** 
+   - A well-organized Events Triggers under the `event-triggers` folder
 
-</div>
+- Shared components between API and Event Triggers are under the `core` folder
 
-English | [简体中文](README-zh_CN.md)
+## About this example
 
-## Quickstart
+This example is a good start if you are building a 
+Firebase Cloud Functions project.
 
-- [Getting Started](https://ng-alain.com/docs/getting-started)
+### About the 2nd gen event triggers example
 
-## Links
+Every time a user or product is created, or a product is updated,
+a new record is created in
+the `db-changes` Firestore Collection that only admins can access,
+the code for these triggers is inside the `event-triggers` folder.
 
-+ [Document](https://ng-alain.com) ([Surge Mirror](https://ng-alain-doc.surge.sh))
-+ [@delon Source](https://github.com/ng-alain/delon)
-+ [DEMO](https://ng-lin.surge.sh) ([国内镜像](https://ng-alain.gitee.io/))
+The triggers are `onUserCreated`, `onProductCreated`, and `onProductUpdated`.
 
-## Features
+### About the `api` HTTP trigger
 
-+ `ng-zorro-antd` based
-+ Responsive Layout
-+ I18n
-+ [@delon](https://github.com/ng-alain/delon)
-+ Lazy load Assets
-+ UI Router States
-+ Customize Theme
-+ Less preprocessor
-+ RTL
-+ Well organized & commented code
-+ Simple upgrade
-+ Support Docker deploy
+There are three roles: `storeOwner`, `buyer` and `admin`.
+Anyone can create an account, but an `adminKey` is required to create 
+a user with `admin` role.
 
-## Architecture
+#### What each user can do
 
-![Architecture](https://raw.githubusercontent.com/ng-alain/delon/master/_screenshot/architecture.png)
+Store Owners:
+  - ✅ Create products
+  - ✅ List public products data
+  - ✅ Get full data of his own product
+  - ❌ Get full data of other store owners' product
+  - ❌ List records of changes made inside the DB, like "Product Blouse has been updated"
 
-> [delon](https://github.com/ng-alain/delon) is a production-ready solution for admin business components packages, Built on the design principles developed by Ant Design.
+Buyers:
 
-## App Shots
+- ✅ List public products data
+- ❌ Create products
+- ❌ Get full data of a product
+- ❌ List records of changes made inside the DB, like "Product Blouse has been updated"
 
-![desktop](https://raw.githubusercontent.com/ng-alain/delon/master/_screenshot/desktop.png)
-![ipad](https://raw.githubusercontent.com/ng-alain/delon/master/_screenshot/ipad.png)
-![iphone](https://raw.githubusercontent.com/ng-alain/delon/master/_screenshot/iphone.png)
+Admins: 
 
-## Contributing
+- ✅ Create products
+- ✅ List public products data
+- ✅ Get full data of ANY product
+- ✅ List records of changes made inside the DB, like "Product Blouse has been updated"
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/ng-alain/ng-alain/pulls)
+## Getting Started
 
-We welcome all contributions. Please read our [CONTRIBUTING.md](https://github.com/ng-alain/ng-alain/blob/master/CONTRIBUTING.md) first. You can submit any ideas as [pull requests](https://github.com/ng-alain/ng-alain/pulls) or as [GitHub issues](https://github.com/ng-alain/ng-alain/issues).
+In the Firebase Console:
+ 
+1. Go to Build > Authentication > Get Started > Sign-in method > Email/Password and enable Email/Password and save it.
 
-> If you're new to posting issues, we ask that you read [*How To Ask Questions The Smart Way*](http://www.catb.org/~esr/faqs/smart-questions.html) (**This guide does not provide actual support services for this project!**), [How to Ask a Question in Open Source Community](https://github.com/seajs/seajs/issues/545) and [How to Report Bugs Effectively](http://www.chiark.greenend.org.uk/~sgtatham/bugs.html) prior to posting. Well written bug reports help us help you!
+2. Also go to Build > Firestore Database > Create database. You can choose the option `Start in test mode`
 
-## Donation
+### Deploying
 
-ng-alain is an MIT-licensed open source project. In order to achieve better and sustainable development of the project, we expect to gain more backers. You can support us in any of the following ways:
+Go to the `functions` folder and run `npm install`
+to install the dependencies. After that,
+go back to the root folder (`cd ..`) and run:
 
-- [patreon](https://www.patreon.com/cipchk)
-- [opencollective](https://opencollective.com/ng-alain)
-- [paypal](https://www.paypal.me/cipchk)
-- [支付宝或微信](https://ng-alain.com/assets/donate.png)
+- `npm install -g firebase-tools` to install the Firebase CLI
+- `firebase use --add` and select your Firebase project, add any alias you prefer
+- And finally, run `firebase deploy`
 
-Or purchasing our [business theme](https://e.ng-alain.com/).
+## API Authentication
 
-## Backers
+Firebase Authentication is used to verify
+if the client is authenticated on Firebase Authentication,
+to do so, the client side should inform the `Authorization` header:
 
-Thank you to all our backers! 🙏
+### `Authorization` Header
 
-<a href="https://opencollective.com/ng-alain#backers" target="_blank"><img src="https://opencollective.com/ng-alain/backers.svg?width=890"></a>
+The client's ID Token on Firebase Authentication in the format `Bearer <idToken>`,
+it can be obtained on the client side after the authentication is performed with the
+Firebase Authentication library for the client side. 
+It can be generated by the client side only.
 
-### License
+#### Option 1: Generating ID Token with Postman:
 
-The MIT License (see the [LICENSE](https://github.com/ng-alain/ng-alain/blob/master/LICENSE) file for the full text)
+Follow the previous instructions on [Use Postman to test it](#using-postman-to-test-it) and pass
+it as `Authorization` header value in the format `Bearer <idToken>`
+
+#### Option 2: Generating ID Token with a Flutter Client:
+```dart
+final idToken = await FirebaseAuth.instance.currentUser!.getIdToken();
+// use idToken as `Authorization` header value in the format "Bearer <idToken>"
+```
+
+#### Option 3: Generating ID Token with a Web Client:
+```javascript
+const idToken = await getAuth(firebaseApp).currentUser.getIdToken();
+// use idToken as `Authorization` header value in the format "Bearer <idToken>"
+```
+
+## Testing
+
+### Option 1: Testing with Remote DB
+To make tests remotely, check what is your **remote** functions URL: in the Firebase Console go
+to **Functions** > and check the `api` url, it ends with `.cloudfunctions.net/api`.
+
+### Option 2: Testing Locally with a local emulator
+
+In case you want to make tests locally using the Firebase Emulator,
+you can run `npm run emulator` inside the `functions` folder.
+
+⚠️ Changes in the local emulator
+**won't affect the remote db.**
+
+Open the Emulator UI
+on http://127.0.0.1:3005 > **Functions emulator** > and on the first lines
+check the `http function initialized...` log, it shows your Local URL, it ends with `/api`.
+
+### Using Postman to test it
+
+**1.** Import the **[postman_collection.json](postman_collection.json)** file to your Postman
+
+**2.** Right-click on the Postman collection you previously imported,
+   click on **Edit** > **Variables** and on **api** replace the **Current Value** with
+   your API URL. 
+
+Make sure the URL **ends with** `/api` and remember that if you use the local
+   emulator URL it won't affect the remote db.
+
+   If you are testing using the local emulator, it will look something like: `http://127.0.0.1:<port>/<your-project-id>/<region>/api`
+
+   But if you are testing using the remote db, it will look like: `https://<your-project-id>.cloudfunctions.net/api`
+
+**3.** Create an account on the `1. Create Account` Postman Request
+
+**4.** Follow the login steps to get an ID Token on Postman:
+   
+   *It's better to use a library of Firebase Authentication on the Client Side
+   to get the ID Token, but let's use this method for testing because we are using Postman only*
+
+- **4.1.** In the Firebase Console > Go to Project Overview and Add a new **Web** platform
+
+- **4.2.** Add a Nickname like "Postman" and click on Register App
+
+- **4.3.** Copy only the **apiKey** field inside the `firebaseConfig` object
+
+-  **4.4** Let's get the Firebase Authentication Token, on Postman, go to `2. Login on Google APIS` request
+   example and pass the `apiKey` as Query Param, edit the body with your email and password and click on **Send**, 
+you will obtain an `idToken` as the response.
+
+-  **4.5** For the other requests, the `idToken` should be set in the `Authorization` header (type **Bearer**).
+   Let's set it as Postman variable too, so right-click on the Postman collection 
+   **Edit** > **Variables** and on **idToken** replace the **Current Value** with
+   the user **idToken** you previously obtained.
+
+## Access Control
+
+This project uses custom claims on Firebase Authentication to
+define which routes the users have access to.
+
+### Define custom claims to a user
+
+This can be done in the server like below:
+```javascript
+await admin.auth().setCustomUserClaims(user.uid, {
+    storeOwner: true,
+    buyer: false,
+    admin: false
+});
+```
+### Configuring the routes
+
+You can set a param (array of strings) on the `httpServer.<method>`
+function, like:
+
+```javascript
+httpServer.get (
+    '/product/:productId/full-details', 
+    this.getProductByIdFull.bind(this), ['storeOwner']
+);
+```
+
+In the example above, only users with the `storeOwner` custom claim will
+have access to the `/product/:productId/full-details` path.
+
+Is this enough? Not always, so let's check the next section [Errors and permissions](#errors-and-permissions).
+
+## API Errors and permissions
+
+You can easily send an HTTP response with code between 400 and 500 to the client
+by simply throwing a `new HttpResponseError(...)` on your controller, service or repository,
+for example:
+
+```javascript
+throw new HttpResponseError(400, 'BAD_REQUEST', "Missing 'name' field on the body");
+```
+
+Sometimes defining roles isn't enough to ensure that a user can't 
+access or modify a specific data,
+let's imagine if a store owner tries to get full details
+of a product he is not selling, like a product of another store owner,
+he still has access to the route because of his `storeOwner` custom claim,
+but an additional verification is needed.
+
+```javascript
+if (product.storeOwnerUid != req.auth!.uid) {
+    throw new HttpResponseError(
+        403, 
+        'FORBIDDEN', 
+        `You aren't the correct storeOwner`
+    );
+}
+```
+
+### 🚫 Permission errors
+
+- #### "Only storeOwner can perform this operation"
+Means you are not logged in with a user that has the `buyer` claim rather
+than with a user that contains the  `storeOwner` claim.
+
+- #### "You aren't the correct storeOwner"
+Means you are logged in with the correct claim, but you are trying to read other storeOwner's data.
+
+- #### "Only admin can perform this operation"
+Means that this operation requires to be logged with
+a user that has the `admin` claim, but the current user hasn't.
+
+- #### "Requires authentication"
+If you forget to add the Authentication header
+
+## Authentication fields on Express Request Handler
+
+This project adds 3 new fields to the request object on the 
+express request handler, 
+you can also customize this on `src/api/@types/express.d.ts` TypeScript file.
+
+### `req.authenticated` 
+type: `boolean`
+
+Is true only if the client is authenticated, which means, the client
+informed `Authorization` on the headers, and these
+values were successfully validated.
+
+### `req.auth` 
+type: [UserRecord](https://firebase.google.com/docs/reference/admin/node/firebase-admin.auth.userrecord) | `null`
+
+If authenticated: Contains user data of Firebase Authentication.
+
+### `req.token` 
+type: [DecodedIdToken](https://firebase.google.com/docs/reference/admin/node/firebase-admin.auth.decodedidtoken) | `null`
+
+If authenticated: Contains token data of Firebase Authentication.
+
+## Getting in touch
+
+Feel free to open a GitHub issue about:
+
+- :grey_question: questions
+
+- :bulb: suggestions
+
+- :ant: potential bugs
+
+## License
+
+[MIT](LICENSE)
+
+## Reference
+
+This project used as reference part of the structure of the GitHub project [node-typescript-restify](https://github.com/vinicostaa/node-typescript-restify).
+Thank you [developer](https://github.com/vinicostaa/)!
