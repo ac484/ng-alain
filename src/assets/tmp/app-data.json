@@ -54,6 +54,11 @@
               "text": "Contract Change",
               "link": "/contract/change/1",
               "i18n": "menu.contract.change"
+            },
+            {
+              "text": "Contract Attachment",
+              "link": "/contract/attachment/1",
+              "i18n": "menu.contract.attachment"
             }
           ]
         },

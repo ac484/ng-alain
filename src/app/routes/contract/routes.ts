@@ -48,6 +48,11 @@ export default [
         path: 'change/:id',
         loadComponent: () => import('./change/change.component').then(m => m.ContractChangeComponent),
         data: { title: '合約追加追減' }
+      },
+      {
+        path: 'attachment/:id',
+        loadComponent: () => import('./attachment/attachment-page.component').then(m => m.ContractAttachmentPageComponent),
+        data: { title: '合約附件' }
       }
     ]
   }

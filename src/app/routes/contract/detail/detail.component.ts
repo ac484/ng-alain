@@ -9,6 +9,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { HttpClient } from '@angular/common/http';
+import { ContractAttachmentComponent } from '../attachment/attachment.component';
 
 interface ContractDetail {
   id: string;
@@ -51,7 +52,17 @@ interface ContractChange {
 @Component({
   selector: 'app-contract-detail',
   standalone: true,
-  imports: [CommonModule, NzCardModule, NzDescriptionsModule, NzButtonModule, NzTagModule, NzSpaceModule, NzProgressModule, NzTableModule],
+  imports: [
+    CommonModule,
+    NzCardModule,
+    NzDescriptionsModule,
+    NzButtonModule,
+    NzTagModule,
+    NzSpaceModule,
+    NzProgressModule,
+    NzTableModule,
+    ContractAttachmentComponent
+  ],
   template: `
     <nz-card title="合約詳情">
       <nz-descriptions nzTitle="基本資訊" [nzColumn]="2" nzBordered>
@@ -164,10 +175,14 @@ interface ContractChange {
           <button nz-button nzType="primary" (click)="editContract()">編輯合約</button>
           <button nz-button nzType="default" (click)="requestPayment()">請款</button>
           <button nz-button nzType="default" (click)="addChange()">追加追減</button>
+          <button nz-button nzType="default" (click)="manageAttachment()">附件管理</button>
           <button nz-button (click)="goBack()">返回列表</button>
         </nz-space>
       </div>
     </nz-card>
+
+    <!-- 合約附件 -->
+    <app-contract-attachment [contractId]="contract?.id || ''" style="margin-top: 16px;"></app-contract-attachment>
   `
 })
 export class ContractDetailComponent implements OnInit {
@@ -248,6 +263,11 @@ export class ContractDetailComponent implements OnInit {
   addChange(): void {
     // 追加追減功能
     this.router.navigate(['/contract/change', this.contract?.id]);
+  }
+
+  manageAttachment(): void {
+    // 附件管理功能
+    this.router.navigate(['/contract/attachment', this.contract?.id]);
   }
 
   getPaymentStatusColor(status?: string): string {
