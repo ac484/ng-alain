@@ -2,7 +2,8 @@
  * PDF.js 配置檔案
  *
  * 此檔案用於配置 PDF.js 庫的初始化設定
- * 支援中英文 PDF 檔案解析
+ * 支援中英文 PDF 檔案解析，專注於文字提取
+ * 不提取圖片內容，支援任意大小的 PDF 檔案
  */
 
 export interface PDFConfig {
@@ -51,10 +52,13 @@ export function initializePDFJS(): Promise<void> {
       // 配置 PDF.js
       pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_CONFIG.workerSrc;
 
-      // 設定字體映射
+      // 設定字體映射（支援中文）
       pdfjsLib.cMapUrl = PDF_CONFIG.cMapUrl;
       pdfjsLib.cMapPacked = PDF_CONFIG.cMapPacked;
       pdfjsLib.standardFontDataUrl = PDF_CONFIG.standardFontDataUrl;
+
+      // 優化設定：專注於文字提取
+      pdfjsLib.GlobalWorkerOptions.verbosity = 0; // 減少日誌輸出
 
       resolve();
     };
@@ -82,3 +86,7 @@ export function getPDFJS(): any {
   }
   return (window as any).pdfjsLib;
 }
+
+// 匯出所有服務
+export * from './pdf.service';
+export * from '../tree/tree-converter.service';

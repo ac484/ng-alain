@@ -15,7 +15,7 @@
   "menu.contract.review": "合約審查",
   "menu.tree": "樹狀結構",
   "menu.tree.search": "樹狀搜尋",
-  "menu.tree.import-export": "匯入/匯出",
+  "menu.tree.import-export": "CVS匯入/匯出",
   "menu.tree.pdf-import": "PDF 匯入",
   "menu.tree.list": "樹狀列表",
   "menu.tree.create": "建立樹狀結構",
