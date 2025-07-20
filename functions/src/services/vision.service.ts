@@ -1,10 +1,10 @@
-/**
- * Google Cloud Vision API 服務
- */
-
 import { ImageAnnotatorClient } from '@google-cloud/vision';
-import * as logger from 'firebase-functions/logger';
-import { OcrResult, PageResult, TextBlock, BoundingBox, OcrOptions } from '../types';
+
+export interface TextDetectionResult {
+  text: string;
+  pages?: number;
+  confidence?: number;
+}
 
 export class VisionService {
   private client: ImageAnnotatorClient;
@@ -13,154 +13,122 @@ export class VisionService {
     this.client = new ImageAnnotatorClient();
   }
 
-  /**
-   * 執行OCR文字識別
-   */
-  async extractText(imageBuffer: Buffer, options: OcrOptions = {}): Promise<OcrResult> {
+  // 單頁圖片文字檢測
+  async extractTextFromBuffer(buffer: Buffer): Promise<TextDetectionResult> {
     try {
-      const request = {
-        image: { content: imageBuffer },
-        features: [
-          {
-            type: 'DOCUMENT_TEXT_DETECTION' as const,
-            maxResults: 1
-          }
-        ],
-        imageContext: {
-          languageHints: options.language ? [options.language] : ['zh-TW']
-        }
+      const [result] = await this.client.textDetection({
+        image: { content: buffer }
+      });
+
+      const detections = result.textAnnotations;
+      return {
+        text: detections?.[0]?.description || '',
+        pages: 1
       };
+    } catch (error) {
+      throw new Error(`Vision API error: ${error}`);
+    }
+  }
 
-      const [result] = await this.client.annotateImage(request);
+  // PDF/TIFF 多頁文檔檢測 (使用 Firebase Storage URI)
+  async extractTextFromDocument(gcsUri: string): Promise<TextDetectionResult> {
+    try {
+      // 構建 GCS URI (Firebase Storage 格式: gs://bucket-name/path)
+      const formattedUri = gcsUri.startsWith('gs://') ? gcsUri : `gs://${gcsUri}`;
 
-      if (!result.fullTextAnnotation) {
-        return {
-          text: '',
-          confidence: 0,
-          pages: []
-        };
+      const [operation] = await this.client.asyncBatchAnnotateFiles({
+        requests: [
+          {
+            inputConfig: {
+              gcsSource: { uri: formattedUri },
+              mimeType: this.getMimeType(gcsUri)
+            },
+            features: [{ type: 'DOCUMENT_TEXT_DETECTION' }],
+            outputConfig: {
+              gcsDestination: {
+                uri: formattedUri.replace(/\.[^/.]+$/, '_output/')
+              }
+            }
+          }
+        ]
+      });
+
+      // 等待異步操作完成
+      const [result] = await operation.promise();
+
+      // 處理結果
+      let allText = '';
+      let pageCount = 0;
+
+      if (result.responses && result.responses.length > 0) {
+        for (const response of result.responses) {
+          if (response.fullTextAnnotation) {
+            allText += response.fullTextAnnotation.text || '';
+            pageCount += response.fullTextAnnotation.pages?.length || 0;
+          }
+        }
       }
 
-      return this.processVisionResult(result, options);
+      return {
+        text: allText || 'No text detected',
+        pages: pageCount,
+        confidence: 0.8 // 預設信心度
+      };
     } catch (error) {
-      logger.error('Vision API error:', error);
-      throw new Error(`OCR processing failed: ${error}`);
+      throw new Error(`Document processing error: ${error}`);
     }
   }
 
-  /**
-   * 處理Vision API結果
-   */
-  private processVisionResult(result: any, options: OcrOptions): OcrResult {
-    const fullText = result.fullTextAnnotation;
-    const pages: PageResult[] = [];
-
-    if (fullText.pages) {
-      fullText.pages.forEach((page: any, index: number) => {
-        const pageResult: PageResult = {
-          pageNumber: index + 1,
-          text: this.extractPageText(page),
-          confidence: this.calculatePageConfidence(page),
-          blocks: options.includeTextBlocks ? this.extractTextBlocks(page) : []
-        };
-        pages.push(pageResult);
+  // 同步處理 PDF 第一頁
+  async extractTextFromPdfFirstPage(buffer: Buffer): Promise<TextDetectionResult> {
+    try {
+      const [result] = await this.client.documentTextDetection({
+        image: { content: buffer }
       });
+
+      const fullText = result.fullTextAnnotation;
+      return {
+        text: fullText?.text || '',
+        pages: fullText?.pages?.length || 0,
+        confidence: this.calculateAverageConfidence(fullText)
+      };
+    } catch (error) {
+      throw new Error(`PDF text detection error: ${error}`);
     }
-
-    return {
-      text: fullText.text || '',
-      confidence: this.calculateOverallConfidence(pages),
-      pages
-    };
   }
 
-  /**
-   * 提取頁面文字
-   */
-  private extractPageText(page: any): string {
-    if (!page.blocks) return '';
-
-    return page.blocks
-      .map((block: any) =>
-        block.paragraphs
-          ?.map((paragraph: any) => paragraph.words?.map((word: any) => word.symbols?.map((symbol: any) => symbol.text).join('')).join(' '))
-          .join('\n')
-      )
-      .join('\n\n');
+  private getMimeType(filename: string): string {
+    const ext = filename.toLowerCase().split('.').pop();
+    switch (ext) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'tiff':
+      case 'tif':
+        return 'image/tiff';
+      default:
+        return 'application/pdf';
+    }
   }
 
-  /**
-   * 計算頁面信心度
-   */
-  private calculatePageConfidence(page: any): number {
-    if (!page.blocks) return 0;
+  private calculateAverageConfidence(fullText: any): number {
+    if (!fullText?.pages) return 0;
 
     let totalConfidence = 0;
-    let count = 0;
+    let wordCount = 0;
 
-    page.blocks.forEach((block: any) => {
-      if (block.confidence !== undefined) {
-        totalConfidence += block.confidence;
-        count++;
+    for (const page of fullText.pages) {
+      for (const block of page.blocks || []) {
+        for (const paragraph of block.paragraphs || []) {
+          for (const word of paragraph.words || []) {
+            if (word.confidence) {
+              totalConfidence += word.confidence;
+              wordCount++;
+            }
+          }
+        }
       }
-    });
-
-    return count > 0 ? totalConfidence / count : 0;
-  }
-
-  /**
-   * 提取文字區塊
-   */
-  private extractTextBlocks(page: any): TextBlock[] {
-    if (!page.blocks) return [];
-
-    return page.blocks.map((block: any) => ({
-      text: this.extractBlockText(block),
-      confidence: block.confidence || 0,
-      boundingBox: this.extractBoundingBox(block.boundingBox)
-    }));
-  }
-
-  /**
-   * 提取區塊文字
-   */
-  private extractBlockText(block: any): string {
-    if (!block.paragraphs) return '';
-
-    return block.paragraphs
-      .map((paragraph: any) => paragraph.words?.map((word: any) => word.symbols?.map((symbol: any) => symbol.text).join('')).join(' '))
-      .join('\n');
-  }
-
-  /**
-   * 提取邊界框
-   */
-  private extractBoundingBox(boundingBox: any): BoundingBox {
-    if (!boundingBox?.vertices || boundingBox.vertices.length < 2) {
-      return { x: 0, y: 0, width: 0, height: 0 };
     }
 
-    const vertices = boundingBox.vertices;
-    const x = Math.min(...vertices.map((v: any) => v.x || 0));
-    const y = Math.min(...vertices.map((v: any) => v.y || 0));
-    const maxX = Math.max(...vertices.map((v: any) => v.x || 0));
-    const maxY = Math.max(...vertices.map((v: any) => v.y || 0));
-
-    return {
-      x,
-      y,
-      width: maxX - x,
-      height: maxY - y
-    };
-  }
-
-  /**
-   * 計算整體信心度
-   */
-  private calculateOverallConfidence(pages: PageResult[]): number {
-    if (pages.length === 0) return 0;
-
-    const totalConfidence = pages.reduce((sum, page) => sum + page.confidence, 0);
-    return totalConfidence / pages.length;
+    return wordCount > 0 ? totalConfidence / wordCount : 0;
   }
 }

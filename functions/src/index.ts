@@ -1,53 +1,99 @@
-/**
- * Firebase Functions - PDF OCR服務
- */
+import * as functions from 'firebase-functions';
+import { OcrService } from './services/ocr.service';
+import cors from 'cors';
 
-import { setGlobalOptions } from 'firebase-functions';
-import { onRequest } from 'firebase-functions/https';
-import * as admin from 'firebase-admin';
-import { OcrController } from './controllers/ocr.controller';
+const corsHandler = cors({ origin: true });
 
-// 初始化Firebase Admin
-admin.initializeApp();
+const ocrService = new OcrService();
 
-// 設置全局選項
-setGlobalOptions({
-  maxInstances: 10,
-  memory: '1GiB',
-  timeoutSeconds: 540
+export const extractTextFromPdf = functions.https.onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      if (req.method !== 'POST') {
+        res.status(405).json({ error: 'Method not allowed' });
+        return;
+      }
+
+      const { filePath, saveResult = false } = req.body;
+
+      if (!filePath) {
+        res.status(400).json({ error: 'filePath is required' });
+        return;
+      }
+
+      const result = await ocrService.processFile(filePath, saveResult);
+
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('OCR Error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
 });
 
-// 創建OCR控制器實例
-const ocrController = new OcrController();
+export const extractTextFromBuffer = functions.https.onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      if (req.method !== 'POST') {
+        res.status(405).json({ error: 'Method not allowed' });
+        return;
+      }
 
-/**
- * PDF OCR文字提取API
- *
- * 使用方式:
- * POST /pdfOcr
- * Content-Type: application/json
- *
- * Body:
- * {
- *   "fileData": "base64編碼的PDF文件",
- *   "fileName": "document.pdf",
- *   "language": "zh-TW",
- *   "includeTextBlocks": true
- * }
- *
- * 或者:
- * {
- *   "fileUrl": "https://example.com/document.pdf",
- *   "fileName": "document.pdf"
- * }
- */
-export const pdfOcr = onRequest(
-  {
-    maxInstances: 5,
-    memory: '1GiB',
-    timeoutSeconds: 540
-  },
-  async (request, response) => {
-    await ocrController.handlePdfOcr(request, response);
-  }
-);
+      if (!req.body || !Buffer.isBuffer(req.body)) {
+        res.status(400).json({ error: 'Buffer data is required' });
+        return;
+      }
+
+      const result = await ocrService.processBuffer(req.body);
+
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('OCR Buffer Error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+});
+
+// 專門處理 PDF 第一頁的端點
+export const extractTextFromPdfFirstPage = functions.https.onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      if (req.method !== 'POST') {
+        res.status(405).json({ error: 'Method not allowed' });
+        return;
+      }
+
+      const { filePath, saveResult = false } = req.body;
+
+      if (!filePath) {
+        res.status(400).json({ error: 'filePath is required' });
+        return;
+      }
+
+      const result = await ocrService.processPdfFirstPage(filePath, saveResult);
+
+      res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      console.error('PDF First Page OCR Error:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+});

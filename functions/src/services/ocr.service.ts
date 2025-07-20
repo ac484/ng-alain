@@ -1,100 +1,86 @@
-/**
- * OCR主服務 - 整合PDF處理和Vision API
- */
-
-import * as logger from 'firebase-functions/logger';
 import { VisionService } from './vision.service';
-import { PdfUtil } from '../utils/pdf.util';
-import { OcrRequest, OcrResult } from '../types';
+import { StorageService } from './storage.service';
+
+export interface OcrResult {
+  text: string;
+  resultPath?: string;
+  confidence?: number;
+  pages?: number;
+}
 
 export class OcrService {
   private visionService: VisionService;
+  private storageService: StorageService;
 
   constructor() {
     this.visionService = new VisionService();
+    this.storageService = new StorageService();
   }
 
-  /**
-   * 處理PDF OCR請求
-   */
-  async processPdfOcr(request: OcrRequest): Promise<OcrResult> {
+  async processFile(filePath: string, saveResult = false): Promise<OcrResult> {
     try {
-      // 獲取文件緩衝區
-      const buffer = await this.getFileBuffer(request);
+      let visionResult;
 
-      // 驗證文件
-      this.validateFile(buffer, request.fileName);
+      // 檢查是否為 PDF/TIFF 多頁文檔
+      if (this.storageService.isPdfOrTiff(filePath)) {
+        // 使用異步批量處理 (適用於多頁 PDF/TIFF)
+        const gcsUri = this.storageService.getGcsUri(filePath);
+        visionResult = await this.visionService.extractTextFromDocument(gcsUri);
+      } else {
+        // 使用同步處理 (適用於單頁圖片)
+        const buffer = await this.storageService.downloadFile(filePath);
+        visionResult = await this.visionService.extractTextFromBuffer(buffer);
+      }
 
-      // 記錄處理信息
-      PdfUtil.logProcessingInfo(request.fileName, buffer);
+      const result: OcrResult = {
+        text: visionResult.text,
+        confidence: visionResult.confidence,
+        pages: visionResult.pages
+      };
 
-      // 執行OCR
-      const result = await this.visionService.extractText(buffer, request.options);
-
-      logger.info('OCR processing completed:', {
-        fileName: request.fileName,
-        textLength: result.text.length,
-        confidence: result.confidence,
-        pageCount: result.pages.length
-      });
+      // 可選：保存結果到Storage
+      if (saveResult && visionResult.text) {
+        result.resultPath = await this.storageService.uploadResult(filePath, visionResult.text);
+      }
 
       return result;
     } catch (error) {
-      logger.error('OCR service error:', {
-        fileName: request.fileName,
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
+      throw new Error(`OCR processing error: ${error}`);
     }
   }
 
-  /**
-   * 獲取文件緩衝區
-   */
-  private async getFileBuffer(request: OcrRequest): Promise<Buffer> {
-    if (request.fileBuffer) {
-      return request.fileBuffer;
-    }
-
-    if (request.fileUrl) {
-      return await this.downloadFile(request.fileUrl);
-    }
-
-    throw new Error('No file buffer or URL provided');
-  }
-
-  /**
-   * 下載文件
-   */
-  private async downloadFile(url: string): Promise<Buffer> {
+  async processBuffer(buffer: Buffer): Promise<OcrResult> {
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const visionResult = await this.visionService.extractTextFromBuffer(buffer);
+      return {
+        text: visionResult.text,
+        confidence: visionResult.confidence,
+        pages: visionResult.pages
+      };
+    } catch (error) {
+      throw new Error(`OCR buffer processing error: ${error}`);
+    }
+  }
+
+  // 專門處理 PDF 第一頁的方法
+  async processPdfFirstPage(filePath: string, saveResult = false): Promise<OcrResult> {
+    try {
+      const buffer = await this.storageService.downloadFile(filePath);
+      const visionResult = await this.visionService.extractTextFromPdfFirstPage(buffer);
+
+      const result: OcrResult = {
+        text: visionResult.text,
+        confidence: visionResult.confidence,
+        pages: visionResult.pages
+      };
+
+      if (saveResult && visionResult.text) {
+        result.resultPath = await this.storageService.uploadResult(filePath, visionResult.text);
       }
 
-      const arrayBuffer = await response.arrayBuffer();
-      return Buffer.from(arrayBuffer);
+      return result;
     } catch (error) {
-      throw new Error(`Failed to download file: ${error}`);
-    }
-  }
-
-  /**
-   * 驗證文件
-   */
-  private validateFile(buffer: Buffer, fileName: string): void {
-    if (!buffer || buffer.length === 0) {
-      throw new Error('Empty file buffer');
-    }
-
-    if (!PdfUtil.validateFileSize(buffer)) {
-      throw new Error('File size exceeds 10MB limit');
-    }
-
-    if (!PdfUtil.validatePdfBuffer(buffer)) {
-      logger.warn('File may not be a valid PDF:', { fileName });
-      // 不拋出錯誤，因為Vision API可以處理多種圖像格式
+      throw new Error(`PDF first page processing error: ${error}`);
     }
   }
 }
