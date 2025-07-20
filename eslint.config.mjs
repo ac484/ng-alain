@@ -19,7 +19,8 @@ export default tseslint.config(
       'schematics/**/files/**/*',
       'src/dist/**/*',
       'src/templates/**/*',
-      'src/app/routes/gen/**/*'
+      'src/app/routes/gen/**/*',
+      'src/functions/**/*',
     ]
   },
   {
