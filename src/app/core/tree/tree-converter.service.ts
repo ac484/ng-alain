@@ -18,7 +18,6 @@ export class TreeConverterService {
     const treeData: TreeNode[] = [];
     let keyCounter = 0;
 
-    // 過濾空行並限制節點數量
     const validLines = textLines.filter(line => line.trim()).slice(0, maxNodes);
 
     validLines.forEach(line => {

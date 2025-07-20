@@ -8,7 +8,6 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
@@ -28,7 +27,6 @@ import { TreeConverterService, TreeNode } from '../../../core/tree/tree-converte
     NzModalModule,
     NzInputModule,
     NzFormModule,
-    NzSelectModule,
     NzAlertModule,
     NzSpinModule,
     NzEmptyModule,
@@ -65,7 +63,6 @@ import { TreeConverterService, TreeNode } from '../../../core/tree/tree-converte
         </div>
       </nz-spin>
 
-      <!-- PDF 上傳模態框 -->
       <nz-modal
         [(nzVisible)]="isUploadModalVisible"
         nzTitle="PDF 檔案匯入"
