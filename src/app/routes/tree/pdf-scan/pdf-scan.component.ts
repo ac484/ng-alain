@@ -95,7 +95,7 @@ import { OcrService, OcrResult } from '../../../core/services/ocr.service';
                 (click)="startOcr()"
                 nzBlock
               >
-                <i nz-icon nzType="scan"></i>
+                <i nz-icon nzType="eye"></i>
                 開始 OCR 掃描
               </button>
             </nz-card>
@@ -133,7 +133,7 @@ import { OcrService, OcrResult } from '../../../core/services/ocr.service';
                     已保存到 Storage
                   </nz-tag>
                   <nz-tag nzColor="processing" *ngIf="ocrResult.pages && ocrResult.pages > 1">
-                    <i nz-icon nzType="file-pdf"></i>
+                    <i nz-icon nzType="file"></i>
                     多頁文檔
                   </nz-tag>
                 </div>
@@ -157,7 +157,7 @@ import { OcrService, OcrResult } from '../../../core/services/ocr.service';
                     下載文字
                   </button>
                   <button nz-button nzType="default" (click)="clearResult()">
-                    <i nz-icon nzType="clear"></i>
+                    <i nz-icon nzType="close"></i>
                     清除結果
                   </button>
                 </div>
