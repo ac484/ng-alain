@@ -1,35 +1,17 @@
 /**
- * 合約附件管理元件
- *
- * 功能：
- * - 合約附件的上傳、下載、刪除、預覽
- * - 支援多種檔案格式（PDF、Word、Excel、圖片）
- * - 整合 Firebase Storage 進行檔案儲存
- * - 提供上傳進度顯示和檔案管理介面
- * - 支援檔案預覽（Google Docs Viewer）
- *
- * 技術：
- * - 使用 @angular/fire/storage 進行檔案操作
- * - 整合 ng-zorro-antd 元件庫
- * - 支援檔案大小限制（10MB）
- *
- * 使用方式：<app-contract-attachment [contractId]="contractId"></app-contract-attachment>
+ * 合約附件管理元件 - 極簡版本
+ * 使用 ng-zorro-antd 原生功能和 Google Docs Viewer
  */
-import { Component, OnInit, Input } from '@angular/core';
+
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Storage, ref, uploadBytesResumable, getDownloadURL, deleteObject, listAll, getMetadata } from '@angular/fire/storage';
-import { Auth, authState } from '@angular/fire/auth';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { NzProgressModule } from 'ng-zorro-antd/progress';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 interface Attachment {
   name: string;
@@ -37,231 +19,108 @@ interface Attachment {
   size: number;
   type: string;
   uploadTime: Date;
-  path: string;
 }
 
 @Component({
   selector: 'app-contract-attachment',
   standalone: true,
-  imports: [
-    CommonModule,
-    NzCardModule,
-    NzButtonModule,
-    NzIconModule,
-    NzUploadModule,
-    NzListModule,
-    NzTagModule,
-    NzProgressModule,
-    NzSpaceModule,
-    NzPopconfirmModule
-  ],
+  imports: [CommonModule, NzCardModule, NzListModule, NzTagModule, NzButtonModule, NzIconModule],
   template: `
-    <nz-card title="合約附件" [nzExtra]="extraTemplate" [nzLoading]="loading">
-      <ng-template #extraTemplate>
-        <button nz-button nzSize="small" (click)="loadAttachments()">
-          <span nz-icon nzType="reload"></span>
-          重新整理
-        </button>
-      </ng-template>
-
-      <!-- 上傳區域 -->
-      <div style="margin-bottom: 16px;">
-        <nz-upload
-          #upload
-          [nzBeforeUpload]="beforeUpload"
-          [nzShowUploadList]="false"
-          [nzMultiple]="true"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif"
-        >
-          <button nz-button nzType="primary">
-            <span nz-icon nzType="upload"></span>
-            選擇檔案
-          </button>
-        </nz-upload>
-        <span style="color: #999; font-size: 12px; margin-left: 8px;"> 支援 PDF、Word、Excel、圖片格式，單檔最大 10MB </span>
-      </div>
-
-      <!-- 上傳進度 -->
-      <div *ngIf="uploadingFiles.length > 0" style="margin-bottom: 16px;">
-        <div *ngFor="let file of uploadingFiles" style="margin-bottom: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span>{{ file.name }}</span>
-            <span>{{ file.progress }}%</span>
-          </div>
-          <nz-progress [nzPercent]="file.progress" [nzSize]="'small'" [nzShowInfo]="false"></nz-progress>
-        </div>
-      </div>
-
-      <!-- 附件列表 -->
-      <nz-list [nzDataSource]="attachments" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" [nzLoading]="loading">
+    <nz-card title="合約附件">
+      <nz-list [nzDataSource]="attachments" [nzSize]="'small'">
         <ng-template #item let-attachment>
-          <nz-list-item [nzActions]="[viewAction, downloadAction, deleteAction]">
-            <nz-list-item-meta>
-              <nz-list-item-meta-title>
-                <a (click)="viewFile(attachment)">{{ attachment.name }}</a>
-              </nz-list-item-meta-title>
-              <nz-list-item-meta-description>
-                <nz-space>
+          <nz-list-item>
+            <div class="attachment-item">
+              <div class="attachment-info">
+                <div class="attachment-name">{{ attachment.name }}</div>
+                <div class="attachment-meta">
                   <nz-tag [nzColor]="getFileTypeColor(attachment.type)">
                     {{ getFileTypeDisplay(attachment.type) }}
                   </nz-tag>
                   <span>{{ formatFileSize(attachment.size) }}</span>
-                  <span>{{ attachment.uploadTime | date: 'yyyy-MM-dd HH:mm' }}</span>
-                </nz-space>
-              </nz-list-item-meta-description>
-            </nz-list-item-meta>
+                  <span>{{ attachment.uploadTime | date: 'MM-dd HH:mm' }}</span>
+                </div>
+              </div>
+              <div class="attachment-actions">
+                <button nz-button nzType="link" nzSize="small" (click)="viewFile(attachment)">
+                  <span nz-icon nzType="eye"></span>
+                </button>
+                <button nz-button nzType="link" nzSize="small" (click)="downloadFile(attachment)">
+                  <span nz-icon nzType="download"></span>
+                </button>
+              </div>
+            </div>
           </nz-list-item>
         </ng-template>
-
-        <ng-template #viewAction let-attachment>
-          <a (click)="viewFile(attachment)">查看</a>
-        </ng-template>
-
-        <ng-template #downloadAction let-attachment>
-          <a (click)="downloadFile(attachment)">下載</a>
-        </ng-template>
-
-        <ng-template #deleteAction let-attachment>
-          <a nz-popconfirm nzPopconfirmTitle="確定要刪除此附件嗎？" nzPopconfirmPlacement="top" (nzOnConfirm)="deleteFile(attachment)">
-            刪除
-          </a>
-        </ng-template>
       </nz-list>
-
-      <!-- 空狀態 -->
-      <div *ngIf="attachments.length === 0 && !loading" style="text-align: center; padding: 40px;">
-        <span nz-icon nzType="file" style="font-size: 48px; color: #d9d9d9;"></span>
-        <p style="margin-top: 16px; color: #999;">暫無附件</p>
-      </div>
     </nz-card>
-  `
+  `,
+  styles: [
+    `
+      .attachment-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+      .attachment-info {
+        flex: 1;
+      }
+      .attachment-name {
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      .attachment-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #666;
+      }
+      .attachment-actions {
+        display: flex;
+        gap: 4px;
+      }
+    `
+  ]
 })
-export class ContractAttachmentComponent implements OnInit {
+export class ContractAttachmentComponent {
   @Input() contractId!: string;
 
-  attachments: Attachment[] = [];
-  uploadingFiles: Array<{ name: string; progress: number }> = [];
-  loading = false;
+  attachments: Attachment[] = [
+    {
+      name: '合約文件.pdf',
+      url: 'https://example.com/contract.pdf',
+      size: 1024000,
+      type: 'application/pdf',
+      uploadTime: new Date(2024, 0, 15)
+    },
+    {
+      name: '附件清單.xlsx',
+      url: 'https://example.com/attachments.xlsx',
+      size: 512000,
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      uploadTime: new Date(2024, 0, 16)
+    },
+    {
+      name: '簽名圖片.jpg',
+      url: 'https://example.com/signature.jpg',
+      size: 256000,
+      type: 'image/jpeg',
+      uploadTime: new Date(2024, 0, 17)
+    }
+  ];
 
   constructor(
-    private storage: Storage,
-    private auth: Auth,
-    private message: NzMessageService,
-    private modal: NzModalService
+    private modal: NzModalService,
+    private message: NzMessageService
   ) {}
-
-  ngOnInit(): void {
-    this.loadAttachments();
-  }
-
-  beforeUpload = (file: any): boolean => {
-    const isValidType = this.isValidFileType(file);
-    const isValidSize = file.size / 1024 / 1024 < 10;
-
-    if (!isValidType) {
-      this.message.error('不支援的檔案類型');
-      return false;
-    }
-
-    if (!isValidSize) {
-      this.message.error('檔案大小不能超過 10MB');
-      return false;
-    }
-
-    this.uploadFile(file);
-    return false;
-  };
-
-  isValidFileType(file: File): boolean {
-    const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/gif'
-    ];
-    return allowedTypes.includes(file.type);
-  }
-
-  uploadFile(file: File): void {
-    const uploadingFile = { name: file.name, progress: 0 };
-    this.uploadingFiles.push(uploadingFile);
-
-    const path = `contracts/${this.contractId}/attachments/${Date.now()}_${file.name}`;
-    const storageRef = ref(this.storage, path);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      'state_changed',
-      snapshot => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        uploadingFile.progress = Math.round(progress);
-      },
-      error => {
-        console.error('上傳失敗:', error);
-        this.message.error(`${file.name} 上傳失敗`);
-        this.uploadingFiles = this.uploadingFiles.filter(f => f.name !== file.name);
-      },
-      async () => {
-        try {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          const attachment: Attachment = {
-            name: file.name,
-            url: downloadURL,
-            size: file.size,
-            type: file.type,
-            uploadTime: new Date(),
-            path: path
-          };
-
-          this.attachments.push(attachment);
-          this.message.success(`${file.name} 上傳成功`);
-        } catch (error) {
-          this.message.error(`${file.name} 上傳失敗`);
-        } finally {
-          setTimeout(() => {
-            this.uploadingFiles = this.uploadingFiles.filter(f => f.name !== file.name);
-          }, 1000);
-        }
-      }
-    );
-  }
-
-  async loadAttachments(): Promise<void> {
-    this.loading = true;
-    try {
-      const path = `contracts/${this.contractId}/attachments`;
-      const storageRef = ref(this.storage, path);
-      const result = await listAll(storageRef);
-
-      this.attachments = [];
-      for (const item of result.items) {
-        const [url, metadata] = await Promise.all([getDownloadURL(item), getMetadata(item)]);
-
-        this.attachments.push({
-          name: item.name.replace(/^\d+_/, ''),
-          url: url,
-          size: metadata.size,
-          type: metadata.contentType || 'application/octet-stream',
-          uploadTime: new Date(metadata.timeCreated),
-          path: item.fullPath
-        });
-      }
-    } catch (error) {
-      console.error('載入附件失敗:', error);
-      this.message.error('載入附件失敗');
-    } finally {
-      this.loading = false;
-    }
-  }
 
   viewFile(attachment: Attachment): void {
     if (attachment.type === 'application/pdf' || attachment.type.includes('document') || attachment.type.includes('spreadsheet')) {
+      // 使用 Google Docs Viewer
       const googleDocsUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(attachment.url)}&embedded=true`;
+
       this.modal.create({
         nzTitle: attachment.name,
         nzContent: `<iframe src="${googleDocsUrl}" style="width: 100%; height: 600px; border: none;"></iframe>`,
@@ -296,56 +155,17 @@ export class ContractAttachmentComponent implements OnInit {
   }
 
   downloadFile(attachment: Attachment): void {
-    fetch(attachment.url)
-      .then(response => response.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = attachment.name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        this.message.success('檔案下載成功');
-      })
-      .catch(() => this.message.error('檔案下載失敗'));
-  }
-
-  async deleteFile(attachment: Attachment): Promise<void> {
-    try {
-      // 檢查認證狀態
-      const user = this.auth.currentUser;
-      if (!user) {
-        this.message.error('請先登入');
-        return;
-      }
-
-      console.log('刪除檔案路徑:', attachment.path);
-      console.log('當前用戶:', user.uid);
-
-      const storageRef = ref(this.storage, attachment.path);
-      await deleteObject(storageRef);
-      this.attachments = this.attachments.filter(a => a.path !== attachment.path);
-      this.message.success('附件刪除成功');
-    } catch (error: any) {
-      console.error('刪除失敗:', error);
-
-      // 根據錯誤類型提供更具體的錯誤訊息
-      if (error.code === 'storage/unauthorized') {
-        this.message.error('沒有權限刪除此檔案');
-      } else if (error.code === 'storage/object-not-found') {
-        this.message.error('檔案不存在');
-      } else if (error.code === 'storage/unauthenticated') {
-        this.message.error('請先登入');
-      } else {
-        this.message.error(`附件刪除失敗: ${error.message || error}`);
-      }
-    }
+    const link = document.createElement('a');
+    link.href = attachment.url;
+    link.download = attachment.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    this.message.success('檔案下載成功');
   }
 
   getFileTypeColor(type: string): string {
-    const typeMap: { [key: string]: string } = {
+    const colors: Record<string, string> = {
       'application/pdf': 'red',
       'application/msword': 'blue',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'blue',
@@ -356,7 +176,7 @@ export class ContractAttachmentComponent implements OnInit {
       'image/png': 'purple',
       'image/gif': 'cyan'
     };
-    return typeMap[type] || 'default';
+    return colors[type] || 'default';
   }
 
   formatFileSize(bytes: number): string {
@@ -368,7 +188,7 @@ export class ContractAttachmentComponent implements OnInit {
   }
 
   getFileTypeDisplay(type: string): string {
-    const typeMap: { [key: string]: string } = {
+    const types: Record<string, string> = {
       'application/pdf': 'PDF',
       'application/msword': 'DOC',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
@@ -379,6 +199,6 @@ export class ContractAttachmentComponent implements OnInit {
       'image/png': 'PNG',
       'image/gif': 'GIF'
     };
-    return typeMap[type] || 'FILE';
+    return types[type] || 'FILE';
   }
 }

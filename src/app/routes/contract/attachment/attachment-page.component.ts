@@ -1,14 +1,7 @@
 /**
- * 合約附件管理頁面元件
- *
- * 功能：
- * - 提供合約附件的獨立管理頁面
- * - 包含返回按鈕，可返回合約詳情頁面
- * - 整合 ContractAttachmentComponent 進行附件操作
- *
- * 路由：/contract/attachment/:id
- * 依賴：ContractAttachmentComponent
+ * 合約附件管理頁面元件 - 極簡版本
  */
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -22,16 +15,21 @@ import { ContractAttachmentComponent } from './attachment.component';
   standalone: true,
   imports: [CommonModule, NzCardModule, NzButtonModule, NzIconModule, ContractAttachmentComponent],
   template: `
-    <nz-card>
-      <div style="margin-bottom: 16px;">
-        <button nz-button (click)="goBack()">
-          <span nz-icon nzType="arrow-left"></span>
-          返回合約詳情
-        </button>
-      </div>
+    <div class="attachment-page">
+      <button nz-button (click)="goBack()" style="margin-bottom: 16px;">
+        <span nz-icon nzType="arrow-left"></span>
+        返回
+      </button>
       <app-contract-attachment [contractId]="contractId"></app-contract-attachment>
-    </nz-card>
-  `
+    </div>
+  `,
+  styles: [
+    `
+      .attachment-page {
+        padding: 16px;
+      }
+    `
+  ]
 })
 export class ContractAttachmentPageComponent implements OnInit {
   contractId = '';
