@@ -93,6 +93,11 @@
               "i18n": "menu.tree.pdf-import"
             },
             {
+              "text": "PDF Scan",
+              "link": "/tree/pdf-scan",
+              "i18n": "menu.tree.pdf-scan"
+            },
+            {
               "text": "Tree Settings",
               "link": "/tree/settings",
               "i18n": "menu.tree.settings"

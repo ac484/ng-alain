@@ -18,7 +18,6 @@ import { ContractAttachmentComponent } from './attachment.component';
           返回合約詳情
         </button>
       </div>
-
       <app-contract-attachment [contractId]="contractId"></app-contract-attachment>
     </nz-card>
   `

@@ -32,6 +32,10 @@ export default [
         loadComponent: () => import('./pdf-import/pdf-import.component').then(m => m.TreePdfImportComponent)
       },
       {
+        path: 'pdf-scan',
+        loadComponent: () => import('./pdf-scan/pdf-scan.component').then(m => m.TreePdfScanComponent)
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./settings/settings.component').then(m => m.TreeSettingsComponent)
       },

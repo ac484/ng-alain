@@ -18,6 +18,7 @@
   "menu.tree.search": "樹狀搜尋",
   "menu.tree.import-export": "CVS匯入/匯出",
   "menu.tree.pdf-import": "PDF 匯入",
+  "menu.tree.pdf-scan": "PDF 掃描",
   "menu.tree.list": "樹狀列表",
   "menu.tree.create": "建立樹狀結構",
   "menu.tree.settings": "樹狀設定",
