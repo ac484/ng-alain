@@ -37,7 +37,8 @@ import { OcrService, OcrResult } from '../../../core/services/ocr.service';
     NzStatisticModule,
     NzGridModule,
     NzSwitchModule,
-    NzAlertModule
+    NzAlertModule,
+    NzCheckboxModule
   ],
   template: `
     <div class="pdf-scan-container">
@@ -244,12 +245,9 @@ import { OcrService, OcrResult } from '../../../core/services/ocr.service';
   ]
 })
 export class TreePdfScanComponent implements OnInit {
-  private readonly http = inject(HttpClient);
+  private readonly ocrService = inject(OcrService);
   private readonly fb = inject(FormBuilder);
   private readonly message = inject(NzMessageService);
-
-  // Firebase Functions URL
-  private readonly functionsUrl = 'https://us-central1-lin-in.cloudfunctions.net/api';
 
   // 表單和狀態
   optionsForm: FormGroup;
@@ -270,21 +268,21 @@ export class TreePdfScanComponent implements OnInit {
   }
 
   beforeUpload = (file: NzUploadFile): boolean => {
+    const fileObj = file as any as File;
+
     // 檢查文件類型
-    const isValidType = this.isValidFileType(file);
-    if (!isValidType) {
+    if (!this.ocrService.isSupportedFileType(fileObj)) {
       this.message.error('請上傳 PDF、TIFF 或圖片文件！');
       return false;
     }
 
     // 檢查文件大小 (20MB)
-    const isLt20M = file.size! / 1024 / 1024 < 20;
-    if (!isLt20M) {
+    if (!this.ocrService.isValidFileSize(fileObj, 20)) {
       this.message.error('文件大小不能超過 20MB！');
       return false;
     }
 
-    this.selectedFile = file as any;
+    this.selectedFile = fileObj;
     this.fileList = [file];
 
     return false; // 阻止自動上傳
@@ -298,12 +296,6 @@ export class TreePdfScanComponent implements OnInit {
     }
   }
 
-  private isValidFileType(file: NzUploadFile): boolean {
-    const validTypes = ['application/pdf', 'image/tiff', 'image/tif', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-
-    return validTypes.some(type => file.type === type || file.name?.toLowerCase().endsWith(type.split('/')[1]));
-  }
-
   async startOcr(): Promise<void> {
     if (!this.selectedFile) {
       this.message.warning('請先選擇文件！');
@@ -314,95 +306,48 @@ export class TreePdfScanComponent implements OnInit {
     this.ocrResult = null;
 
     try {
-      // 上傳文件到 Firebase Storage (這裡簡化處理，實際應該先上傳到 Storage)
-      // 為了演示，我們使用 buffer 方式處理
-      const result = await this.processWithBuffer();
+      // 將文件轉換為 ArrayBuffer 並處理
+      const arrayBuffer = await this.ocrService.fileToArrayBuffer(this.selectedFile);
 
-      if (result.success && result.data) {
-        this.ocrResult = result.data;
-        this.message.success('OCR 處理完成！');
-      } else {
-        throw new Error(result.error || 'OCR 處理失敗');
-      }
+      // 使用 OCR 服務處理
+      this.ocrService.extractFromBuffer(arrayBuffer).subscribe({
+        next: result => {
+          this.ocrResult = result;
+          this.message.success('OCR 處理完成！');
+          this.loading = false;
+        },
+        error: error => {
+          console.error('OCR Error:', error);
+          this.message.error(`OCR 處理失敗: ${error.message}`);
+          this.loading = false;
+        }
+      });
     } catch (error) {
-      console.error('OCR Error:', error);
-      this.message.error(`OCR 處理失敗: ${error}`);
-    } finally {
+      console.error('File processing error:', error);
+      this.message.error('文件處理失敗！');
       this.loading = false;
     }
   }
 
-  private async processWithBuffer(): Promise<OcrResponse> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = async () => {
-        try {
-          const arrayBuffer = reader.result as ArrayBuffer;
-          const uint8Array = new Uint8Array(arrayBuffer);
-
-          const headers = new HttpHeaders({
-            'Content-Type': 'application/octet-stream'
-          });
-
-          const response = await this.http.post<OcrResponse>(`${this.functionsUrl}/ocr/buffer`, uint8Array, { headers }).toPromise();
-
-          resolve(response!);
-        } catch (error) {
-          reject(error);
-        }
-      };
-
-      reader.onerror = () => reject(new Error('文件讀取失敗'));
-      reader.readAsArrayBuffer(this.selectedFile!);
-    });
-  }
-
-  // 如果文件已上傳到 Storage，可以使用這個方法
-  private processWithStoragePath(filePath: string): Observable<OcrResponse> {
-    const options = this.optionsForm.value;
-    const endpoint = options.pdfFirstPageOnly ? 'pdf-first-page' : 'extract';
-
-    const body = {
-      filePath: filePath,
-      saveResult: options.saveResult
-    };
-
-    return this.http.post<OcrResponse>(`${this.functionsUrl}/ocr/${endpoint}`, body);
-  }
-
   formatText(text: string): string {
-    if (!text) return '';
-
-    // 簡單的文字格式化
-    return text.replace(/\n/g, '<br>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/  /g, '&nbsp;&nbsp;');
+    return this.ocrService.formatText(text);
   }
 
-  copyText(): void {
+  async copyText(): Promise<void> {
     if (!this.ocrResult?.text) return;
 
-    navigator.clipboard
-      .writeText(this.ocrResult.text)
-      .then(() => {
-        this.message.success('文字已複製到剪貼板！');
-      })
-      .catch(() => {
-        this.message.error('複製失敗！');
-      });
+    const success = await this.ocrService.copyToClipboard(this.ocrResult.text);
+    if (success) {
+      this.message.success('文字已複製到剪貼板！');
+    } else {
+      this.message.error('複製失敗！');
+    }
   }
 
   downloadText(): void {
     if (!this.ocrResult?.text) return;
 
-    const blob = new Blob([this.ocrResult.text], { type: 'text/plain;charset=utf-8' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-
-    link.href = url;
-    link.download = `ocr-result-${new Date().getTime()}.txt`;
-    link.click();
-
-    window.URL.revokeObjectURL(url);
+    this.ocrService.downloadTextFile(this.ocrResult.text);
     this.message.success('文字文件已下載！');
   }
 
