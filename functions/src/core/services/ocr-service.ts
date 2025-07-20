@@ -20,7 +20,15 @@ export class OcrService {
 
   constructor() {
     this.visionClient = new ImageAnnotatorClient();
-    this.bucket = admin.storage().bucket();
+    // 延遲初始化 bucket，避免在模組載入時就調用
+    this.bucket = null;
+  }
+
+  private getBucket() {
+    if (!this.bucket) {
+      this.bucket = admin.storage().bucket();
+    }
+    return this.bucket;
   }
 
   // 智能處理文件 (根據類型選擇最佳方法)
@@ -94,7 +102,7 @@ export class OcrService {
 
   private async downloadFile(filePath: string): Promise<Buffer> {
     try {
-      const file = this.bucket.file(filePath);
+      const file = this.getBucket().file(filePath);
       const [buffer] = await file.download();
       return buffer;
     } catch (error) {
@@ -105,7 +113,7 @@ export class OcrService {
   private async uploadResult(filePath: string, content: string): Promise<string> {
     try {
       const resultPath = filePath.replace(/\.[^/.]+$/, '_ocr.txt');
-      const file = this.bucket.file(resultPath);
+      const file = this.getBucket().file(resultPath);
 
       await file.save(content, {
         metadata: { contentType: 'text/plain' }
@@ -118,7 +126,7 @@ export class OcrService {
   }
 
   private getGcsUri(filePath: string): string {
-    return `gs://${this.bucket.name}/${filePath}`;
+    return `gs://${this.getBucket().name}/${filePath}`;
   }
 
   private isPdfOrTiff(filePath: string): boolean {
