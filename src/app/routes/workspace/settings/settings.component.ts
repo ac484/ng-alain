@@ -1,3 +1,33 @@
+/**
+ * 工作區設定元件
+ *
+ * 功能：
+ * - 提供工作區的設定管理
+ * - 支援工作區配置和偏好設定
+ * - 表單驗證和設定保存
+ *
+ * 設定項目：
+ * - 基本設定：工作區名稱、描述、圖標
+ * - 通知設定：郵件通知、推送通知
+ * - 權限設定：成員權限、訪問控制
+ * - 整合設定：第三方服務連接
+ * - 主題設定：介面主題、語言設定
+ *
+ * 表單功能：
+ * - 響應式表單驗證
+ * - 設定項目分類管理
+ * - 重置和保存操作
+ * - 即時預覽效果
+ *
+ * 業務邏輯：
+ * - 設定資料的載入和保存
+ * - 表單驗證確保資料完整性
+ * - 設定變更的即時應用
+ * - 設定備份和恢復功能
+ *
+ * 路由：/workspace/settings
+ * 依賴：Angular Reactive Forms、ng-zorro-antd/form
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';

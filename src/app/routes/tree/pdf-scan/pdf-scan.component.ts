@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { NzUploadModule, NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -16,20 +15,8 @@ import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { Observable, finalize } from 'rxjs';
-
-interface OcrResult {
-  text: string;
-  resultPath?: string;
-  confidence?: number;
-  pages?: number;
-}
-
-interface OcrResponse {
-  success: boolean;
-  data?: OcrResult;
-  error?: string;
-}
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { OcrService, OcrResult } from '../../../core/services/ocr.service';
 
 @Component({
   selector: 'app-tree-pdf-scan',

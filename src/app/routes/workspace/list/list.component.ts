@@ -1,3 +1,33 @@
+/**
+ * 工作區列表元件
+ *
+ * 功能：
+ * - 展示所有工作區的列表
+ * - 提供工作區的基本資訊檢視
+ * - 支援編輯和查看操作
+ *
+ * 表格欄位：
+ * - 名稱：工作區的顯示名稱
+ * - 類型：專案/團隊/個人（不同顏色標籤）
+ * - 成員數量：當前成員人數
+ * - 狀態：啟用/停用狀態
+ * - 創建日期：工作區的建立時間
+ * - 操作：編輯、查看按鈕
+ *
+ * 狀態顯示：
+ * - 啟用狀態：綠色標籤
+ * - 停用狀態：灰色標籤
+ * - 類型顏色：藍色（專案）、綠色（團隊）、橙色（個人）
+ *
+ * 互動功能：
+ * - 工作區點擊查看詳情
+ * - 編輯工作區設定
+ * - 工作區狀態管理
+ * - 成員管理功能
+ *
+ * 路由：/workspace/list
+ * 依賴：ng-zorro-antd/table、ng-zorro-antd/tag
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';
