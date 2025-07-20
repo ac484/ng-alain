@@ -124,10 +124,8 @@ import {
   ExperimentOutline,
   // OCR 組件需要的圖標
   InboxOutline,
-  ScanOutline,
   SaveOutline,
-  CopyOutline,
-  ClearOutline
+  CopyOutline
 } from '@ant-design/icons-angular/icons';
 
 export const ICONS = [
@@ -242,8 +240,6 @@ export const ICONS = [
   ExperimentOutline,
   // OCR 組件需要的圖標
   InboxOutline,
-  ScanOutline,
   SaveOutline,
-  CopyOutline,
-  ClearOutline
+  CopyOutline
 ];
