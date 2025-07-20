@@ -20,6 +20,18 @@ export default [
         loadComponent: () => import('./create/create.component').then(m => m.TreeCreateComponent)
       },
       {
+        path: 'search',
+        loadComponent: () => import('./search/search.component').then(m => m.TreeSearchComponent)
+      },
+      {
+        path: 'import-export',
+        loadComponent: () => import('./import-export/import-export.component').then(m => m.TreeImportExportComponent)
+      },
+      {
+        path: 'pdf-import',
+        loadComponent: () => import('./pdf-import/pdf-import.component').then(m => m.TreePdfImportComponent)
+      },
+      {
         path: 'settings',
         loadComponent: () => import('./settings/settings.component').then(m => m.TreeSettingsComponent)
       },

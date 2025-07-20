@@ -73,6 +73,21 @@
               "i18n": "menu.tree.create"
             },
             {
+              "text": "Tree Search",
+              "link": "/tree/search",
+              "i18n": "menu.tree.search"
+            },
+            {
+              "text": "Import/Export",
+              "link": "/tree/import-export",
+              "i18n": "menu.tree.import-export"
+            },
+            {
+              "text": "PDF Import",
+              "link": "/tree/pdf-import",
+              "i18n": "menu.tree.pdf-import"
+            },
+            {
               "text": "Tree Settings",
               "link": "/tree/settings",
               "i18n": "menu.tree.settings"
