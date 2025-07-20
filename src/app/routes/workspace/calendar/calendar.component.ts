@@ -1,5 +1,5 @@
 /**
- * 工作區行事曆元件 - 極簡版本
+ * 工地重設備搬運行事曆元件 - 極簡版本
  * 使用 ng-zorro-antd calendar 原生功能
  */
 
@@ -9,11 +9,12 @@ import { NzCalendarModule } from 'ng-zorro-antd/calendar';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 
-interface CalendarEvent {
+interface ConstructionEvent {
   id: string;
   title: string;
   date: Date;
-  type: 'meeting' | 'task' | 'reminder';
+  type: 'construction' | 'equipment' | 'safety' | 'maintenance';
+  priority: 'low' | 'medium' | 'high';
 }
 
 @Component({
@@ -21,7 +22,7 @@ interface CalendarEvent {
   standalone: true,
   imports: [CommonModule, NzCalendarModule, NzCardModule, NzBadgeModule],
   template: `
-    <nz-card nzTitle="工作區日曆">
+    <nz-card nzTitle="工地施工行事曆">
       <nz-calendar [nzFullscreen]="false">
         <ul *nzDateCell="let date" class="events">
           <ng-container *ngFor="let event of getEventsForDate(date)">
@@ -47,42 +48,83 @@ interface CalendarEvent {
         text-overflow: ellipsis;
         font-size: 12px;
       }
-      .event-meeting .ant-badge-status-dot {
+      .event-construction .ant-badge-status-dot {
         background-color: #1890ff;
       }
-      .event-task .ant-badge-status-dot {
-        background-color: #52c41a;
+      .event-equipment .ant-badge-status-dot {
+        background-color: #722ed1;
       }
-      .event-reminder .ant-badge-status-dot {
-        background-color: #faad14;
+      .event-safety .ant-badge-status-dot {
+        background-color: #f5222d;
+      }
+      .event-maintenance .ant-badge-status-dot {
+        background-color: #fa8c16;
       }
     `
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WorkspaceCalendarComponent {
-  events: CalendarEvent[] = [
+  events: ConstructionEvent[] = [
     {
       id: '1',
-      title: '團隊會議',
-      date: new Date(2024, 0, 15, 10, 0),
-      type: 'meeting'
+      title: '主體結構施工開始',
+      date: new Date(2024, 0, 15, 8, 0),
+      type: 'construction',
+      priority: 'high'
     },
     {
       id: '2',
-      title: '完成報告',
-      date: new Date(2024, 0, 20, 14, 30),
-      type: 'task'
+      title: '起重機安全檢查',
+      date: new Date(2024, 0, 20, 7, 30),
+      type: 'safety',
+      priority: 'high'
     },
     {
       id: '3',
-      title: '客戶回訪',
+      title: '混凝土泵車維護',
       date: new Date(2024, 0, 25, 9, 0),
-      type: 'reminder'
+      type: 'maintenance',
+      priority: 'medium'
+    },
+    {
+      id: '4',
+      title: '鋼筋籠吊裝作業',
+      date: new Date(2024, 0, 28, 14, 0),
+      type: 'construction',
+      priority: 'high'
+    },
+    {
+      id: '5',
+      title: '高空作業平台檢查',
+      date: new Date(2024, 1, 2, 8, 0),
+      type: 'safety',
+      priority: 'high'
+    },
+    {
+      id: '6',
+      title: '設備運輸任務',
+      date: new Date(2024, 1, 5, 6, 0),
+      type: 'equipment',
+      priority: 'medium'
+    },
+    {
+      id: '7',
+      title: '環境噪音檢測',
+      date: new Date(2024, 1, 8, 10, 0),
+      type: 'safety',
+      priority: 'low'
+    },
+    {
+      id: '8',
+      title: '主體澆築作業',
+      date: new Date(2024, 1, 12, 7, 0),
+      type: 'construction',
+      priority: 'high'
     }
   ];
 
-  getEventsForDate(date: Date): CalendarEvent[] {
+  getEventsForDate(date: Date): ConstructionEvent[] {
     return this.events.filter(
       event =>
         event.date.getDate() === date.getDate() &&
@@ -91,11 +133,12 @@ export class WorkspaceCalendarComponent {
     );
   }
 
-  getEventStatus(type: string): 'success' | 'processing' | 'warning' {
-    const status: Record<string, 'success' | 'processing' | 'warning'> = {
-      meeting: 'processing',
-      task: 'success',
-      reminder: 'warning'
+  getEventStatus(type: string): 'success' | 'processing' | 'warning' | 'error' {
+    const status: Record<string, 'success' | 'processing' | 'warning' | 'error'> = {
+      construction: 'processing',
+      equipment: 'success',
+      safety: 'error',
+      maintenance: 'warning'
     };
     return status[type] || 'warning';
   }
