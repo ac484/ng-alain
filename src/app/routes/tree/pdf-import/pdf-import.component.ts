@@ -12,7 +12,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { FormsModule } from '@angular/forms';
-import { PDFService } from '../../../core/pdf/pdf.service';
+import { PDFService, CustomerPOItem } from '../../../core/pdf/pdf.service';
 import { TreeConverterService, TreeNode } from '../../../core/tree/tree-converter.service';
 
 @Component({
@@ -39,6 +39,16 @@ import { TreeConverterService, TreeNode } from '../../../core/tree/tree-converte
           <span nz-icon nzType="upload"></span>
           選擇 PDF 檔案
         </button>
+
+        <div *ngIf="showCustomerPOView && customerPOItems.length > 0" style="margin-top: 8px;">
+          <nz-alert nzType="success" [nzMessage]="'成功提取 ' + customerPOItems.length + ' 個 Customer PO 項目'" nzShowIcon> </nz-alert>
+          <div style="margin-top: 8px;">
+            <button nz-button nzType="default" (click)="exportToJson()">
+              <span nz-icon nzType="download"></span>
+              匯出 JSON
+            </button>
+          </div>
+        </div>
       </div>
 
       <nz-spin [nzSpinning]="isProcessing">
@@ -117,6 +127,8 @@ export class TreePdfImportComponent {
   isUploadModalVisible = false;
   isProcessing = false;
   selectedFile: File | null = null;
+  customerPOItems: CustomerPOItem[] = [];
+  showCustomerPOView = false;
 
   constructor(
     private message: NzMessageService,
@@ -159,9 +171,31 @@ export class TreePdfImportComponent {
     try {
       const result = await this.pdfService.parsePDF(this.selectedFile);
       if (result.success && result.data) {
-        this.treeData = this.treeConverter.convertToTree(result.data);
+        // 檢查是否有Customer PO項目
+        if (result.customerPOItems && result.customerPOItems.length > 0) {
+          this.customerPOItems = result.customerPOItems;
+          this.treeData = this.treeConverter.convertCustomerPOToTree(result.customerPOItems);
+          this.showCustomerPOView = true;
+
+          // 顯示更詳細的提取結果信息
+          const contentCount = result.customerPOItems.filter(item => item.content).length;
+          this.message.success(
+            `PDF 解析成功，共 ${result.pageCount} 頁，找到 ${result.customerPOItems.length} 個 Customer PO 項目，` +
+              `其中 ${contentCount} 個有內容`
+          );
+
+          // 如果有些項目沒有內容，顯示警告
+          if (contentCount < result.customerPOItems.length) {
+            this.message.warning(`有 ${result.customerPOItems.length - contentCount} 個 Customer PO 項目沒有提取到內容`);
+          }
+        } else {
+          // 如果沒有Customer PO，使用原有的文字行轉換
+          this.treeData = this.treeConverter.convertToTree(result.data);
+          this.showCustomerPOView = false;
+          this.message.success(`PDF 解析成功，共 ${result.pageCount} 頁，生成 ${this.treeData.length} 個節點`);
+        }
+
         this.expandedKeys = this.treeConverter.getAllKeys(this.treeData);
-        this.message.success(`PDF 解析成功，共 ${result.pageCount} 頁，生成 ${this.treeData.length} 個節點`);
         this.isUploadModalVisible = false;
       } else {
         this.message.error('PDF 解析失敗：' + (result.error || '未知錯誤'));
@@ -179,5 +213,65 @@ export class TreePdfImportComponent {
 
   onNodeClick(event: any): void {
     console.log('節點點擊:', event);
+    if (event.node && event.node.origin && event.node.origin.data) {
+      console.log('節點數據:', event.node.origin.data);
+    }
+  }
+
+  resetData(): void {
+    this.treeData = [];
+    this.expandedKeys = [];
+    this.customerPOItems = [];
+    this.showCustomerPOView = false;
+  }
+
+  /**
+   * 匯出Customer PO項目為JSON檔案
+   */
+  exportToJson(): void {
+    if (!this.customerPOItems || this.customerPOItems.length === 0) {
+      this.message.warning('沒有可匯出的Customer PO項目');
+      return;
+    }
+
+    try {
+      // 格式化數據以便更好地顯示
+      const exportData = this.customerPOItems.map((item, index) => {
+        // 提取識別碼（如果存在）
+        let identifier = '';
+        const identifierMatch = item.customerPO.match(/^([A-Z0-9]+)\(/);
+        if (identifierMatch) {
+          identifier = identifierMatch[1];
+        }
+
+        return {
+          id: index + 1,
+          identifier: identifier || undefined,
+          customerPO: item.customerPO,
+          content: item.content || '',
+          costRef: item.costRef || undefined
+        };
+      });
+
+      // 創建Blob並下載
+      const jsonString = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+
+      // 創建下載連結
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `customer_po_items_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+
+      // 清理
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      this.message.success('成功匯出Customer PO項目');
+    } catch (error) {
+      this.message.error('匯出失敗: ' + error);
+    }
   }
 }
