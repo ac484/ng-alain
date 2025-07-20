@@ -1,0 +1,1 @@
+import{e as o}from"./chunk-PERLWIG6.js";import{rb as i,ta as n}from"./chunk-C2TUN3UK.js";var y=(()=>{class e{srv=n(o);transform(r,t){return this.srv.format(r,t)}static \u0275fac=function(t){return new(t||e)};static \u0275pipe=i({name:"price",type:e,pure:!0})}return e})();export{y as a};
