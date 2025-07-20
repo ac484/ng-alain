@@ -1,3 +1,31 @@
+/**
+ * 樹狀面板元件
+ *
+ * 功能：
+ * - 提供可折疊的側邊樹狀面板
+ * - 整合樹狀結構導航和內容展示
+ * - 支援響應式佈局設計
+ *
+ * 主要特性：
+ * - 可折疊的側邊面板（寬度 300px/80px）
+ * - 樹狀節點選擇和詳細資訊顯示
+ * - 展開/收合全部節點功能
+ * - 任務清單功能（CheckList）
+ *
+ * 面板功能：
+ * - 左側：樹狀結構導航面板
+ * - 右側：選中節點的詳細資訊
+ * - 支援面板折疊/展開切換
+ * - 響應式設計適配不同螢幕
+ *
+ * 互動功能：
+ * - 節點點擊顯示詳細資訊
+ * - 面板折疊狀態管理
+ * - 任務清單操作指南
+ *
+ * 路由：/tree/panel
+ * 依賴：ng-zorro-antd/layout、ng-zorro-antd/tree、ng-zorro-antd/check-list
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

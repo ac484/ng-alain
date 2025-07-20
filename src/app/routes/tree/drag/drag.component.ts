@@ -1,3 +1,26 @@
+/**
+ * 樹狀拖曳功能元件
+ *
+ * 功能：
+ * - 提供樹狀節點的拖曳操作
+ * - 支援節點位置調整和重新排列
+ * - 拖曳狀態的視覺回饋
+ *
+ * 主要特性：
+ * - 拖曳開始、進入、離開、放置事件處理
+ * - 拖曳完成後自動更新樹狀結構
+ * - 支援拖曳到子節點或兄弟節點位置
+ * - 展開/收合全部節點功能
+ *
+ * 拖曳流程：
+ * - 拖曳開始：記錄拖曳源節點
+ * - 拖曳進入：顯示放置位置指示
+ * - 拖曳放置：更新樹狀結構
+ * - 拖曳結束：清理拖曳狀態
+ *
+ * 路由：/tree/drag
+ * 依賴：ng-zorro-antd/tree、ng-zorro-antd/message
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

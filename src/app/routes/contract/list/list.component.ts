@@ -1,3 +1,24 @@
+/**
+ * 合約列表元件
+ *
+ * 功能：
+ * - 合約列表的展示和搜尋
+ * - 使用 ng-alain ST 表格元件進行資料展示
+ * - 提供合約基本資訊的快速檢視
+ * - 支援分頁和操作按鈕
+ *
+ * 表格欄位：
+ * - 合約標題、客戶、金額資訊（原始、變更、現行）
+ * - 合約狀態、進度、建立日期、到期日期
+ * - 操作按鈕（查看、編輯）
+ *
+ * 狀態顯示：
+ * - 草稿（default）、待審核（processing）
+ * - 已核准（success）、已拒絕（error）
+ *
+ * 路由：/contract/list
+ * 依賴：@delon/abc/st 表格元件、Mock API
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';

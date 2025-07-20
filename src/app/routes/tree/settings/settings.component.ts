@@ -1,3 +1,31 @@
+/**
+ * 樹狀設定元件
+ *
+ * 功能：
+ * - 提供樹狀結構的設定管理
+ * - 支援樹狀顯示和行為配置
+ * - 表單驗證和設定保存
+ *
+ * 設定項目：
+ * - 顯示設定：節點圖標、連線樣式
+ * - 行為設定：展開模式、選擇模式
+ * - 樣式設定：主題色彩、字體大小
+ * - 功能設定：拖曳、右鍵選單開關
+ *
+ * 表單功能：
+ * - 響應式表單驗證
+ * - 設定項目分類管理
+ * - 重置和保存操作
+ * - 即時預覽效果
+ *
+ * 業務邏輯：
+ * - 設定資料的載入和保存
+ * - 表單驗證確保資料完整性
+ * - 設定變更的即時應用
+ *
+ * 路由：/tree/settings
+ * 依賴：Angular Reactive Forms、ng-zorro-antd/form
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';

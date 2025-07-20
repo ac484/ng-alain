@@ -1,3 +1,32 @@
+/**
+ * 工作區檢查元件
+ *
+ * 功能：
+ * - 提供工作區的檢查項目管理
+ * - 支援檢查清單的展示和更新
+ * - 整合品質控制和進度追蹤
+ *
+ * 主要特性：
+ * - 檢查項目的列表展示
+ * - 檢查狀態的視覺化顯示
+ * - 檢查結果的記錄和追蹤
+ * - 檢查報告的生成和匯出
+ *
+ * 檢查內容：
+ * - 檢查項目名稱和描述
+ * - 檢查狀態（待檢查、進行中、已完成、失敗）
+ * - 檢查人員和時間記錄
+ * - 檢查結果和備註說明
+ *
+ * 互動功能：
+ * - 檢查項目狀態更新
+ * - 檢查結果記錄
+ * - 檢查報告生成
+ * - 檢查歷史追蹤
+ *
+ * 路由：/workspace/inspection
+ * 依賴：ng-zorro-antd/list、ng-zorro-antd/tag、ng-zorro-antd/progress
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

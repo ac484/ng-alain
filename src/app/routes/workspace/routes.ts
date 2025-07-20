@@ -3,6 +3,24 @@
  *
  * 此檔案定義工作區管理模組的路由配置
  * 包含工作區列表、創建工作區、工作區設定等功能
+ *
+ * 路由功能：
+ * - list: 工作區列表展示
+ * - create: 創建新的工作區
+ * - settings: 工作區設定管理
+ * - calendar: 工作區行事曆
+ * - task: 任務管理功能
+ * - overview: 工作區概覽
+ * - timeline: 時間軸功能
+ * - memos: 備忘錄管理
+ * - inspection: 檢查項目管理
+ * - daily-log: 日誌記錄功能
+ *
+ * 技術特點：
+ * - 使用 Angular 懶載入提升效能
+ * - 支援獨立元件載入
+ * - 預設重定向到列表頁面
+ * - 工作區協作功能整合
  */
 
 import { Routes } from '@angular/router';

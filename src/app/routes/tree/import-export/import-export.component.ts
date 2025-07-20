@@ -1,3 +1,30 @@
+/**
+ * 樹狀匯入匯出元件
+ *
+ * 功能：
+ * - 支援 JSON 和 CSV 格式的樹狀資料匯出
+ * - 提供樹狀資料的匯入功能
+ * - 匯入資料格式驗證和預覽
+ *
+ * 匯出功能：
+ * - JSON 格式：完整樹狀結構匯出
+ * - CSV 格式：扁平化節點資料匯出
+ * - 自動檔案下載功能
+ *
+ * 匯入功能：
+ * - 支援 JSON 和 CSV 格式匯入
+ * - 匯入資料格式驗證
+ * - 匯入前預覽功能
+ * - 匯入後覆蓋現有樹狀結構
+ *
+ * 技術特點：
+ * - 檔案處理和 Blob 下載
+ * - CSV 解析和樹狀重建
+ * - 模態框互動介面
+ *
+ * 路由：/tree/import-export
+ * 依賴：ng-zorro-antd/tree、ng-zorro-antd/modal、ng-zorro-antd/upload
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

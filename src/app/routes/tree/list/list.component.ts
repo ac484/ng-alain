@@ -1,3 +1,27 @@
+/**
+ * 樹狀結構列表元件
+ *
+ * 功能：
+ * - 展示所有樹狀結構的列表
+ * - 提供樹狀結構的基本資訊檢視
+ * - 支援編輯和查看操作
+ *
+ * 表格欄位：
+ * - 名稱：樹狀結構的顯示名稱
+ * - 類型：組織/分類/權限（不同顏色標籤）
+ * - 層級：樹狀結構的最大深度
+ * - 狀態：啟用/停用狀態
+ * - 創建日期：樹狀結構的建立時間
+ * - 操作：編輯、查看按鈕
+ *
+ * 狀態顯示：
+ * - 啟用狀態：綠色標籤
+ * - 停用狀態：灰色標籤
+ * - 類型顏色：藍色（組織）、綠色（分類）、橙色（權限）
+ *
+ * 路由：/tree/list
+ * 依賴：ng-zorro-antd/table、ng-zorro-antd/tag
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

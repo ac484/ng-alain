@@ -1,3 +1,26 @@
+/**
+ * 合約詳情檢視元件
+ *
+ * 功能：
+ * - 合約完整資訊的展示和管理
+ * - 顯示合約基本資訊、進度、請款輪次、變更歷史
+ * - 提供合約操作入口（編輯、請款、追加追減、附件管理）
+ * - 整合附件管理元件
+ *
+ * 主要區塊：
+ * - 基本資訊：合約標題、客戶、金額、狀態、日期等
+ * - 進度摘要：整體進度條顯示
+ * - 請款輪次：各輪次的金額、進度、狀態管理
+ * - 合約變更：追加追減歷史記錄
+ * - 附件管理：整合 ContractAttachmentComponent
+ *
+ * 操作功能：
+ * - 編輯合約、請款管理、追加追減、附件管理
+ * - 請款輪次狀態更新
+ *
+ * 路由：/contract/detail/:id
+ * 依賴：ContractAttachmentComponent、Mock API
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';

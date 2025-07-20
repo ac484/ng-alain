@@ -1,3 +1,27 @@
+/**
+ * 工作區創建元件
+ *
+ * 功能：
+ * - 提供工作區的創建表單
+ * - 支援工作區基本資訊設定
+ * - 表單驗證和資料提交
+ *
+ * 表單欄位：
+ * - 工作區名稱：必填，工作區的顯示名稱
+ * - 工作區類型：必選，專案/團隊/個人
+ * - 描述：選填，工作區的詳細說明
+ * - 成員數量：必填，預期成員人數
+ * - 開始日期：必填，工作區開始時間
+ *
+ * 業務邏輯：
+ * - 表單驗證確保資料完整性
+ * - 創建成功後導向工作區列表
+ * - 支援取消操作返回列表
+ * - 工作區類型影響後續功能配置
+ *
+ * 路由：/workspace/create
+ * 依賴：Angular Reactive Forms、ng-zorro-antd/form
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

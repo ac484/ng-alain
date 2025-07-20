@@ -1,3 +1,25 @@
+/**
+ * 樹狀結構創建元件
+ *
+ * 功能：
+ * - 提供樹狀結構的創建表單
+ * - 支援樹狀名稱、類型、最大層級設定
+ * - 表單驗證和資料提交
+ *
+ * 表單欄位：
+ * - 樹狀名稱：必填，樹狀結構的顯示名稱
+ * - 樹狀類型：必選，組織/分類/權限
+ * - 最大層級：必填，限制樹狀深度（1-10）
+ * - 描述：選填，樹狀結構的詳細說明
+ *
+ * 業務邏輯：
+ * - 表單驗證確保資料完整性
+ * - 創建成功後導向樹狀列表頁面
+ * - 支援取消操作返回列表
+ *
+ * 路由：/tree/create
+ * 依賴：Angular Reactive Forms、ng-zorro-antd/form
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

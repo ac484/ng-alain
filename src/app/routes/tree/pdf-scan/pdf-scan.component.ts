@@ -1,21 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NzCardModule } from 'ng-zorro-antd/card';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NzUploadModule, NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzUploadModule } from 'ng-zorro-antd/upload';
-import { NzTreeModule } from 'ng-zorro-antd/tree';
-import { VisionApiService, ScanResult } from '../../../core/services/vision-api.service';
-import { TreeConverterService, TreeNode } from '../../../core/tree/tree-converter.service';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzStatisticModule } from 'ng-zorro-antd/statistic';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { Observable, finalize } from 'rxjs';
+
+interface OcrResult {
+  text: string;
+  resultPath?: string;
+  confidence?: number;
+  pages?: number;
+}
+
+interface OcrResponse {
+  success: boolean;
+  data?: OcrResult;
+  error?: string;
+}
 
 @Component({
   selector: 'app-tree-pdf-scan',
@@ -24,244 +38,389 @@ import { TreeConverterService, TreeNode } from '../../../core/tree/tree-converte
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NzCardModule,
-    NzButtonModule,
-    NzIconModule,
-    NzModalModule,
-    NzInputModule,
-    NzFormModule,
-    NzAlertModule,
-    NzSpinModule,
-    NzEmptyModule,
-    NzDividerModule,
     NzUploadModule,
-    NzTreeModule
+    NzButtonModule,
+    NzCardModule,
+    NzFormModule,
+    NzInputModule,
+    NzSpinModule,
+    NzDividerModule,
+    NzTypographyModule,
+    NzTagModule,
+    NzStatisticModule,
+    NzGridModule,
+    NzSwitchModule,
+    NzAlertModule
   ],
   template: `
-    <nz-card [nzTitle]="'PDF 掃描 (Google Cloud Vision API)'">
-      <div style="margin-bottom: 16px;">
-        <nz-alert
-          nzType="info"
-          nzMessage="此功能使用Google Cloud Vision API掃描PDF文件，需要先將PDF上傳到Google Cloud Storage"
-          nzShowIcon
-        ></nz-alert>
-      </div>
+    <div class="pdf-scan-container">
+      <nz-card nzTitle="PDF OCR 文字掃描" [nzExtra]="extraTemplate">
+        <div nz-row [nzGutter]="24">
+          <!-- 上傳區域 -->
+          <div nz-col nzSpan="12">
+            <nz-card nzSize="small" nzTitle="文件上傳">
+              <nz-upload
+                nzType="drag"
+                [nzMultiple]="false"
+                [nzAccept]="'.pdf,.tiff,.tif,.jpg,.jpeg,.png,.gif'"
+                [nzBeforeUpload]="beforeUpload"
+                [nzFileList]="fileList"
+                (nzChange)="handleChange($event)"
+              >
+                <p class="ant-upload-drag-icon">
+                  <i nz-icon nzType="inbox"></i>
+                </p>
+                <p class="ant-upload-text">點擊或拖拽文件到此區域上傳</p>
+                <p class="ant-upload-hint">
+                  支援 PDF、TIFF、JPG、PNG 等格式<br />
+                  單個文件大小不超過 20MB
+                </p>
+              </nz-upload>
 
-      <nz-form-item>
-        <nz-form-label [nzSpan]="6">Google Cloud Storage 桶名</nz-form-label>
-        <nz-form-control [nzSpan]="18">
-          <input nz-input [(ngModel)]="bucketName" placeholder="輸入GCS桶名" />
-        </nz-form-control>
-      </nz-form-item>
+              <nz-divider></nz-divider>
 
-      <nz-form-item>
-        <nz-form-label [nzSpan]="6">PDF文件路徑</nz-form-label>
-        <nz-form-control [nzSpan]="18">
-          <input nz-input [(ngModel)]="pdfPath" placeholder="輸入PDF在GCS中的路徑" />
-        </nz-form-control>
-      </nz-form-item>
+              <!-- 處理選項 -->
+              <form nz-form [formGroup]="optionsForm">
+                <nz-form-item>
+                  <nz-form-label>處理模式</nz-form-label>
+                  <nz-form-control>
+                    <label nz-checkbox formControlName="saveResult">保存結果到 Storage</label>
+                  </nz-form-control>
+                </nz-form-item>
 
-      <div style="margin-bottom: 16px; text-align: center;">
-        <button nz-button nzType="primary" (click)="scanPdf()" [nzLoading]="isProcessing">
-          <span nz-icon nzType="scan"></span>
-          掃描PDF
-        </button>
-      </div>
+                <nz-form-item>
+                  <nz-form-label>PDF 處理</nz-form-label>
+                  <nz-form-control>
+                    <nz-switch formControlName="pdfFirstPageOnly" nzCheckedChildren="僅第一頁" nzUnCheckedChildren="完整文檔"> </nz-switch>
+                  </nz-form-control>
+                </nz-form-item>
+              </form>
 
-      <nz-divider></nz-divider>
+              <nz-divider></nz-divider>
 
-      <nz-spin [nzSpinning]="isProcessing">
-        <div *ngIf="!scanResult" class="empty-state">
-          <nz-empty nzNotFoundImage="simple">
-            <span>尚未掃描PDF文件</span>
-          </nz-empty>
+              <button
+                nz-button
+                nzType="primary"
+                nzSize="large"
+                [nzLoading]="loading"
+                [disabled]="!selectedFile"
+                (click)="startOcr()"
+                nzBlock
+              >
+                <i nz-icon nzType="scan"></i>
+                開始 OCR 掃描
+              </button>
+            </nz-card>
+          </div>
+
+          <!-- 結果區域 -->
+          <div nz-col nzSpan="12">
+            <nz-card nzSize="small" nzTitle="掃描結果">
+              <div *ngIf="loading" class="loading-container">
+                <nz-spin nzSize="large">
+                  <div class="loading-text">正在處理文件，請稍候...</div>
+                </nz-spin>
+              </div>
+
+              <div *ngIf="!loading && ocrResult">
+                <!-- 統計信息 -->
+                <div nz-row [nzGutter]="16" class="stats-row">
+                  <div nz-col nzSpan="8">
+                    <nz-statistic nzTitle="文字長度" [nzValue]="ocrResult.text.length" nzSuffix="字符"> </nz-statistic>
+                  </div>
+                  <div nz-col nzSpan="8" *ngIf="ocrResult.pages">
+                    <nz-statistic nzTitle="頁數" [nzValue]="ocrResult.pages" nzSuffix="頁"> </nz-statistic>
+                  </div>
+                  <div nz-col nzSpan="8" *ngIf="ocrResult.confidence">
+                    <nz-statistic nzTitle="信心度" [nzValue]="ocrResult.confidence * 100" [nzPrecision]="1" nzSuffix="%"> </nz-statistic>
+                  </div>
+                </div>
+
+                <nz-divider></nz-divider>
+
+                <!-- 結果標籤 -->
+                <div class="result-tags">
+                  <nz-tag nzColor="success" *ngIf="ocrResult.resultPath">
+                    <i nz-icon nzType="save"></i>
+                    已保存到 Storage
+                  </nz-tag>
+                  <nz-tag nzColor="processing" *ngIf="ocrResult.pages && ocrResult.pages > 1">
+                    <i nz-icon nzType="file-pdf"></i>
+                    多頁文檔
+                  </nz-tag>
+                </div>
+
+                <nz-divider></nz-divider>
+
+                <!-- 文字內容 -->
+                <div class="text-result">
+                  <h4>提取的文字內容：</h4>
+                  <div class="text-content" [innerHTML]="formatText(ocrResult.text)"></div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="action-buttons">
+                  <button nz-button nzType="default" (click)="copyText()">
+                    <i nz-icon nzType="copy"></i>
+                    複製文字
+                  </button>
+                  <button nz-button nzType="default" (click)="downloadText()">
+                    <i nz-icon nzType="download"></i>
+                    下載文字
+                  </button>
+                  <button nz-button nzType="default" (click)="clearResult()">
+                    <i nz-icon nzType="clear"></i>
+                    清除結果
+                  </button>
+                </div>
+              </div>
+
+              <nz-alert *ngIf="!loading && !ocrResult" nzType="info" nzMessage="請上傳文件並開始 OCR 掃描" nzShowIcon> </nz-alert>
+            </nz-card>
+          </div>
         </div>
+      </nz-card>
+    </div>
 
-        <div *ngIf="scanResult">
-          <nz-alert
-            nzType="success"
-            [nzMessage]="'掃描成功，共 ' + scanResult.pages + ' 頁'"
-            nzShowIcon
-            style="margin-bottom: 16px;"
-          ></nz-alert>
-
-          <div style="margin-bottom: 16px;">
-            <button nz-button nzType="default" (click)="convertToTree()">
-              <span nz-icon nzType="apartment"></span>
-              轉換為樹狀結構
-            </button>
-            <button nz-button nzType="default" (click)="exportToText()" style="margin-left: 8px;">
-              <span nz-icon nzType="download"></span>
-              匯出文本
-            </button>
-          </div>
-
-          <div *ngIf="treeData.length > 0" class="tree-container">
-            <nz-tree
-              [nzData]="treeData"
-              [nzBlockNode]="true"
-              [nzShowLine]="true"
-              [nzShowIcon]="true"
-              [nzExpandedKeys]="expandedKeys"
-              (nzExpandChange)="onExpandChange($event)"
-              (nzClick)="onNodeClick($event)"
-            >
-            </nz-tree>
-          </div>
-
-          <div *ngIf="!showTreeView" class="text-container">
-            <pre>{{ scanResult.text }}</pre>
-          </div>
-        </div>
-      </nz-spin>
-    </nz-card>
+    <ng-template #extraTemplate>
+      <nz-tag nzColor="blue">
+        <i nz-icon nzType="cloud"></i>
+        Firebase Functions
+      </nz-tag>
+    </ng-template>
   `,
   styles: [
     `
-      .empty-state {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 200px;
+      .pdf-scan-container {
+        padding: 24px;
       }
 
-      .tree-container {
-        border: 1px solid #d9d9d9;
-        border-radius: 6px;
-        min-height: 300px;
-        padding: 16px;
+      .loading-container {
+        text-align: center;
+        padding: 50px 0;
+      }
+
+      .loading-text {
         margin-top: 16px;
+        color: #666;
       }
 
-      .text-container {
-        border: 1px solid #d9d9d9;
-        border-radius: 6px;
-        min-height: 300px;
+      .stats-row {
+        margin-bottom: 16px;
+      }
+
+      .result-tags {
+        margin-bottom: 16px;
+      }
+
+      .result-tags nz-tag {
+        margin-right: 8px;
+      }
+
+      .text-result {
+        margin-bottom: 24px;
+      }
+
+      .text-content {
+        background: #f5f5f5;
         padding: 16px;
-        margin-top: 16px;
-        max-height: 500px;
-        overflow: auto;
-      }
-
-      pre {
+        border-radius: 6px;
+        max-height: 300px;
+        overflow-y: auto;
         white-space: pre-wrap;
         word-wrap: break-word;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .action-buttons button {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      :host ::ng-deep .ant-upload.ant-upload-drag {
+        background: #fafafa;
+      }
+
+      :host ::ng-deep .ant-upload-drag-icon i {
+        font-size: 48px;
+        color: #1890ff;
       }
     `
   ]
 })
 export class TreePdfScanComponent implements OnInit {
-  bucketName = '';
-  pdfPath = '';
-  isProcessing = false;
-  scanResult: ScanResult | null = null;
-  treeData: TreeNode[] = [];
-  expandedKeys: string[] = [];
-  showTreeView = false;
+  private readonly http = inject(HttpClient);
+  private readonly fb = inject(FormBuilder);
+  private readonly message = inject(NzMessageService);
 
-  constructor(
-    private message: NzMessageService,
-    private visionApiService: VisionApiService,
-    private treeConverter: TreeConverterService
-  ) {}
+  // Firebase Functions URL
+  private readonly functionsUrl = 'https://us-central1-lin-in.cloudfunctions.net/api';
 
-  ngOnInit(): void {}
+  // 表單和狀態
+  optionsForm: FormGroup;
+  fileList: NzUploadFile[] = [];
+  selectedFile: File | null = null;
+  loading = false;
+  ocrResult: OcrResult | null = null;
 
-  scanPdf(): void {
-    if (!this.bucketName || !this.pdfPath) {
-      this.message.warning('請輸入GCS桶名和PDF路徑');
-      return;
-    }
+  ngOnInit(): void {
+    this.initForm();
+  }
 
-    this.isProcessing = true;
-    this.message.info('開始掃描PDF文件...');
-
-    this.visionApiService.scanPdf(this.bucketName, this.pdfPath).subscribe({
-      next: response => {
-        if (response.success && response.result) {
-          this.scanResult = response.result;
-          this.message.success(`PDF掃描成功，共 ${this.scanResult.pages} 頁`);
-          this.showTreeView = false;
-          this.treeData = [];
-        } else {
-          this.message.error('PDF掃描失敗：' + (response.error || '未知錯誤'));
-        }
-      },
-      error: error => {
-        console.error('API調用錯誤', error);
-        this.message.error('API調用錯誤：' + (error.message || '未知錯誤'));
-      },
-      complete: () => {
-        this.isProcessing = false;
-      }
+  private initForm(): void {
+    this.optionsForm = this.fb.group({
+      saveResult: [false],
+      pdfFirstPageOnly: [false]
     });
   }
 
-  convertToTree(): void {
-    if (!this.scanResult || !this.scanResult.text) {
-      this.message.warning('沒有可轉換的文本');
+  beforeUpload = (file: NzUploadFile): boolean => {
+    // 檢查文件類型
+    const isValidType = this.isValidFileType(file);
+    if (!isValidType) {
+      this.message.error('請上傳 PDF、TIFF 或圖片文件！');
+      return false;
+    }
+
+    // 檢查文件大小 (20MB)
+    const isLt20M = file.size! / 1024 / 1024 < 20;
+    if (!isLt20M) {
+      this.message.error('文件大小不能超過 20MB！');
+      return false;
+    }
+
+    this.selectedFile = file as any;
+    this.fileList = [file];
+
+    return false; // 阻止自動上傳
+  };
+
+  handleChange(info: NzUploadChangeParam): void {
+    if (info.file.status === 'removed') {
+      this.selectedFile = null;
+      this.fileList = [];
+      this.clearResult();
+    }
+  }
+
+  private isValidFileType(file: NzUploadFile): boolean {
+    const validTypes = ['application/pdf', 'image/tiff', 'image/tif', 'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+
+    return validTypes.some(type => file.type === type || file.name?.toLowerCase().endsWith(type.split('/')[1]));
+  }
+
+  async startOcr(): Promise<void> {
+    if (!this.selectedFile) {
+      this.message.warning('請先選擇文件！');
       return;
     }
 
-    try {
-      // 將文本按行分割
-      const lines = this.scanResult.text.split('\n').filter(line => line.trim() !== '');
-
-      // 使用TreeConverter服務將文本轉換為樹狀結構
-      this.treeData = this.treeConverter.convertToTree(lines);
-      this.expandedKeys = this.treeConverter.getAllKeys(this.treeData);
-      this.showTreeView = true;
-
-      this.message.success(`成功轉換為樹狀結構，生成 ${this.treeData.length} 個根節點`);
-    } catch (error) {
-      console.error('轉換錯誤', error);
-      this.message.error('轉換為樹狀結構時發生錯誤：' + error);
-    }
-  }
-
-  exportToText(): void {
-    if (!this.scanResult || !this.scanResult.text) {
-      this.message.warning('沒有可匯出的文本');
-      return;
-    }
+    this.loading = true;
+    this.ocrResult = null;
 
     try {
-      // 創建Blob並下載
-      const blob = new Blob([this.scanResult.text], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
+      // 上傳文件到 Firebase Storage (這裡簡化處理，實際應該先上傳到 Storage)
+      // 為了演示，我們使用 buffer 方式處理
+      const result = await this.processWithBuffer();
 
-      // 創建下載連結
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `pdf_scan_${new Date().toISOString().slice(0, 10)}.txt`;
-      document.body.appendChild(a);
-      a.click();
-
-      // 清理
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      this.message.success('成功匯出文本');
+      if (result.success && result.data) {
+        this.ocrResult = result.data;
+        this.message.success('OCR 處理完成！');
+      } else {
+        throw new Error(result.error || 'OCR 處理失敗');
+      }
     } catch (error) {
-      this.message.error('匯出失敗: ' + error);
+      console.error('OCR Error:', error);
+      this.message.error(`OCR 處理失敗: ${error}`);
+    } finally {
+      this.loading = false;
     }
   }
 
-  onExpandChange(event: any): void {
-    this.expandedKeys = event.keys;
+  private async processWithBuffer(): Promise<OcrResponse> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = async () => {
+        try {
+          const arrayBuffer = reader.result as ArrayBuffer;
+          const uint8Array = new Uint8Array(arrayBuffer);
+
+          const headers = new HttpHeaders({
+            'Content-Type': 'application/octet-stream'
+          });
+
+          const response = await this.http.post<OcrResponse>(`${this.functionsUrl}/ocr/buffer`, uint8Array, { headers }).toPromise();
+
+          resolve(response!);
+        } catch (error) {
+          reject(error);
+        }
+      };
+
+      reader.onerror = () => reject(new Error('文件讀取失敗'));
+      reader.readAsArrayBuffer(this.selectedFile!);
+    });
   }
 
-  onNodeClick(event: any): void {
-    console.log('節點點擊:', event);
-    if (event.node && event.node.origin && event.node.origin.data) {
-      console.log('節點數據:', event.node.origin.data);
-    }
+  // 如果文件已上傳到 Storage，可以使用這個方法
+  private processWithStoragePath(filePath: string): Observable<OcrResponse> {
+    const options = this.optionsForm.value;
+    const endpoint = options.pdfFirstPageOnly ? 'pdf-first-page' : 'extract';
+
+    const body = {
+      filePath: filePath,
+      saveResult: options.saveResult
+    };
+
+    return this.http.post<OcrResponse>(`${this.functionsUrl}/ocr/${endpoint}`, body);
   }
 
-  resetData(): void {
-    this.scanResult = null;
-    this.treeData = [];
-    this.expandedKeys = [];
-    this.showTreeView = false;
+  formatText(text: string): string {
+    if (!text) return '';
+
+    // 簡單的文字格式化
+    return text.replace(/\n/g, '<br>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/  /g, '&nbsp;&nbsp;');
+  }
+
+  copyText(): void {
+    if (!this.ocrResult?.text) return;
+
+    navigator.clipboard
+      .writeText(this.ocrResult.text)
+      .then(() => {
+        this.message.success('文字已複製到剪貼板！');
+      })
+      .catch(() => {
+        this.message.error('複製失敗！');
+      });
+  }
+
+  downloadText(): void {
+    if (!this.ocrResult?.text) return;
+
+    const blob = new Blob([this.ocrResult.text], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `ocr-result-${new Date().getTime()}.txt`;
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+    this.message.success('文字文件已下載！');
+  }
+
+  clearResult(): void {
+    this.ocrResult = null;
+    this.message.info('結果已清除');
   }
 }

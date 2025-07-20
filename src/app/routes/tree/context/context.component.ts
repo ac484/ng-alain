@@ -1,3 +1,26 @@
+/**
+ * 樹狀右鍵選單元件
+ *
+ * 功能：
+ * - 提供樹狀節點的右鍵上下文選單
+ * - 支援新增子節點和兄弟節點
+ * - 提供編輯、複製、刪除節點功能
+ * - 自訂右鍵選單樣式和互動
+ *
+ * 主要特性：
+ * - 右鍵選單定位和顯示控制
+ * - 節點操作（新增、編輯、複製、刪除）
+ * - 樹狀結構的動態更新
+ * - 展開/收合全部節點功能
+ *
+ * 技術實現：
+ * - 使用自訂 CSS 實現右鍵選單
+ * - 整合 ng-zorro-antd 樹狀元件
+ * - 支援節點狀態管理
+ *
+ * 路由：/tree/context
+ * 依賴：ng-zorro-antd/tree、ng-zorro-antd/message
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

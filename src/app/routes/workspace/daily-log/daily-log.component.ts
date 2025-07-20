@@ -1,3 +1,32 @@
+/**
+ * 工作區日誌元件
+ *
+ * 功能：
+ * - 提供工作區的日誌記錄功能
+ * - 支援日誌條目的展示和管理
+ * - 整合工作進度和活動記錄
+ *
+ * 主要特性：
+ * - 日誌條目的列表展示
+ * - 日誌內容的詳細檢視
+ * - 日誌分類和標籤管理
+ * - 日誌搜尋和篩選功能
+ *
+ * 日誌內容：
+ * - 日期和時間記錄
+ * - 工作內容描述
+ * - 進度和成果記錄
+ * - 相關人員和資源
+ *
+ * 互動功能：
+ * - 日誌條目點擊查看詳情
+ * - 日誌分類篩選
+ * - 日誌搜尋功能
+ * - 日誌匯出功能
+ *
+ * 路由：/workspace/daily-log
+ * 依賴：ng-zorro-antd/list、ng-zorro-antd/tag
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

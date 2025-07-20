@@ -1,3 +1,26 @@
+/**
+ * 合約審查管理元件
+ *
+ * 功能：
+ * - 合約審查流程的管理和操作
+ * - 使用 ng-alain ST 表格展示待審查合約
+ * - 提供核准和拒絕操作
+ * - 記錄審查意見和審查人資訊
+ *
+ * 審查流程：
+ * - 待審核 → 已核准/已拒絕
+ * - 記錄審查人、審查日期、審查意見
+ * - 支援確認對話框防止誤操作
+ *
+ * 表格欄位：
+ * - 合約標題、客戶、金額
+ * - 審查狀態、提交日期
+ * - 審核人、審核日期
+ * - 操作按鈕（核准、拒絕、查看）
+ *
+ * 路由：/contract/review
+ * 依賴：@delon/abc/st 表格元件、Mock API
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';

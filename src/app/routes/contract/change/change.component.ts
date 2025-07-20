@@ -1,3 +1,21 @@
+/**
+ * 合約追加追減管理元件
+ *
+ * 功能：
+ * - 合約變更的申請和管理
+ * - 支援追加和追減兩種變更類型
+ * - 顯示合約基本資訊和變更歷史
+ * - 提供變更申請表單（類型、描述、金額、日期、版本）
+ * - 自動計算新版本號
+ *
+ * 業務邏輯：
+ * - 變更類型：追加（增加金額）、追減（減少金額）
+ * - 版本管理：自動遞增變更版本號
+ * - 歷史追蹤：記錄所有變更記錄
+ *
+ * 路由：/contract/change/:id
+ * 依賴：Mock API 進行資料操作
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

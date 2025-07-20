@@ -1,3 +1,14 @@
+/**
+ * 合約附件管理頁面元件
+ *
+ * 功能：
+ * - 提供合約附件的獨立管理頁面
+ * - 包含返回按鈕，可返回合約詳情頁面
+ * - 整合 ContractAttachmentComponent 進行附件操作
+ *
+ * 路由：/contract/attachment/:id
+ * 依賴：ContractAttachmentComponent
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';

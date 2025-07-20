@@ -1,3 +1,25 @@
+/**
+ * 合約創建元件
+ *
+ * 功能：
+ * - 新合約的創建和初始化
+ * - 提供合約基本資訊輸入表單
+ * - 自動計算請款輪次和進度
+ * - 設定合約初始狀態和版本
+ *
+ * 表單欄位：
+ * - 合約標題、客戶名稱、合約金額
+ * - 開始日期、結束日期、合約描述
+ *
+ * 業務邏輯：
+ * - 自動計算請款輪次（每5萬一輪）
+ * - 設定初始版本號（1.0）
+ * - 初始化進度為0%
+ * - 建立請款輪次資料結構
+ *
+ * 路由：/contract/create
+ * 依賴：Mock API 進行資料儲存
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

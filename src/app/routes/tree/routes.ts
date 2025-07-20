@@ -3,6 +3,23 @@
  *
  * 此檔案定義樹狀結構管理模組的路由配置
  * 包含樹狀列表、創建樹狀結構、樹狀設定等功能
+ *
+ * 路由功能：
+ * - list: 樹狀結構列表展示
+ * - create: 創建新的樹狀結構
+ * - search: 樹狀節點搜尋功能
+ * - import-export: 樹狀資料匯入匯出
+ * - pdf-import: PDF 檔案匯入轉換
+ * - pdf-scan: PDF 掃描功能
+ * - settings: 樹狀設定管理
+ * - drag: 拖曳功能展示
+ * - context: 右鍵選單功能
+ * - panel: 樹狀面板功能
+ *
+ * 技術特點：
+ * - 使用 Angular 懶載入提升效能
+ * - 支援獨立元件載入
+ * - 預設重定向到列表頁面
  */
 
 import { Routes } from '@angular/router';

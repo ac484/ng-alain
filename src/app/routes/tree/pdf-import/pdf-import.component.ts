@@ -1,3 +1,33 @@
+/**
+ * PDF 匯入樹狀元件
+ *
+ * 功能：
+ * - 支援 PDF 檔案上傳和解析
+ * - 自動提取 Customer PO 項目
+ * - 將 PDF 內容轉換為樹狀結構
+ * - 支援 JSON 格式匯出
+ *
+ * 主要特性：
+ * - PDF 檔案驗證和處理
+ * - Customer PO 項目自動識別
+ * - 文字內容提取和結構化
+ * - 樹狀結構生成和展示
+ *
+ * 處理流程：
+ * - 檔案選擇和驗證
+ * - PDF 文字提取
+ * - Customer PO 項目識別
+ * - 樹狀結構轉換
+ * - 結果展示和匯出
+ *
+ * 技術整合：
+ * - 整合 PDFService 進行檔案處理
+ * - 使用 TreeConverterService 轉換結構
+ * - 支援中英文 PDF 檔案
+ *
+ * 路由：/tree/pdf-import
+ * 依賴：PDFService、TreeConverterService、ng-zorro-antd/tree
+ */
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';

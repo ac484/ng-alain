@@ -1,3 +1,24 @@
+/**
+ * 合約編輯元件
+ *
+ * 功能：
+ * - 現有合約資訊的修改和更新
+ * - 提供合約基本資訊編輯表單
+ * - 載入現有合約資料並填入表單
+ * - 提交更新後返回合約詳情頁面
+ *
+ * 表單欄位：
+ * - 合約標題、客戶名稱、合約金額
+ * - 開始日期、結束日期、合約描述
+ *
+ * 業務邏輯：
+ * - 根據路由參數載入合約資料
+ * - 表單驗證確保資料完整性
+ * - 更新成功後導向合約詳情頁面
+ *
+ * 路由：/contract/edit/:id
+ * 依賴：Mock API 進行資料載入和更新
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

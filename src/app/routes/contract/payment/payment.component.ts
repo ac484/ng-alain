@@ -1,3 +1,26 @@
+/**
+ * 合約請款管理元件
+ *
+ * 功能：
+ * - 合約請款流程的管理和操作
+ * - 顯示合約基本資訊和請款輪次
+ * - 提供請款狀態更新功能
+ * - 支援新增請款申請
+ *
+ * 請款狀態流程：
+ * - 草稿 → 送出 → 審查 → 開票 → 完成
+ * - 每個狀態對應不同的操作按鈕
+ * - 狀態更新需要按順序進行
+ *
+ * 主要功能：
+ * - 請款輪次列表展示和管理
+ * - 請款狀態的逐步更新
+ * - 新增請款申請表單
+ * - 進度條顯示各輪次進度
+ *
+ * 路由：/contract/payment/:id
+ * 依賴：Mock API 進行請款資料操作
+ */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';

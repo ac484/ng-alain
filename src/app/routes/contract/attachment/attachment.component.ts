@@ -1,3 +1,20 @@
+/**
+ * 合約附件管理元件
+ *
+ * 功能：
+ * - 合約附件的上傳、下載、刪除、預覽
+ * - 支援多種檔案格式（PDF、Word、Excel、圖片）
+ * - 整合 Firebase Storage 進行檔案儲存
+ * - 提供上傳進度顯示和檔案管理介面
+ * - 支援檔案預覽（Google Docs Viewer）
+ *
+ * 技術：
+ * - 使用 @angular/fire/storage 進行檔案操作
+ * - 整合 ng-zorro-antd 元件庫
+ * - 支援檔案大小限制（10MB）
+ *
+ * 使用方式：<app-contract-attachment [contractId]="contractId"></app-contract-attachment>
+ */
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Storage, ref, uploadBytesResumable, getDownloadURL, deleteObject, listAll, getMetadata } from '@angular/fire/storage';
