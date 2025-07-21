@@ -74,22 +74,22 @@
             },
             {
               "text": "Create Tree",
-              "link": "/tree/create",
+              "link": "/tree/template/create",
               "i18n": "menu.tree.create"
             },
             {
               "text": "Tree Search",
-              "link": "/tree/search",
+              "link": "/tree/template/search",
               "i18n": "menu.tree.search"
             },
             {
               "text": "Import/Export",
-              "link": "/tree/import-export",
+              "link": "/tree/template/import-export",
               "i18n": "menu.tree.import-export"
             },
             {
               "text": "PDF Import",
-              "link": "/tree/pdf-import",
+              "link": "/tree/template/pdf-import",
               "i18n": "menu.tree.pdf-import"
             },
             {
@@ -99,17 +99,17 @@
             },
             {
               "text": "Tree Settings",
-              "link": "/tree/settings",
+              "link": "/tree/template/settings",
               "i18n": "menu.tree.settings"
             },
             {
               "text": "Drag",
-              "link": "/tree/drag",
+              "link": "/tree/template/drag",
               "i18n": "menu.tree.drag"
             },
             {
               "text": "Context Menu",
-              "link": "/tree/context",
+              "link": "/tree/template/context",
               "i18n": "menu.tree.context"
             },
             {
