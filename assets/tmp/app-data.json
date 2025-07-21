@@ -68,6 +68,11 @@
           "icon": "anticon-fork",
           "children": [
             {
+              "text": "Firebase Crud",
+              "link": "/tree/firebase-crud",
+              "i18n": "menu.tree.firebase-crud"
+            },
+            {
               "text": "Tree List",
               "link": "/tree/list",
               "i18n": "menu.tree.list"
