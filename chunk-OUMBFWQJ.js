@@ -1,1 +1,0 @@
-import{c as o}from"./chunk-MMGGDOKT.js";import{qb as i,ra as n}from"./chunk-F2J3MLFC.js";var y=(()=>{class e{srv=n(o);transform(r,t){return this.srv.format(r,t)}static \u0275fac=function(t){return new(t||e)};static \u0275pipe=i({name:"price",type:e,pure:!0})}return e})();export{y as a};
