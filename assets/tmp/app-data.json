@@ -98,6 +98,11 @@
               "i18n": "menu.tree.pdf-scan"
             },
             {
+              "text": "Scan Result",
+              "link": "/tree/scan-result",
+              "i18n": "menu.tree.scan-result"
+            },
+            {
               "text": "Tree Settings",
               "link": "/tree/template/settings",
               "i18n": "menu.tree.settings"
