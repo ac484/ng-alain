@@ -11,6 +11,7 @@ import { SHARED_IMPORTS } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { FirebaseACLService, ACLRole } from '../../../core/firebase/firebase-acl.service';
 import { Observable } from 'rxjs';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-acl-roles',
@@ -31,7 +32,7 @@ import { Observable } from 'rxjs';
       </ng-template>
     </st>
   `,
-  imports: [...SHARED_IMPORTS]
+  imports: [...SHARED_IMPORTS, NgFor]
 })
 export class ACLRolesComponent implements OnInit {
   private readonly firebaseACLSrv = inject(FirebaseACLService);
