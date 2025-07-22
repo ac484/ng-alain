@@ -61,6 +61,10 @@ export default [
         loadComponent: () => import('./scan-result/scan-result.component').then(m => m.ScanResultComponent)
       },
       {
+        path: 'task-detail',
+        loadComponent: () => import('./task-detail/task-detail.component').then(m => m.TaskDetailComponent)
+      },
+      {
         path: 'document-viewer',
         loadComponent: () => import('../../layout/basic/widgets/document-viewer.component').then(m => m.DocumentViewerComponent)
       },
