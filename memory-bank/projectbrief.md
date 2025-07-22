@@ -1,17 +1,19 @@
-# Project Brief: [Project Name]
+# Project Brief: ng-alain
 
 ## Overview
-[High-level overview of what you're building]
+ng-alain 是一個基於 Angular 20 與 ng-zorro-antd 的企業級管理後台前端框架，提供現代化 UI、豐富元件、權限管理、國際化與雲端整合能力。
 
 ## Core Requirements
-- [Requirement 1]
-- [Requirement 2]
-- [Requirement 3]
+- 現代化 UI/UX 設計
+- 豐富且可擴展的元件庫
+- 權限與角色管理
+- 多語系與主題切換
+- 與 Firebase/雲端服務整合
 
 ## Goals
-- [Goal 1]
-- [Goal 2]
-- [Goal 3]
+- 提升企業級管理後台開發效率
+- 支援多場景與高度自訂
+- 易於維護與擴展
 
 ## Project Scope
-[Define what is in and out of scope for this project] 
+本專案聚焦於前端管理平台建構，不包含後端 API 實作。 

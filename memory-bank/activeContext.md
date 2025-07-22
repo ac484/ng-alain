@@ -1,23 +1,27 @@
-# Active Context: [Project Name]
+# Active Context: ng-alain
 
 ## Current Work Focus
-[Describe what you're currently working on]
+- 專案初始化與最佳化配置
+- 建立與補全 Memory Bank 文件
+- 處理 build 相容性問題
 
 ## Recent Changes
-- [Change 1]
-- [Change 2]
-- [Change 3]
+- 升級 Angular 20
+- 建立 Memory Bank 文件
+- 優化專案配置與依賴
 
 ## Next Steps
-- [Step 1]
-- [Step 2]
-- [Step 3]
+- 補充專案文件內容
+- 修正 build 與相容性問題
+- 完善 CI/CD 流程
 
 ## Active Decisions and Considerations
-[Document decisions being made and factors being considered]
+- 採用最新 Angular/Delon 生態
+- 嚴格型別與最佳實踐
 
 ## Important Patterns and Preferences
-[Document patterns that are emerging in the project]
+- 模組分層、配置驅動、嚴格 Lint
 
 ## Learnings and Project Insights
-[Document what you've learned so far] 
+- Angular 20 獨立 API 實踐
+- ng-alain/Delon 生態整合經驗 

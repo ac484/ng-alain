@@ -1,22 +1,29 @@
-# Tech Context: [Project Name]
+# Tech Context: ng-alain
 
 ## Technologies Used
-- [Technology 1]
-- [Technology 2]
-- [Technology 3]
+- Angular 20
+- ng-zorro-antd 20
+- @delon 系列
+- TypeScript 5.8
+- Firebase
+- rxjs
+- less
 
 ## Development Setup
-[Describe the development environment setup]
+- Node.js (建議 LTS)
+- Yarn 4
+- Angular CLI
+- ESLint、Stylelint、Husky
 
 ## Technical Constraints
-- [Constraint 1]
-- [Constraint 2]
-- [Constraint 3]
+- 僅支援現代瀏覽器
+- 嚴格型別與模組化
+- 需支援 SSR
 
 ## Dependencies
-- [Dependency 1]
-- [Dependency 2]
-- [Dependency 3]
+- 主要依賴詳見 package.json（Angular、ng-zorro-antd、@delon、Firebase、rxjs 等）
 
 ## Tool Usage Patterns
-[Describe how tools are used in the project] 
+- CLI 腳本自動化
+- 主題/國際化切換
+- CI/CD、Lint/Format 工具整合 
