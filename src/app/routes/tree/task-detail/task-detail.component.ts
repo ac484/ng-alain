@@ -99,7 +99,7 @@ export class TaskDetailComponent implements OnInit {
         this.message.success('任務狀態已更新');
         this.loading = false;
       })
-      .catch(err => {
+      .catch(() => {
         this.message.error('更新任務狀態失敗');
         this.loading = false;
       });
