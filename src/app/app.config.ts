@@ -59,6 +59,7 @@ import { getMessaging, provideMessaging } from '@angular/fire/messaging';
 import { getPerformance, providePerformance } from '@angular/fire/performance';
 import { getRemoteConfig, provideRemoteConfig } from '@angular/fire/remote-config';
 import { getStorage, provideStorage } from '@angular/fire/storage';
+import { getVertexAI, provideVertexAI } from '@angular/fire/vertexai';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   provideRouter,
@@ -84,7 +85,6 @@ import { zh_CN as zorroLang } from 'ng-zorro-antd/i18n';
 import { ICONS } from '../style-icons';
 import { ICONS_AUTO } from '../style-icons-auto';
 import { routes } from './routes/routes';
-import { getVertexAI, provideVertexAI } from '@angular/fire/vertexai';
 
 /**
  * 預設語言配置

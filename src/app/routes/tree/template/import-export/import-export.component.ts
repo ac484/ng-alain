@@ -13,10 +13,10 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTreeModule } from 'ng-zorro-antd/tree';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 
 interface TreeNode {
   title: string;

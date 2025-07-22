@@ -1,6 +1,6 @@
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import * as logger from 'firebase-functions/logger';
 import { ImageAnnotatorClient } from '@google-cloud/vision';
+import * as logger from 'firebase-functions/logger';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
 
 const visionClient = new ImageAnnotatorClient();
 
