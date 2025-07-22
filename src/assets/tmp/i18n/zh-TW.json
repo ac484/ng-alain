@@ -20,6 +20,7 @@
   "menu.tree.pdf-import": "PDF 匯入",
   "menu.tree.pdf-scan": "PDF 掃描",
   "menu.tree.scan-result": "掃描結果",
+  "menu.tree.task-detail": "任務詳情",
   "menu.tree.firebase-crud": "Firebase CRUD",
   "menu.tree.list": "樹狀列表",
   "menu.tree.create": "建立樹狀結構",
