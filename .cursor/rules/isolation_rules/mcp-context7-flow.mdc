@@ -1,0 +1,40 @@
+---
+description: Context7 MCP 文檔庫查詢與建構流程
+globs:
+alwaysApply: false
+---
+
+## 🔍 流程簡介
+Context7 提供程式庫文檔查詢、範例獲取及專案建構功能，支援快速檢索技術文檔與程式碼範例。
+
+## 🗺️ 流程圖
+```
+graph TD
+    A[開始查詢] --> B[解析庫ID]
+    B --> C[獲取文檔]
+    C --> D[檢索範例]
+    D --> E[執行建構]
+    E --> F[完成輸出]
+```
+
+## ✅ 標準步驟
+1. **庫ID解析** - 確定目標程式庫
+2. **文檔檢索** - 獲取相關文檔
+3. **範例查找** - 尋找程式碼範例
+4. **建構執行** - 執行建構流程
+5. **結果輸出** - 回傳處理結果
+
+## 📝 範例命令/調用格式
+- `resolve-library-id`: 解析庫標識符
+- `get-library-docs`: 獲取庫文檔
+- `get-examples`: 獲取程式碼範例
+- `build`: 執行建構流程
+
+## 🌟 最佳實踐
+- 先解析庫ID確保目標正確
+- 組合使用文檔與範例提升理解
+- 建構前確認依賴項完整
+
+[[calls]]
+match = """context7|library docs|get examples|resolve library"""
+tool = "context7"

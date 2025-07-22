@@ -1,0 +1,57 @@
+<div class="alain-default__content-title">
+  <h1>
+    ACL 權限控制 (Firestore 整合)
+    <small> 注意觀察左邊的選單；ACL 服務提供完整的基於角色的訪問控制，現在整合了 Firestore 後端存儲。 </small>
+  </h1>
+</div>
+
+<div nz-row [nzGutter]="16">
+  <div nz-col [nzSpan]="24">
+    <nz-card nzTitle="權限狀態">
+      <p><strong>當前 ACL 資料：</strong>{{ data | json }}</p>
+      <div class="mt-md">
+        <button nz-button [acl]="'user'" nzType="default">用戶權限</button>
+        <button nz-button [acl]="'user1'" nzType="default" class="ml-sm">認證用戶</button>
+        <button nz-button [acl]="'admin'" nzType="default" class="ml-sm">管理員權限</button>
+        <button nz-button [acl]="'dashboard:read'" nzType="default" class="ml-sm">儀表板讀取</button>
+        <button nz-button [acl]="'admin:access'" nzType="default" class="ml-sm">管理員訪問</button>
+      </div>
+    </nz-card>
+  </div>
+</div>
+
+<div nz-row [nzGutter]="16">
+  <div nz-col [nzSpan]="8">
+    <nz-card nzTitle="全量權限">
+      <button nz-button (click)="toggleFull()" [nzType]="full ? 'primary' : 'default'"> {{ full ? '關閉' : '開啟' }}全量權限 </button>
+      <p class="pt-md text-grey">全量權限指系統管理員角色，無任何限制。</p>
+    </nz-card>
+  </div>
+
+  <div nz-col [nzSpan]="8">
+    <nz-card nzTitle="角色切換">
+      <div class="mb-sm" *ngFor="let role of availableRoles">
+        <button nz-button (click)="setRole(role.id)" nzType="default" nzBlock> {{ role.name }} ({{ role.id }}) </button>
+      </div>
+      <button nz-button (click)="clearACL()" nzType="dashed" nzBlock class="mt-md"> 清除權限 </button>
+    </nz-card>
+  </div>
+
+  <div nz-col [nzSpan]="8">
+    <nz-card nzTitle="當前用戶權限">
+      <div *ngIf="currentUserACL$ | async as userACL; else noUser">
+        <p><strong>角色：</strong>{{ userACL.roles.join(', ') || '無' }}</p>
+        <p><strong>權限：</strong></p>
+        <nz-tag *ngFor="let permission of userACL.permissions" class="mb-xs">
+          {{ permission }}
+        </nz-tag>
+        <p class="mt-md text-grey">
+          <small>最後更新：{{ userACL.updatedAt | date: 'medium' }}</small>
+        </p>
+      </div>
+      <ng-template #noUser>
+        <p class="text-grey">請先登入以查看權限</p>
+      </ng-template>
+    </nz-card>
+  </div>
+</div>

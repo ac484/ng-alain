@@ -1,0 +1,113 @@
+/**
+ * NG-ALAIN 自動圖示靜態資源
+ *
+ * 此檔案包含：
+ * - 自動載入的 Ant Design 圖示資源
+ * - 應用程式特定的圖示集合
+ * - 圖示元件的自動匯出定義
+ *
+ * 用於 ng-alain 框架的圖示系統整合
+ * 基於 @ant-design/icons-angular 套件
+ */
+
+// Auto icon static resources
+
+import {
+  AlipayCircleOutline,
+  ApiOutline,
+  AppstoreOutline,
+  ArrowDownOutline,
+  BookOutline,
+  BorderLeftOutline,
+  BorderRightOutline,
+  CloudOutline,
+  CopyrightOutline,
+  CustomerServiceOutline,
+  DashboardOutline,
+  DatabaseOutline,
+  DingdingOutline,
+  DislikeOutline,
+  DownloadOutline,
+  ForkOutline,
+  FrownOutline,
+  FullscreenExitOutline,
+  FullscreenOutline,
+  GithubOutline,
+  GlobalOutline,
+  HddOutline,
+  LaptopOutline,
+  LikeOutline,
+  LockOutline,
+  LogoutOutline,
+  MailOutline,
+  MenuFoldOutline,
+  MenuUnfoldOutline,
+  MessageOutline,
+  PayCircleOutline,
+  PieChartOutline,
+  PrinterOutline,
+  RocketOutline,
+  ScanOutline,
+  SettingOutline,
+  ShareAltOutline,
+  ShoppingCartOutline,
+  SoundOutline,
+  StarOutline,
+  TaobaoCircleOutline,
+  TaobaoOutline,
+  TeamOutline,
+  ToolOutline,
+  TrophyOutline,
+  UsbOutline,
+  UserOutline
+} from '@ant-design/icons-angular/icons';
+
+export const ICONS_AUTO = [
+  AlipayCircleOutline,
+  ApiOutline,
+  AppstoreOutline,
+  ArrowDownOutline,
+  BookOutline,
+  BorderLeftOutline,
+  BorderRightOutline,
+  CloudOutline,
+  CopyrightOutline,
+  CustomerServiceOutline,
+  DashboardOutline,
+  DatabaseOutline,
+  DingdingOutline,
+  DislikeOutline,
+  DownloadOutline,
+  ForkOutline,
+  FrownOutline,
+  FullscreenExitOutline,
+  FullscreenOutline,
+  GithubOutline,
+  GlobalOutline,
+  HddOutline,
+  LaptopOutline,
+  LikeOutline,
+  LockOutline,
+  LogoutOutline,
+  MailOutline,
+  MenuFoldOutline,
+  MenuUnfoldOutline,
+  MessageOutline,
+  PayCircleOutline,
+  PieChartOutline,
+  PrinterOutline,
+  RocketOutline,
+  ScanOutline,
+  SettingOutline,
+  ShareAltOutline,
+  ShoppingCartOutline,
+  SoundOutline,
+  StarOutline,
+  TaobaoCircleOutline,
+  TaobaoOutline,
+  TeamOutline,
+  ToolOutline,
+  TrophyOutline,
+  UsbOutline,
+  UserOutline
+];

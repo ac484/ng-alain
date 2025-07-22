@@ -1,0 +1,70 @@
+<nz-card nzTitle="檔案列表">
+  <div class="results-container">
+    <div class="header-actions">
+      <button nz-button nzType="primary" (click)="goToScan()">
+        <span nz-icon nzType="scan"></span>
+        掃描
+      </button>
+      <button nz-button (click)="refresh()">
+        <span nz-icon nzType="reload"></span>
+        重新整理
+      </button>
+    </div>
+
+    @if (hasError()) {
+      <nz-result nzStatus="error" nzTitle="載入失敗" [nzSubTitle]="error()">
+        <div nz-result-extra>
+          <button nz-button nzType="primary" (click)="refresh()">重試</button>
+        </div>
+      </nz-result>
+    } @else {
+      <nz-list [nzDataSource]="scanResults()" [nzItemLayout]="'horizontal'" [nzLoading]="isLoading()">
+        @for (result of scanResults(); track result.id) {
+          <nz-list-item>
+            <nz-list-item-meta>
+              <nz-list-item-meta-title>
+                <span class="file-name">{{ result.fileName }}</span>
+              </nz-list-item-meta-title>
+              <nz-list-item-meta-description>
+                <div class="file-info">
+                  <nz-tag [nzColor]="result.fileType === 'pdf' ? 'blue' : 'green'">
+                    {{ result.fileType.toUpperCase() }}
+                  </nz-tag>
+                  <span class="info-item">
+                    <span nz-icon nzType="file"></span>
+                    {{ formatFileSize(result.fileSize) }}
+                  </span>
+                  <span class="info-item">
+                    <span nz-icon nzType="clock-circle"></span>
+                    {{ formatDate(result.createdAt) }}
+                  </span>
+                </div>
+              </nz-list-item-meta-description>
+            </nz-list-item-meta>
+            <div class="action-buttons">
+              <button nz-button nzType="primary" (click)="previewFile(result)">
+                <span nz-icon nzType="eye"></span>
+                Google Docs 檢視
+              </button>
+              <button nz-button (click)="downloadFile(result)">
+                <span nz-icon nzType="download"></span>
+                下載
+              </button>
+              <button nz-button nzDanger (click)="deleteFile(result)">
+                <span nz-icon nzType="delete"></span>
+                刪除
+              </button>
+            </div>
+          </nz-list-item>
+        } @empty {
+          <nz-empty nzNotFoundImage="simple" nzNotFoundContent="目前沒有檔案">
+            <button nz-button nzType="primary" (click)="goToScan()">
+              <span nz-icon nzType="scan"></span>
+              開始掃描
+            </button>
+          </nz-empty>
+        }
+      </nz-list>
+    }
+  </div>
+</nz-card>

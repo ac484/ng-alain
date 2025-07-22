@@ -1,0 +1,60 @@
+<app-firebase-crud></app-firebase-crud>
+<div class="toolbar">
+  <button nz-button nzType="default" (click)="addRootNode()" style="margin-bottom:8px">
+    <span nz-icon nzType="cluster"></span>建立根結點
+  </button>
+</div>
+<nz-input-group [nzSuffix]="suffixIcon">
+  <input type="text" nz-input placeholder="搜尋節點" [(ngModel)]="searchValue" />
+</nz-input-group>
+<ng-template #suffixIcon>
+  <nz-icon nzType="search" />
+</ng-template>
+<br />
+<nz-tree
+  nzBlockNode
+  nzDraggable
+  [nzData]="(treeData$ | async) ?? []"
+  [nzSearchValue]="searchValue"
+  nzVirtualHeight="300px"
+  (nzClick)="activeNode($event)"
+  (nzDblClick)="openFolder($event)"
+  (nzOnDrop)="onDrop($event)"
+  [nzTreeTemplate]="nzTreeTemplate"
+  (contextmenu)="onPanelContextMenu($event)"
+></nz-tree>
+<ng-template #nzTreeTemplate let-node let-origin="origin">
+  <span class="custom-node">
+    <span (contextmenu)="contextMenu($event, menu, node)">
+      <ng-container *ngIf="origin.isTask; else folderOrFile">
+        <nz-icon nzType="check-circle" style="color: #52c41a"></nz-icon>
+        <span class="task-name">{{ node.title }}</span>
+        <span class="task-status" [ngClass]="origin.taskStatus">{{ origin.taskStatus }}</span>
+        <span class="task-desc">created by {{ origin.author | lowercase }}</span>
+      </ng-container>
+      <ng-template #folderOrFile>
+        <ng-container *ngIf="!node.isLeaf; else fileIcon">
+          <nz-icon [nzType]="node.isExpanded ? 'folder-open' : 'folder'" (click)="openFolder(node)" />
+          <span class="folder-name">{{ node.title }}</span>
+        </ng-container>
+        <ng-template #fileIcon>
+          <nz-icon nzType="file" />
+          <span class="file-name">{{ node.title }}</span>
+        </ng-template>
+      </ng-template>
+    </span>
+  </span>
+</ng-template>
+<nz-dropdown-menu #rootMenu="nzDropdownMenu">
+  <ul nz-menu>
+    <li nz-menu-item (click)="addRootNode()">新增根節點</li>
+  </ul>
+</nz-dropdown-menu>
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <ul nz-menu>
+    <li nz-menu-item (click)="addNode()">新增節點</li>
+    <li *ngIf="contextNode" nz-menu-item (click)="addTask()">新增任務</li>
+    <li *ngIf="contextNode" nz-menu-item (click)="editNode()">編輯節點</li>
+    <li *ngIf="contextNode" nz-menu-item (click)="deleteNode()">刪除節點</li>
+  </ul>
+</nz-dropdown-menu>

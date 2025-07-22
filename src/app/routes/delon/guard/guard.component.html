@@ -1,0 +1,54 @@
+<div class="alain-default__content-title">
+  <h1>路由守衛 (Firestore 整合)</h1>
+</div>
+
+<div nz-row [nzGutter]="16" class="mb-lg">
+  <div nz-col [nzSpan]="24">
+    <nz-card nzTitle="路由測試">
+      <nz-space>
+        <button *nzSpaceItem nz-button [routerLink]="['/delon/guard/leave']"> 離開確認頁 </button>
+        <button *nzSpaceItem nz-button [routerLink]="['/delon/guard/auth']"> 需要 user1 權限 </button>
+        <button *nzSpaceItem nz-button [routerLink]="['/delon/guard/admin']"> 需要管理員權限 </button>
+      </nz-space>
+    </nz-card>
+  </div>
+</div>
+
+<div nz-row [nzGutter]="16" class="mb-lg">
+  <div nz-col [nzSpan]="12">
+    <nz-card nzTitle="權限控制">
+      <nz-space nzDirection="vertical" style="width: 100%">
+        <button *nzSpaceItem nz-button (click)="setFull(true)" nzType="primary"> 設置全量權限 </button>
+        <div *nzSpaceItem>
+          <p class="mb-sm"><strong>可用角色：</strong></p>
+          <nz-space>
+            <ng-container *ngFor="let role of availableRoles">
+              <button *nzSpaceItem nz-button (click)="setRole(role.id)" nzType="default">
+                {{ role.name }}
+              </button>
+            </ng-container>
+          </nz-space>
+        </div>
+        <button *nzSpaceItem nz-button (click)="clearACL()" nzType="dashed"> 清除權限 </button>
+      </nz-space>
+    </nz-card>
+  </div>
+
+  <div nz-col [nzSpan]="12">
+    <nz-card nzTitle="當前狀態">
+      <p><strong>ACL 資料：</strong></p>
+      <pre>{{ data | json }}</pre>
+
+      <div *ngIf="currentUserACL$ | async as userACL" class="mt-md">
+        <p><strong>用戶權限：</strong></p>
+        <p>角色：{{ userACL.roles.join(', ') || '無' }}</p>
+        <p>權限：</p>
+        <nz-tag *ngFor="let permission of userACL.permissions" class="mb-xs">
+          {{ permission }}
+        </nz-tag>
+      </div>
+    </nz-card>
+  </div>
+</div>
+
+<router-outlet />

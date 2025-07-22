@@ -1,0 +1,39 @@
+<!-- NG-ALAIN ST 表格元件演示 -->
+<div class="st-demo">
+  <page-header [title]="'ST 表格元件演示'" [home]="'home'">
+    <ng-template #extra>
+      <button nz-button nzType="primary" (click)="fullChange()">
+        <span nz-icon nzType="fullscreen"></span>
+        全螢幕
+      </button>
+    </ng-template>
+  </page-header>
+
+  <nz-card>
+    <st #st [data]="url" [columns]="columns" [total]="total" [page]="{ show: true, front: false }" [scroll]="scroll">
+      <ng-template st-row="events" let-item>
+        <g2-mini-bar [data]="events" [height]="30" color="#999" borderWidth="3" [padding]="[0, 0, 0, 0]" tooltipType="mini" theme="mini"></g2-mini-bar>
+      </ng-template>
+    </st>
+  </nz-card>
+
+  <!-- Firebase 整合展示 -->
+  <nz-card nzTitle="Firebase 整合狀態" class="mt-lg">
+    <div class="firebase-status">
+      <nz-descriptions nzTitle="認證狀態" [nzColumn]="2">
+        <nz-descriptions-item nzTitle="Firebase Auth">
+          <nz-tag nzColor="green">已整合</nz-tag>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Firestore ACL">
+          <nz-tag nzColor="green">已整合</nz-tag>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Google 登入">
+          <nz-tag nzColor="green">已整合</nz-tag>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="權限控制">
+          <nz-tag nzColor="green">已整合</nz-tag>
+        </nz-descriptions-item>
+      </nz-descriptions>
+    </div>
+  </nz-card>
+</div>

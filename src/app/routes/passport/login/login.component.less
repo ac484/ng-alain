@@ -1,0 +1,60 @@
+@import '@delon/theme/index';
+
+:host {
+  display: block;
+  width: 368px;
+  margin: 0 auto;
+
+  ::ng-deep {
+    .ant-input-affix-wrapper .ant-input:not(:first-child) {
+      padding-left: 4px;
+    }
+
+    .icon {
+      cursor: pointer;
+      margin-left: 16px;
+      font-size: 24px;
+      color: rgb(0 0 0 / 20%);
+      vertical-align: middle;
+      transition: color 0.3s;
+
+      &:hover {
+        color: @primary-color;
+      }
+    }
+
+    app-anonymous-login,
+    app-email-login,
+    app-logout {
+      margin-left: 16px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .other {
+      margin-top: 24px;
+      line-height: 22px;
+      text-align: left;
+
+      nz-tooltip {
+        vertical-align: middle;
+      }
+
+      .register {
+        float: right;
+      }
+    }
+  }
+}
+
+[data-theme='dark'] {
+  :host ::ng-deep {
+    .icon {
+      color: rgb(255 255 255 / 20%);
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+}
