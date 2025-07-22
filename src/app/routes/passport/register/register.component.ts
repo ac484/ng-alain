@@ -5,18 +5,17 @@
  * 整合：Firebase Auth 回調處理
  */
 
-import { ChangeDetectorRef, OnDestroy, inject } from '@angular/core';
+import { HttpContext } from '@angular/common/http';
+import { ChangeDetectorRef, OnDestroy, inject, Component } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { _HttpClient, I18nPipe } from '@delon/theme';
 import { ALLOW_ANONYMOUS } from '@delon/auth';
-import { HttpContext } from '@angular/common/http';
-import { finalize } from 'rxjs/operators';
+import { _HttpClient, I18nPipe } from '@delon/theme';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { Component } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register',

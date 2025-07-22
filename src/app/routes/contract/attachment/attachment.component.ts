@@ -3,15 +3,15 @@
  * 使用 ng-zorro-antd 原生功能和 Google Docs Viewer
  */
 
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzTagModule } from 'ng-zorro-antd/tag';
+import { Component, Input } from '@angular/core';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzListModule } from 'ng-zorro-antd/list';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 interface Attachment {
   name: string;
@@ -184,7 +184,7 @@ export class ContractAttachmentComponent {
     const k = 1024;
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
 
   getFileTypeDisplay(type: string): string {

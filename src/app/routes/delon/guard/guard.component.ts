@@ -7,14 +7,15 @@
  * 整合：Firebase 認證與 ng-alain ACL
  */
 
+import { AsyncPipe, JsonPipe, NgIf, NgFor } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { ACLService } from '@delon/acl';
 import { MenuService } from '@delon/theme';
-import { Auth } from '@angular/fire/auth';
 import { SHARED_IMPORTS } from '@shared';
+
 import { FirebaseACLService, ACLRole } from '../../../core/firebase/firebase-acl.service';
-import { AsyncPipe, JsonPipe, NgIf, NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-guard',

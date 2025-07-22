@@ -3,15 +3,15 @@
  * 使用 ng-zorro-antd 原生功能
  */
 
-import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzStatisticModule } from 'ng-zorro-antd/statistic';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzProgressModule } from 'ng-zorro-antd/progress';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzTagModule } from 'ng-zorro-antd/tag';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzStatisticModule } from 'ng-zorro-antd/statistic';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 interface ConstructionProject {
   name: string;

@@ -1,7 +1,8 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+
 import { environment } from '../../../environments/environment';
 
 export interface OcrResult {
@@ -111,7 +112,7 @@ export class OcrService {
   /**
    * 檢查文件大小是否符合限制
    */
-  isValidFileSize(file: File, maxSizeMB: number = 20): boolean {
+  isValidFileSize(file: File, maxSizeMB = 20): boolean {
     return file.size <= maxSizeMB * 1024 * 1024;
   }
 
@@ -140,7 +141,7 @@ export class OcrService {
   formatText(text: string): string {
     if (!text) return '';
 
-    return text.replace(/\n/g, '<br>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/  /g, '&nbsp;&nbsp;');
+    return text.replace(/\n/g, '<br>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;').replace(/ {2}/g, '&nbsp;&nbsp;');
   }
 
   /**

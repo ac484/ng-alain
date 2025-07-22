@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface ScanRequest {
@@ -28,6 +28,7 @@ export class VisionApiService {
 
   /**
    * 使用Google Cloud Vision API掃描PDF文件
+   *
    * @param bucketName Google Cloud Storage桶名
    * @param pdfPath PDF文件在桶中的路徑
    */

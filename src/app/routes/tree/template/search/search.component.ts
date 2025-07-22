@@ -1,11 +1,11 @@
 /**
  * 樹狀搜尋元件（極簡主義，官方推薦）
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzTreeModule, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 @Component({
   selector: 'app-tree-search',

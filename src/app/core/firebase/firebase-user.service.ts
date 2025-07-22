@@ -6,8 +6,8 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from '@angular/fire/firestore';
 import { User } from '@angular/fire/auth';
+import { Firestore, doc, setDoc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 

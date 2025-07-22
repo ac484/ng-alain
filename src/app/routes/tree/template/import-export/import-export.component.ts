@@ -1,22 +1,22 @@
 /**
  * 樹狀匯入匯出元件（極簡主義）
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTreeModule } from 'ng-zorro-antd/tree';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzUploadModule } from 'ng-zorro-antd/upload';
-import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzTreeModule } from 'ng-zorro-antd/tree';
+import { NzUploadModule } from 'ng-zorro-antd/upload';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 interface TreeNode {
   title: string;
@@ -192,7 +192,7 @@ export class TreeImportExportComponent {
       this.downloadFile(jsonData, 'tree-data.json', 'application/json');
       this.message.success('JSON 檔案匯出成功');
     } catch (error) {
-      this.message.error('匯出失敗: ' + error);
+      this.message.error(`匯出失敗: ${error}`);
     }
   }
 
@@ -202,7 +202,7 @@ export class TreeImportExportComponent {
       this.downloadFile(csvData, 'tree-data.csv', 'text/csv');
       this.message.success('CSV 檔案匯出成功');
     } catch (error) {
-      this.message.error('匯出失敗: ' + error);
+      this.message.error(`匯出失敗: ${error}`);
     }
   }
 
@@ -266,7 +266,7 @@ export class TreeImportExportComponent {
         this.message.error('匯入的資料格式不正確');
       }
     } catch (error) {
-      this.message.error('匯入失敗: ' + error);
+      this.message.error(`匯入失敗: ${error}`);
     }
   }
 
@@ -281,7 +281,7 @@ export class TreeImportExportComponent {
         throw new Error('JSON 格式不正確');
       }
     } catch (error) {
-      throw new Error('JSON 解析失敗: ' + error);
+      throw new Error(`JSON 解析失敗: ${error}`);
     }
   }
 
@@ -324,7 +324,7 @@ export class TreeImportExportComponent {
 
       return nodes;
     } catch (error) {
-      throw new Error('CSV 解析失敗: ' + error);
+      throw new Error(`CSV 解析失敗: ${error}`);
     }
   }
 

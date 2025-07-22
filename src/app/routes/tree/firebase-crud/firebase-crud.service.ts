@@ -3,6 +3,7 @@ import { Firestore, collection, collectionData, addDoc, updateDoc, deleteDoc, do
 import { runTransaction, getFirestore, doc as firestoreDoc } from 'firebase/firestore';
 import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
+
 import { SpaceNode } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
@@ -16,7 +17,7 @@ export class FirebaseCrudService {
   }
 
   getNode(id: string): Observable<SpaceNode | undefined> {
-    const ref = doc(this.firestore, this.collectionName + '/' + id);
+    const ref = doc(this.firestore, `${this.collectionName}/${id}`);
     return from(getDoc(ref)).pipe(
       map(snap => {
         if (!snap.exists()) return undefined;
@@ -27,25 +28,25 @@ export class FirebaseCrudService {
   }
 
   addNode(node: SpaceNode): Promise<void> {
-    const ref = doc(this.firestore, this.collectionName + '/' + node.id);
+    const ref = doc(this.firestore, `${this.collectionName}/${node.id}`);
     return setDoc(ref, node);
   }
 
   updateNode(id: string, updates: Partial<SpaceNode>): Promise<void> {
-    const ref = doc(this.firestore, this.collectionName + '/' + id);
+    const ref = doc(this.firestore, `${this.collectionName}/${id}`);
     return updateDoc(ref, { ...updates, updatedAt: new Date().toISOString() });
   }
 
   deleteNode(id: string): Promise<void> {
-    const ref = doc(this.firestore, this.collectionName + '/' + id);
+    const ref = doc(this.firestore, `${this.collectionName}/${id}`);
     return deleteDoc(ref);
   }
 
-  moveNodesBatch(updates: { id: string; parentKey: string | null; order: number }[]): Promise<void> {
+  moveNodesBatch(updates: Array<{ id: string; parentKey: string | null; order: number }>): Promise<void> {
     const db = getFirestore();
     return runTransaction(db, async transaction => {
       for (const u of updates) {
-        const ref = firestoreDoc(db, this.collectionName + '/' + u.id);
+        const ref = firestoreDoc(db, `${this.collectionName}/${u.id}`);
         transaction.update(ref, {
           parentKey: u.parentKey,
           order: u.order,

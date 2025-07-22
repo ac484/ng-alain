@@ -5,13 +5,14 @@
  * 使用 ST 表格元件展示角色清單
  */
 
+import { NgFor } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { STColumn } from '@delon/abc/st';
 import { SHARED_IMPORTS } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { FirebaseACLService, ACLRole } from '../../../core/firebase/firebase-acl.service';
 import { Observable } from 'rxjs';
-import { NgFor } from '@angular/common';
+
+import { FirebaseACLService, ACLRole } from '../../../core/firebase/firebase-acl.service';
 
 @Component({
   selector: 'app-acl-roles',

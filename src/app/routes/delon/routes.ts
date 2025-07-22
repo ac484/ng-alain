@@ -10,9 +10,9 @@ import { aclCanActivate } from '@delon/acl';
 
 import { ACLComponent } from './acl/acl.component';
 import { ACLAdminComponent } from './acl-admin/acl-admin.component';
-import { ACLUsersComponent } from './acl-users/acl-users.component';
-import { ACLRolesComponent } from './acl-roles/acl-roles.component';
 import { ACLPermissionsComponent } from './acl-permissions/acl-permissions.component';
+import { ACLRolesComponent } from './acl-roles/acl-roles.component';
+import { ACLUsersComponent } from './acl-users/acl-users.component';
 import { CacheComponent } from './cache/cache.component';
 import { DownFileComponent } from './downfile/downfile.component';
 import { DelonFormComponent } from './form/form.component';

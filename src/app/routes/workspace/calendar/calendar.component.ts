@@ -3,11 +3,11 @@
  * 使用 ng-zorro-antd calendar 原生功能
  */
 
-import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzCalendarModule } from 'ng-zorro-antd/calendar';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
 
 interface ConstructionEvent {
   id: string;

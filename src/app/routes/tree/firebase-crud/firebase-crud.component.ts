@@ -1,10 +1,11 @@
 import { Component, ViewChild, TemplateRef, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { SpaceNode } from '../models/models';
-import { FirebaseCrudService } from './firebase-crud.service';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable } from 'rxjs';
+
+import { FirebaseCrudService } from './firebase-crud.service';
+import { SpaceNode } from '../models/models';
 
 @Component({
   selector: 'app-firebase-crud',
@@ -96,7 +97,7 @@ export class FirebaseCrudComponent {
           });
       } else {
         const now = new Date().toISOString();
-        const key = 'node-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        const key = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const newNode: SpaceNode = {
           id: key,
           key,

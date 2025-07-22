@@ -1,15 +1,15 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Storage, ref, listAll, getMetadata, getDownloadURL, deleteObject } from '@angular/fire/storage';
 import { Router } from '@angular/router';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzListModule } from 'ng-zorro-antd/list';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { Storage, ref, listAll, getMetadata, getDownloadURL, deleteObject } from '@angular/fire/storage';
 
 interface ScanResult {
   id: string;
@@ -85,7 +85,7 @@ export class ScanResultComponent implements OnInit {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
 
   public formatDate(date: Date): string {

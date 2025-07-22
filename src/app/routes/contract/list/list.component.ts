@@ -19,15 +19,15 @@
  * 路由：/contract/list
  * 依賴：@delon/abc/st 表格元件、Mock API
  */
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { STComponent, STColumn, STData } from '@delon/abc/st';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { HttpClient } from '@angular/common/http';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 interface Contract {
   id: string;

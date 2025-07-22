@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { CustomerPOItem } from '../pdf/pdf.service';
 
 export interface TreeNode {
@@ -84,7 +85,7 @@ export class TreeConverterService {
   /**
    * 將文字行轉換為樹狀結構（原有方法，保持向後兼容）
    */
-  convertToTree(textLines: string[], maxNodes: number = 100): TreeNode[] {
+  convertToTree(textLines: string[], maxNodes = 100): TreeNode[] {
     const treeData: TreeNode[] = [];
     let keyCounter = 0;
 
@@ -108,8 +109,8 @@ export class TreeConverterService {
   /**
    * 截斷過長的標題
    */
-  private truncateTitle(title: string, maxLength: number = 50): string {
-    return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
+  private truncateTitle(title: string, maxLength = 50): string {
+    return title.length > maxLength ? `${title.substring(0, maxLength)}...` : title;
   }
 
   /**

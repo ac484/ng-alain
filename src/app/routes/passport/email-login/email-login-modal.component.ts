@@ -8,6 +8,7 @@
 import { Component } from '@angular/core';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+
 import { EmailLoginFormComponent } from './email-login-form.component';
 import { EmailRegisterFormComponent } from './email-register-form.component';
 import { EmailResetFormComponent } from './email-reset-form.component';

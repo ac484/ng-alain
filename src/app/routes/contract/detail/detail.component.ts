@@ -21,17 +21,18 @@
  * 路由：/contract/detail/:id
  * 依賴：ContractAttachmentComponent、Mock API
  */
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { HttpClient } from '@angular/common/http';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+
 import { ContractAttachmentComponent } from '../attachment/attachment.component';
 
 interface ContractDetail {

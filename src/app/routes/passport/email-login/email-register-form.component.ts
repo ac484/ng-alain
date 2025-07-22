@@ -6,13 +6,12 @@
  */
 
 import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { createUserWithEmailAndPassword, sendEmailVerification, Auth } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { createUserWithEmailAndPassword, sendEmailVerification } from '@angular/fire/auth';
-import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-email-register-form',
@@ -72,7 +71,7 @@ export class EmailRegisterFormComponent {
     { validators: this.passwordMatchValidator }
   );
 
-  passwordMatchValidator(group: any): { [key: string]: any } | null {
+  passwordMatchValidator(group: any): Record<string, any> | null {
     const password = group.get('password');
     const confirmPassword = group.get('confirmPassword');
     return password && confirmPassword && password.value !== confirmPassword.value ? { passwordMismatch: true } : null;

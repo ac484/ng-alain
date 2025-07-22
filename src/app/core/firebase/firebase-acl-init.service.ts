@@ -7,6 +7,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable, from, forkJoin, map, switchMap } from 'rxjs';
+
 import { ACLRole, ACLPermission } from './firebase-acl.service';
 
 @Injectable({
@@ -18,7 +19,7 @@ export class FirebaseACLInitService {
   /**
    * 預設權限定義
    */
-  private readonly defaultPermissions: Omit<ACLPermission, 'createdAt' | 'updatedAt'>[] = [
+  private readonly defaultPermissions: Array<Omit<ACLPermission, 'createdAt' | 'updatedAt'>> = [
     {
       id: 'dashboard:read',
       name: '儀表板查看',
@@ -56,7 +57,7 @@ export class FirebaseACLInitService {
   /**
    * 預設角色定義
    */
-  private readonly defaultRoles: Omit<ACLRole, 'createdAt' | 'updatedAt'>[] = [
+  private readonly defaultRoles: Array<Omit<ACLRole, 'createdAt' | 'updatedAt'>> = [
     {
       id: 'user',
       name: '一般用戶',

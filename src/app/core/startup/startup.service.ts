@@ -63,8 +63,8 @@ import { ALAIN_I18N_TOKEN, MenuService, SettingsService, TitleService } from '@d
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { Observable, zip, catchError, map, of } from 'rxjs';
 
-import { I18NService } from '../i18n/i18n.service';
 import { FirebaseACLInitService } from '../firebase/firebase-acl-init.service';
+import { I18NService } from '../i18n/i18n.service';
 
 /**
  * 應用程式啟動提供者

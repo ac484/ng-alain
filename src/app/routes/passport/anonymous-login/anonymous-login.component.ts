@@ -6,12 +6,12 @@
  */
 
 import { Component, inject } from '@angular/core';
+import { Auth, signInAnonymously } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { Auth, signInAnonymously } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-anonymous-login',

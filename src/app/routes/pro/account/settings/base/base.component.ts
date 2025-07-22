@@ -8,13 +8,13 @@
  * - 支援與 Firebase Firestore 整合的用戶資料管理
  */
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Auth, user } from '@angular/fire/auth';
+import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
 import { SHARED_IMPORTS } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadComponent } from 'ng-zorro-antd/upload';
-import { Firestore, doc, getDoc, updateDoc } from '@angular/fire/firestore';
-import { Auth, user } from '@angular/fire/auth';
-import { map, switchMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 interface ProAccountSettingsUser {
   email: string;

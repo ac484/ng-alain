@@ -6,13 +6,12 @@
  */
 
 import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { sendPasswordResetEmail, Auth } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { sendPasswordResetEmail } from '@angular/fire/auth';
-import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-email-reset-form',

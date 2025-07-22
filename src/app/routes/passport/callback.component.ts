@@ -7,14 +7,13 @@
  */
 
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
 import { Auth, User, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc, serverTimestamp } from '@angular/fire/firestore';
-import { SocialService } from '@delon/auth';
-import { SettingsService } from '@delon/theme';
-import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
-import { ReuseTabService } from '@delon/abc/reuse-tab';
+import { Router, ActivatedRoute } from '@angular/router';
 import { StartupService } from '@core';
+import { ReuseTabService } from '@delon/abc/reuse-tab';
+import { SocialService, DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
+import { SettingsService } from '@delon/theme';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { Observable, from } from 'rxjs';

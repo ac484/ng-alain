@@ -27,13 +27,13 @@
  * 路由：/workspace/daily-log
  * 依賴：ng-zorro-antd/list、ng-zorro-antd/tag
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
+import { Component } from '@angular/core';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzTimelineModule } from 'ng-zorro-antd/timeline';
 
 interface ConstructionLog {
   time: string;

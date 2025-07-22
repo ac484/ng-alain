@@ -27,10 +27,10 @@
  * 路由：/workspace/memos
  * 依賴：ng-zorro-antd/list、ng-zorro-antd/tag、ng-zorro-antd/button
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCardModule } from 'ng-zorro-antd/card';
+import { Component } from '@angular/core';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzListModule } from 'ng-zorro-antd/list';
 import { NzTagModule } from 'ng-zorro-antd/tag';

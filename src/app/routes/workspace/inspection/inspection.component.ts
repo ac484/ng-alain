@@ -27,12 +27,12 @@
  * 路由：/workspace/inspection
  * 依賴：ng-zorro-antd/list、ng-zorro-antd/tag、ng-zorro-antd/progress
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 
 interface ConstructionInspection {
   name: string;

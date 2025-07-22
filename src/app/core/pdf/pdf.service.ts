@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { initializePDFJS, getPDFJS } from './pdf.config';
 
 export interface CustomerPOItem {
@@ -92,7 +93,7 @@ export class PDFService {
               currentLine = item.text;
               lastY = item.y;
             } else {
-              currentLine += ' ' + item.text;
+              currentLine += ` ${item.text}`;
             }
           });
 
@@ -132,7 +133,7 @@ export class PDFService {
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
 
   /**

@@ -1,15 +1,16 @@
 /**
  * 樹狀面板（極簡主義，官方虛擬卷軸 + 搜索 + 拖曳）
  */
-import { Component, ViewChild } from '@angular/core';
 import { CommonModule, LowerCasePipe } from '@angular/common';
+import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NzTreeModule, NzTreeNode, NzFormatEmitEvent, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { NzDropDownModule, NzDropdownMenuComponent, NzContextMenuService } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzTreeModule, NzTreeNode, NzFormatEmitEvent, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
 import { FirebaseCrudComponent } from '../firebase-crud/firebase-crud.component';
 import { FirebaseCrudService } from '../firebase-crud/firebase-crud.service';
 import { SpaceNode } from '../models/models';
@@ -94,7 +95,7 @@ export class TreePanelComponent {
     if (!this.contextNode) return;
     const parentKey = this.contextNode.key;
     const now = new Date().toISOString();
-    const key = 'task-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    const key = `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const newTask: SpaceNode = {
       id: key,
       key,

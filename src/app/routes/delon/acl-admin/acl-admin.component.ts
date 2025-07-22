@@ -4,11 +4,12 @@
  * 提供角色和權限的管理界面
  */
 
+import { NgFor } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { SHARED_IMPORTS } from '@shared';
-import { FirebaseACLService, ACLRole, ACLPermission } from '../../../core/firebase/firebase-acl.service';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NgFor } from '@angular/common';
+
+import { FirebaseACLService, ACLRole, ACLPermission } from '../../../core/firebase/firebase-acl.service';
 
 @Component({
   selector: 'app-acl-admin',

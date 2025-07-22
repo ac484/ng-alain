@@ -3,12 +3,12 @@
  * 使用 ng-zorro-antd table 原生功能
  */
 
-import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzTableModule } from 'ng-zorro-antd/table';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 interface ConstructionTask {
   id: string;

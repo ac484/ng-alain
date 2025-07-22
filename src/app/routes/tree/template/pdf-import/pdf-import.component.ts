@@ -1,20 +1,21 @@
 /**
  * PDF 匯入樹狀元件（極簡主義）
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTreeModule } from 'ng-zorro-antd/tree';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzTreeModule } from 'ng-zorro-antd/tree';
+
 import { PDFService, CustomerPOItem } from '../../../../core/pdf/pdf.service';
 import { TreeConverterService, TreeNode } from '../../../../core/tree/tree-converter.service';
 
@@ -197,10 +198,10 @@ export class TreePdfImportComponent {
         this.expandedKeys = this.treeConverter.getAllKeys(this.treeData);
         this.isUploadModalVisible = false;
       } else {
-        this.message.error('PDF 解析失敗：' + (result.error || '未知錯誤'));
+        this.message.error(`PDF 解析失敗：${result.error || '未知錯誤'}`);
       }
     } catch (error) {
-      this.message.error('處理過程中發生錯誤：' + error);
+      this.message.error(`處理過程中發生錯誤：${error}`);
     } finally {
       this.isProcessing = false;
     }
@@ -262,7 +263,7 @@ export class TreePdfImportComponent {
 
       this.message.success('成功匯出Customer PO項目');
     } catch (error) {
-      this.message.error('匯出失敗: ' + error);
+      this.message.error(`匯出失敗: ${error}`);
     }
   }
 }
