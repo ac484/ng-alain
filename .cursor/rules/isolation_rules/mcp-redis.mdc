@@ -78,9 +78,72 @@ flowchart TD
 
 ---
 
+## 智能積累與自淨流程
+
+```mermaid
+flowchart TD
+    N[新知識產生] --> Q[質量評分/審核]
+    Q -- 高質量 --> V[生成向量/存入 Redis]
+    Q -- 低質量 --> D[丟棄/不積累]
+    V --> F{已存在同 id?}
+    F -- 是 --> U[覆蓋/版本升級]
+    F -- 否 --> S[新增]
+    S & U --> L[記錄日誌]
+    L --> R[定期清理/淘汰]
+    R -->|過期/低質量/冷門| X[刪除]
+    R -->|高頻/高質量| K[保留/升級]
+```
+
+### 流程說明
+1. **新知識產生**：來自 context7、memory-flow、memory-bank 或用戶輸入。
+2. **質量評分/審核**：自動或人工評分，僅高質量（如分數 > 0.8）才進入 Redis。
+3. **生成向量/存入 Redis**：自動生成 embedding，存入 knowledge_vectors。
+4. **覆蓋/版本升級**：若已存在同 id，且新知識明顯優於舊資料，則覆蓋並升級 version。
+5. **記錄日誌**：所有寫入/覆蓋/刪除皆記錄日誌，便於追溯。
+6. **定期清理/淘汰**：定期（或事件觸發）清理過期、低質量、冷門資料。
+7. **刪除/保留**：過期、低質量、查詢頻率低自動刪除；高頻/高質量則保留或升級。
+
+### 規則建議
+- **積累門檻**：質量分數 > 0.8 才積累。
+- **淘汰門檻**：TTL（如 30 天）、查詢頻率低於 2 次/30 天自動淘汰。
+- **覆蓋規則**：新知識內容明顯優於舊資料時直接覆蓋，保留 version 與 updated_at。
+- **人工審查**：每週統計命中率、質量分布、查詢頻率，低質量/冷門自動淘汰。
+- **日誌追蹤**：所有操作皆記錄日誌，便於審查。
+
+### 偽代碼範例
+```typescript
+function accumulateToRedis(knowledge) {
+  if (qualityScore(knowledge) < 0.8) return; // 低質量不積累
+  const id = getKnowledgeId(knowledge);
+  if (redis.exists(id)) {
+    if (isBetter(knowledge, redis.get(id))) {
+      redis.set(id, knowledge, { version: nextVersion(), updated_at: now() });
+      log('覆蓋', id);
+    }
+  } else {
+    redis.set(id, knowledge, { version: 1, created_at: now() });
+    log('新增', id);
+  }
+}
+
+function periodicCleanup() {
+  for (const id of redis.keys()) {
+    if (isExpired(id) || isLowQuality(id) || isLowFrequency(id)) {
+      redis.delete(id);
+      log('刪除', id);
+    }
+  }
+}
+```
+
+---
+
 > 本規範為 MCP Redis 向量知識庫最佳實踐，請團隊嚴格遵循，並根據實際需求持續優化。
 
 
 [[calls]]
+match = """redis|cache|store|save|get|retrieve|set|hash|list|stream|json|pub|sub|zadd|sadd|lpush|rpush|hset|hget|vector|search|memory|session|queue"""
+tool = "redis-mcp"
+
 match = """redis|cache|store|save|get|retrieve|set|hash|list|stream|json|pub|sub|zadd|sadd|lpush|rpush|hset|hget|vector|search|memory|session|queue"""
 tool = "redis-mcp"

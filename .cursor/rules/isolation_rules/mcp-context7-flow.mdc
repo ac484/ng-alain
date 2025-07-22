@@ -38,3 +38,42 @@ graph TD
 [[calls]]
 match = """context7|library docs|get examples|resolve library"""
 tool = "context7"
+
+
+## 智能 context7 觸發查詢流程
+
+```mermaid
+flowchart TD
+    Q[用戶查詢] --> L[查本地知識庫]
+    L -->|高信心| R1[直接回傳本地知識]
+    L -->|低信心/部分命中| C7[查 context7]
+    C7 --> M[合併本地與 context7 結果]
+    M --> R2[回傳合併答案]
+    C7 -->|查到新知| A[積累回本地知識庫]
+```
+
+### 步驟說明
+1. **用戶查詢**：接收用戶輸入的查詢內容。
+2. **查本地知識庫**：依序查詢 Redis 向量庫、Memory-Flow、Memory-Bank，並計算信心分數（如向量相似度、關鍵詞覆蓋率）。
+3. **信心分數判斷**：
+   - 若分數高（如 >0.85），直接回傳本地知識。
+   - 若分數低於閾值或僅部分命中，進入 context7 查詢。
+4. **查 context7**：查詢官方文檔/範例，獲取最新權威知識。
+5. **合併回應**：將 context7 結果與本地知識合併，標註來源。
+6. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/Memory-Bank），提升下次命中率。
+
+### 觸發條件
+- 本地知識信心分數低於閾值（如 0.85）。
+- 僅部分命中或內容明顯過時。
+- 用戶明確要求查官方文件。
+- 關鍵詞判斷涉及新技術、API 變更時。
+
+### 實踐建議
+- 設定高/低信心閾值，低信心時自動提示或觸發 context7。
+- 合併回應時標註來源，讓用戶可辨識新舊知識。
+- 查到新知時自動積累，逐步提升本地知識覆蓋率。
+
+
+[[calls]]
+match = """context7|library docs|get examples|resolve library"""
+tool = "context7"

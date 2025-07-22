@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # Cursor's Memory Bank
@@ -16,11 +16,11 @@ flowchart TD
     PB[projectbrief.md] --> PC[productContext.md]
     PB --> SP[systemPatterns.md]
     PB --> TC[techContext.md]
-    
+
     PC --> AC[activeContext.md]
     SP --> AC
     TC --> AC
-    
+
     AC --> P[progress.md]
 \```
 
@@ -76,10 +76,10 @@ Create additional files/folders within memory-bank/ when they help organize:
 flowchart TD
     Start[Start] --> ReadFiles[Read Memory Bank]
     ReadFiles --> CheckFiles{Files Complete?}
-    
+
     CheckFiles -->|No| Plan[Create Plan]
     Plan --> Document[Document in Chat]
-    
+
     CheckFiles -->|Yes| Verify[Verify Context]
     Verify --> Strategy[Develop Strategy]
     Strategy --> Present[Present Approach]
@@ -106,16 +106,16 @@ Memory Bank updates occur when:
 \```mermaid
 flowchart TD
     Start[Update Process]
-    
+
     subgraph Process
         P1[Review ALL Files]
         P2[Document Current State]
         P3[Clarify Next Steps]
         P4[Update .cursor/rules]
-        
+
         P1 --> P2 --> P3 --> P4
     end
-    
+
     Start --> Process
 \```
 
@@ -128,19 +128,19 @@ The .cursor/rules file is my learning journal for each project. It captures impo
 \```mermaid
 flowchart TD
     Start{Discover New Pattern}
-    
+
     subgraph Learn [Learning Process]
         D1[Identify Pattern]
         D2[Validate with User]
         D3[Document in .cursor/rules]
     end
-    
+
     subgraph Apply [Usage]
         A1[Read .cursor/rules]
         A2[Apply Learned Patterns]
         A3[Improve Future Work]
     end
-    
+
     Start --> Learn
     Learn --> Apply
 \```
@@ -151,6 +151,13 @@ flowchart TD
 - Project-specific patterns
 - Known challenges
 - Evolution of project decisions
+- Tool usage patterns
+
+The format is flexible - focus on capturing valuable insights that help me work more effectively with you and the project. Think of .cursor/rules as a living document that grows smarter as we work together.
+
+REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.
+
+> 各層 Memory Bank 文件已自動與 context7、Redis、Memory-Flow 閉環協作，所有同步、積累、淘汰皆由 isolation_rules/mcp-* 分層規則自動處理，主流程架構與文件結構不需更動。
 - Tool usage patterns
 
 The format is flexible - focus on capturing valuable insights that help me work more effectively with you and the project. Think of .cursor/rules as a living document that grows smarter as we work together.
