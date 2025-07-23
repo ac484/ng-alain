@@ -2708,13 +2708,12 @@ __metadata:
   linkType: hard
 
 "@google-cloud/vision@npm:^5.3.1":
-  version: 5.3.1
-  resolution: "@google-cloud/vision@npm:5.3.1"
+  version: 5.3.2
+  resolution: "@google-cloud/vision@npm:5.3.2"
   dependencies:
     "@google-cloud/promisify": "npm:^5.0.0"
     google-gax: "npm:^5.0.0"
-    is: "npm:^3.3.0"
-  checksum: 10c0/e951d7775e9799040812c8f110e61ee7625dee814cc997e3879f591f5e43b90e2bb8394c77c9d85d52a8561d3fa5dbc97483d9cd147071d7520716d5455da38e
+  checksum: 10c0/8763aa097152cdf19a730e1d3c29b11de9b3940ac5f7d6d8436f99e2226fcc52ec09182c4acdda791305d827736ebeff60370e1d74ea1140fa038eaf7e52114b
   languageName: node
   linkType: hard
 
@@ -6250,9 +6249,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.173":
-  version: 1.5.189
-  resolution: "electron-to-chromium@npm:1.5.189"
-  checksum: 10c0/53e43a5ad26636eae04f273d65ca4ca5b8f3084690e08caeef34fddf4ed6d16c076d7ceb5feaec36ac4979f250a5a70b13b5c0a33111f89af7b3cd529b751b3f
+  version: 1.5.190
+  resolution: "electron-to-chromium@npm:1.5.190"
+  checksum: 10c0/d6ebf5c3fd72ed1e57f536558c201573693b39bc23fd7c6a4b30d9e17a0aa5d1ea1e93cf4f7d7dfbc2042cf104e3ea72b2f882192886e56ebea7c472eb124021
   languageName: node
   linkType: hard
 
@@ -8680,13 +8679,6 @@ __metadata:
   dependencies:
     is-docker: "npm:^2.0.0"
   checksum: 10c0/a6fa2d370d21be487c0165c7a440d567274fbba1a817f2f0bfa41cc5e3af25041d84267baa22df66696956038a43973e72fca117918c91431920bdef490fa25e
-  languageName: node
-  linkType: hard
-
-"is@npm:^3.3.0":
-  version: 3.3.2
-  resolution: "is@npm:3.3.2"
-  checksum: 10c0/bbb6e0887fdf193d6080fc5cb383ba7a3a5b498d93491032a4dd7e3716d4540c90eb7e579022528883ca3619a056eea596a75758625f24a25c3382328256347a
   languageName: node
   linkType: hard
 
