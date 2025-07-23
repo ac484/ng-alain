@@ -1,60 +1,213 @@
+<!-- Firebase CRUD 組件 -->
 <app-firebase-crud></app-firebase-crud>
-<div class="toolbar">
-  <button nz-button nzType="default" (click)="addRootNode()" style="margin-bottom:8px">
-    <span nz-icon nzType="cluster"></span>建立根結點
-  </button>
-</div>
-<nz-input-group [nzSuffix]="suffixIcon">
-  <input type="text" nz-input placeholder="搜尋節點" [(ngModel)]="searchValue" />
-</nz-input-group>
-<ng-template #suffixIcon>
-  <nz-icon nzType="search" />
-</ng-template>
-<br />
-<nz-tree
-  nzBlockNode
-  nzDraggable
-  [nzData]="(treeData$ | async) ?? []"
-  [nzSearchValue]="searchValue"
-  nzVirtualHeight="300px"
-  (nzClick)="activeNode($event)"
-  (nzDblClick)="openFolder($event)"
-  (nzOnDrop)="onDrop($event)"
-  [nzTreeTemplate]="nzTreeTemplate"
-  (contextmenu)="onPanelContextMenu($event)"
-></nz-tree>
-<ng-template #nzTreeTemplate let-node let-origin="origin">
-  <span class="custom-node">
-    <span (contextmenu)="contextMenu($event, menu, node)">
-      <ng-container *ngIf="origin.isTask; else folderOrFile">
-        <nz-icon nzType="check-circle" style="color: #52c41a"></nz-icon>
-        <span class="task-name">{{ node.title }}</span>
-        <span class="task-status" [ngClass]="origin.taskStatus">{{ origin.taskStatus }}</span>
-        <span class="task-desc">created by {{ origin.author | lowercase }}</span>
-      </ng-container>
-      <ng-template #folderOrFile>
-        <ng-container *ngIf="!node.isLeaf; else fileIcon">
-          <nz-icon [nzType]="node.isExpanded ? 'folder-open' : 'folder'" (click)="openFolder(node)" />
-          <span class="folder-name">{{ node.title }}</span>
-        </ng-container>
-        <ng-template #fileIcon>
-          <nz-icon nzType="file" />
-          <span class="file-name">{{ node.title }}</span>
-        </ng-template>
+
+<!-- 主要容器：使用 Flex 佈局替代 Splitter -->
+<div class="tree-panel-container">
+
+  <!-- 左側面板：樹狀探索區 -->
+  <div class="tree-exploration-panel"
+       [class.collapsed]="leftPanelCollapsed">
+
+    <!-- 工具列 -->
+    <div class="toolbar">
+      <button nz-button nzType="default" (click)="addRootNode()" class="add-root-btn">
+        <span nz-icon nzType="cluster"></span>建立根結點
+      </button>
+    </div>
+
+    <!-- 搜尋功能 -->
+    <nz-input-group [nzSuffix]="suffixIcon" class="search-input">
+      <input
+        type="text"
+        nz-input
+        placeholder="搜尋節點"
+        [ngModel]="searchValue"
+        (ngModelChange)="onSearchChange($event)" />
+    </nz-input-group>
+    <ng-template #suffixIcon>
+      <nz-icon nzType="search" />
+    </ng-template>
+
+    <!-- 樹狀結構 -->
+    <div class="tree-container">
+      <nz-tree
+        nzBlockNode
+        nzDraggable
+        [nzData]="(treeData$ | async) ?? []"
+        [nzSearchValue]="searchValue"
+        nzVirtualHeight="calc(100vh - 180px)"
+        (nzClick)="activeNode($event)"
+        (nzDblClick)="openFolder($event)"
+        (nzOnDrop)="onDrop($event)"
+        [nzTreeTemplate]="nzTreeTemplate"
+        (contextmenu)="onPanelContextMenu($event)">
+      </nz-tree>
+    </div>
+
+    <!-- 增強節點模板 -->
+    <ng-template #nzTreeTemplate let-node let-origin="origin">
+      <span class="custom-node"
+            [class.selected]="activatedNode?.key === node.key">
+        <span (contextmenu)="contextMenu($event, menu, node)">
+          <ng-container *ngIf="origin.isTask; else folderOrFile">
+            <nz-icon nzType="check-circle" style="color: #52c41a"></nz-icon>
+            <span class="task-name">{{ node.title }}</span>
+            <span class="task-status" [ngClass]="'task-' + (origin.taskStatus || 'pending')">
+              {{ origin.taskStatus || 'pending' }}
+            </span>
+            <span class="task-desc">created by {{ origin.author | lowercase }}</span>
+          </ng-container>
+          <ng-template #folderOrFile>
+            <ng-container *ngIf="!node.isLeaf; else fileIcon">
+              <nz-icon [nzType]="node.isExpanded ? 'folder-open' : 'folder'"
+                       (click)="openFolder(node)" />
+              <span class="folder-name">{{ node.title }}</span>
+            </ng-container>
+            <ng-template #fileIcon>
+              <nz-icon nzType="file" />
+              <span class="file-name">{{ node.title }}</span>
+            </ng-template>
+          </ng-template>
+        </span>
+      </span>
+    </ng-template>
+
+    <!-- 右鍵選單 -->
+    <nz-dropdown-menu #rootMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item (click)="addRootNode()">新增根節點</li>
+      </ul>
+    </nz-dropdown-menu>
+
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item (click)="addNode()">新增節點</li>
+        <li *ngIf="contextNode" nz-menu-item (click)="addTask()">新增任務</li>
+        <li *ngIf="contextNode" nz-menu-item (click)="editNode()">編輯節點</li>
+        <li *ngIf="contextNode" nz-menu-item (click)="deleteNode()">刪除節點</li>
+      </ul>
+    </nz-dropdown-menu>
+  </div>
+
+  <!-- 拖曳分隔線 -->
+  <div class="resizer-handle vertical-resizer"></div>
+
+  <!-- 右側面板：詳情分析區 -->
+  <div class="details-analysis-panel">
+
+    <!-- 上方：節點詳情區 -->
+    <div class="node-details-section">
+
+      <!-- 節點詳情內容 -->
+      <div class="node-details" *ngIf="selectedNodeForDetail$ | async as selectedNode; else noNodeSelected">
+        <!-- 詳情標題 -->
+        <div class="details-header">
+          <h3>
+            <nz-icon [nzType]="getNodeIcon(selectedNode)"></nz-icon>
+            {{ selectedNode.title }}
+          </h3>
+          <button nz-button nzType="text" (click)="onEditNodeRequested(selectedNode)">
+            <nz-icon nzType="edit"></nz-icon>
+          </button>
+        </div>
+
+        <!-- 節點資訊 -->
+        <nz-descriptions [nzColumn]="1" nzBordered nzSize="small">
+          <nz-descriptions-item nzTitle="類型">
+            <nz-tag [nzColor]="getTypeColor(selectedNode.type)">
+              {{ getTypeLabel(selectedNode.type) }}
+            </nz-tag>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="狀態" *ngIf="selectedNode.status">
+            <nz-tag [nzColor]="getStatusColor(selectedNode.status)">
+              {{ selectedNode.status }}
+            </nz-tag>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="建立時間" *ngIf="selectedNode.createdAt">
+            {{ selectedNode.createdAt | date:'short' }}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="更新時間" *ngIf="selectedNode.updatedAt">
+            {{ selectedNode.updatedAt | date:'short' }}
+          </nz-descriptions-item>
+        </nz-descriptions>
+
+        <!-- 操作按鈕 -->
+        <div class="actions-section">
+          <button nz-button nzType="primary" (click)="onAddChildRequested(selectedNode)">
+            <nz-icon nzType="plus"></nz-icon>
+            新增子節點
+          </button>
+          <button nz-button (click)="onAddTaskRequested(selectedNode)">
+            <nz-icon nzType="check-circle"></nz-icon>
+            新增任務
+          </button>
+        </div>
+      </div>
+
+      <!-- 未選擇節點時的提示 -->
+      <ng-template #noNodeSelected>
+        <nz-empty nzNotFoundContent="請選擇一個節點查看詳情" class="empty-state">
+          <div>點擊左側樹狀結構中的任一節點即可查看詳細資訊</div>
+        </nz-empty>
       </ng-template>
-    </span>
-  </span>
-</ng-template>
-<nz-dropdown-menu #rootMenu="nzDropdownMenu">
-  <ul nz-menu>
-    <li nz-menu-item (click)="addRootNode()">新增根節點</li>
-  </ul>
-</nz-dropdown-menu>
-<nz-dropdown-menu #menu="nzDropdownMenu">
-  <ul nz-menu>
-    <li nz-menu-item (click)="addNode()">新增節點</li>
-    <li *ngIf="contextNode" nz-menu-item (click)="addTask()">新增任務</li>
-    <li *ngIf="contextNode" nz-menu-item (click)="editNode()">編輯節點</li>
-    <li *ngIf="contextNode" nz-menu-item (click)="deleteNode()">刪除節點</li>
-  </ul>
-</nz-dropdown-menu>
+    </div>
+
+    <!-- 水平分隔線 -->
+    <div class="resizer-handle horizontal-resizer"></div>
+
+    <!-- 下方：任務列表區 -->
+    <div class="task-list-section">
+      <div class="task-list" *ngIf="selectedNodeForDetail$ | async as selectedNode; else noTasksAvailable">
+        <!-- 任務列表標題 -->
+        <div class="task-header">
+          <h4>相關任務</h4>
+          <button nz-button nzType="primary" nzSize="small" (click)="onAddTaskRequested(selectedNode)">
+            <nz-icon nzType="plus"></nz-icon>
+            新增任務
+          </button>
+        </div>
+
+        <!-- 任務列表內容 -->
+        <nz-list
+          [nzDataSource]="getRelatedTasks(selectedNode.id)"
+          nzSize="small">
+          <ng-template #item let-task>
+            <nz-list-item [nzActions]="[editAction, deleteAction]">
+              <nz-list-item-meta>
+                <nz-list-item-meta-title>
+                  <span [class]="'task-title task-' + (task.taskStatus || 'pending')">
+                    {{ task.title }}
+                  </span>
+                </nz-list-item-meta-title>
+                <nz-list-item-meta-description>
+                  建立於 {{ task.createdAt | date:'short' }}
+                </nz-list-item-meta-description>
+              </nz-list-item-meta>
+              <nz-tag [nzColor]="getTaskStatusColor(task.taskStatus || 'pending')">
+                {{ getTaskStatusLabel(task.taskStatus || 'pending') }}
+              </nz-tag>
+
+              <ng-template #editAction>
+                <button nz-button nzType="link" nzSize="small" (click)="onEditNodeRequested(task)">
+                  編輯
+                </button>
+              </ng-template>
+              <ng-template #deleteAction>
+                <button nz-button nzType="link" nzSize="small" nzDanger (click)="deleteNode()">
+                  刪除
+                </button>
+              </ng-template>
+            </nz-list-item>
+          </ng-template>
+        </nz-list>
+      </div>
+
+      <!-- 未選擇節點時的任務區提示 -->
+      <ng-template #noTasksAvailable>
+        <nz-empty nzNotFoundContent="選擇節點以查看相關任務" class="empty-state">
+          <div>任務將顯示在此區域</div>
+        </nz-empty>
+      </ng-template>
+    </div>
+  </div>
+</div>

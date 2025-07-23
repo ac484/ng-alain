@@ -1,28 +1,470 @@
+/* ============================================
+   次世代樹狀面板樣式系統
+   採用現代化 Flex 佈局 + 響應式設計
+============================================ */
+
+/* 主容器 */
+.tree-panel-container {
+  display: flex;
+  height: calc(100vh - 100px);
+  min-height: 600px;
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* ====== 左側面板：樹狀探索區 ====== */
+.tree-exploration-panel {
+  flex: 0 0 70%;
+  min-width: 300px;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+
+  &.collapsed {
+    flex: 0 0 60px;
+    min-width: 60px;
+    overflow: hidden;
+  }
+}
+
+/* 工具列樣式 */
+.toolbar {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+
+  .add-root-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+
+    &:hover {
+      background: #e6f7ff;
+      border-color: #91d5ff;
+      color: #1890ff;
+    }
+  }
+}
+
+/* 搜尋框樣式 */
+.search-input {
+  margin: 16px;
+
+  input {
+    border-radius: 6px;
+
+    &:focus {
+      border-color: #40a9ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+  }
+}
+
+/* 樹狀容器 */
+.tree-container {
+  flex: 1;
+  padding: 0 16px 16px;
+  overflow: hidden;
+}
+
+/* 樹狀組件優化 */
 nz-tree {
   overflow: hidden;
-  margin: 0 -24px;
-  padding: 0 24px;
+  height: 100%;
+
+  .ant-tree {
+    background: transparent;
+  }
+
+  .ant-tree-node-content-wrapper {
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    &.ant-tree-node-selected {
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+    }
+  }
 }
+
+/* 自定義節點樣式 */
 .custom-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 8px;
+  line-height: 28px;
   cursor: pointer;
-  line-height: 24px;
-  margin-left: 4px;
-  display: inline-block;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &.selected {
+    background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+    border-left: 3px solid #1890ff;
+    font-weight: 500;
+  }
+
+  &:hover {
+    background: #f0f9ff;
+    transform: translateX(2px);
+  }
+
+  nz-icon {
+    margin-right: 6px;
+    font-size: 14px;
+  }
 }
+
+/* 檔案/資料夾名稱 */
 .file-name,
 .folder-name {
-  margin-left: 4px;
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #262626;
 }
-.file-desc,
-.folder-desc {
-  padding: 0 8px;
-  display: inline-block;
-  background: #87ceff;
-  color: #fff;
+
+.folder-name {
+  font-weight: 500;
+  color: #1890ff;
+}
+
+/* 任務相關樣式 */
+.task-name {
+  margin-left: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.task-status {
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+
+  &.task-pending {
+    background: #fff7e6;
+    color: #fa8c16;
+    border: 1px solid #ffd591;
+  }
+
+  &.task-in-progress {
+    background: #e6f7ff;
+    color: #1890ff;
+    border: 1px solid #91d5ff;
+  }
+
+  &.task-completed {
+    background: #f6ffed;
+    color: #52c41a;
+    border: 1px solid #b7eb8f;
+  }
+
+  &.task-cancelled {
+    background: #fff2f0;
+    color: #ff4d4f;
+    border: 1px solid #ffccc7;
+  }
+}
+
+.task-desc {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+/* ====== 拖曳分隔線 ====== */
+.resizer-handle {
+  background: #f0f0f0;
+  transition: all 0.2s ease;
   position: relative;
-  left: 12px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    background: #d9d9d9;
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    background: #e6f7ff;
+
+    &::before {
+      background: #1890ff;
+    }
+  }
 }
-.task-status.pending { color: #faad14; }
-.task-status.in-progress { color: #1890ff; }
-.task-status.completed { color: #52c41a; }
-.task-status.cancelled { color: #f5222d; }
+
+.vertical-resizer {
+  width: 4px;
+  cursor: ew-resize;
+
+  &::before {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+  }
+}
+
+.horizontal-resizer {
+  height: 4px;
+  cursor: ns-resize;
+  margin: 8px 0;
+
+  &::before {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 2px;
+    width: 40px;
+  }
+}
+
+/* ====== 右側面板：詳情分析區 ====== */
+.details-analysis-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  min-width: 300px;
+}
+
+/* 節點詳情區 */
+.node-details-section {
+  flex: 0 0 60%;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  overflow-y: auto;
+}
+
+.node-details {
+  .details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #262626;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      nz-icon {
+        font-size: 20px;
+        color: #1890ff;
+      }
+    }
+
+    button {
+      color: #8c8c8c;
+
+      &:hover {
+        color: #1890ff;
+        background: #f0f9ff;
+      }
+    }
+  }
+
+  nz-descriptions {
+    margin-bottom: 20px;
+  }
+
+  .actions-section {
+    display: flex;
+    gap: 12px;
+    padding-top: 16px;
+
+    button {
+      flex: 1;
+      height: 40px;
+      border-radius: 6px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      &[nztype="primary"] {
+        background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+        border: none;
+
+        &:hover {
+          background: linear-gradient(135deg, #40a9ff 0%, #1890ff 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+      }
+    }
+  }
+}
+
+/* 任務列表區 */
+.task-list-section {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.task-list {
+  .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+
+    h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #262626;
+    }
+
+    button {
+      height: 32px;
+      border-radius: 6px;
+      font-size: 12px;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+      }
+    }
+  }
+
+  nz-list {
+    .ant-list-item {
+      border-radius: 6px;
+      margin-bottom: 8px;
+      padding: 12px;
+      background: #fafafa;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f0f9ff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+    }
+
+    .task-title {
+      font-weight: 500;
+      font-size: 14px;
+    }
+  }
+}
+
+/* 空狀態樣式 */
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+
+  .ant-empty-description {
+    color: #8c8c8c;
+    font-size: 14px;
+  }
+}
+
+/* ====== 響應式設計 ====== */
+@media (max-width: 1200px) {
+  .tree-exploration-panel {
+    flex: 0 0 60%;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tree-panel-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 80vh;
+  }
+
+  .tree-exploration-panel {
+    flex: 0 0 400px;
+    border-right: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .vertical-resizer {
+    display: none;
+  }
+
+  .details-analysis-panel {
+    flex: 1;
+    min-height: 400px;
+  }
+
+  .node-details-section {
+    flex: 0 0 auto;
+    min-height: 200px;
+  }
+
+  .task-list-section {
+    min-height: 200px;
+  }
+}
+
+/* ====== 動畫效果 ====== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.node-details,
+.task-list {
+  animation: fadeInUp 0.3s ease;
+}
+
+/* ====== 滾動條美化 ====== */
+.tree-container,
+.node-details-section,
+.task-list-section {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+
+    &:hover {
+      background: #bfbfbf;
+    }
+  }
+}
