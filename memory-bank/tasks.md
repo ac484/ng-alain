@@ -341,3 +341,11 @@ graph TD
 | 開發團隊 | SYS-001 | 100% | 8週 |
 | 前端團隊 | COMP-002 | 80% | 4-6週 |
 | 架構團隊 | COMP-003 | 60% | 6-8週 | 
+
+## 2024年12月 - IMPLEMENT 階段進度
+- [x] 已建立 system.module.ts，作為 system/ 路由模組骨架。
+- [x] 已建立 SystemLayoutComponent，作為統一佈局骨架。
+- [x] 已建立 SystemAccountService，繼承 firebase-user.service.ts，支援 users$、loading$、批量操作。
+- [x] 每階段同步更新 memory-bank 文件，確保知識完整。
+
+---

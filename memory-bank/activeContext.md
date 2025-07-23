@@ -262,3 +262,22 @@ interface Menu {
 
 **上次更新**: 2024年12月 - CREATIVE PHASE 完成
 **下次行動**: 等待 BUILD 階段確認開始 
+
+## 2024年12月 - IMPLEMENT 階段啟動
+
+- [x] 進入 BUILD/IMPLEMENT 階段，開始 system/ 路由與模組骨架擴展。
+- [x] 檢查現有 system/ 目錄結構，確認需新建 system.module.ts 與 SystemLayoutComponent。
+- [x] 擬定每個階段都同步更新 memory-bank 文件的策略。
+- [x] 所有擴展均基於現有架構，不破壞穩定部分。
+- [x] 如遇嚴重錯誤，將即時記錄於 activeContext.md 並標註於 progress.md。
+
+--- 
+
+## 2024年12月 - IMPLEMENT 階段進度
+
+- [x] 已建立 system.module.ts，作為 system/ 路由模組骨架。
+- [x] 已建立 SystemLayoutComponent，作為統一佈局骨架。
+- [x] 已建立 SystemAccountService，繼承 firebase-user.service.ts，支援 users$、loading$、批量操作。
+- [x] 每階段同步更新 memory-bank 文件，確保知識完整。
+
+--- 
