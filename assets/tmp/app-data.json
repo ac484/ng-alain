@@ -108,6 +108,11 @@
               "i18n": "menu.tree.scan-result"
             },
             {
+              "text": "Task Detail",
+              "link": "/tree/task-detail",
+              "i18n": "menu.tree.task-detail"
+            },
+            {
               "text": "Tree Settings",
               "link": "/tree/template/settings",
               "i18n": "menu.tree.settings"
