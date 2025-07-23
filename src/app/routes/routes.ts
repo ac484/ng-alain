@@ -113,7 +113,14 @@ export const routes: Routes = [
       { path: 'tree', loadChildren: () => import('./tree/routes').then(m => m.default) },
 
       // 工作區模組 - 懶載入
-      { path: 'workspace', loadChildren: () => import('./workspace/routes').then(m => m.default) }
+      { path: 'workspace', loadChildren: () => import('./workspace/routes').then(m => m.default) },
+
+      // 系統管理模組 - 懶載入
+      {
+        path: 'system',
+        loadChildren: () => import('./system/routes').then(m => m.routes),
+        data: { title: '系統管理', titleI18n: 'menu.system' }
+      }
     ]
   },
 
