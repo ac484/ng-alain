@@ -61,10 +61,12 @@ import { ACLService } from '@delon/acl';
 import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
 import { ALAIN_I18N_TOKEN, MenuService, SettingsService, TitleService } from '@delon/theme';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
-import { Observable, zip, catchError, map, of } from 'rxjs';
+import { Observable, zip, catchError, map, of, mergeMap } from 'rxjs';
 
 import { FirebaseACLInitService } from '../firebase/firebase-acl-init.service';
 import { I18NService } from '../i18n/i18n.service';
+import { FirebaseACLService } from '../firebase/firebase-acl.service';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * 應用程式啟動提供者
@@ -113,6 +115,7 @@ export class StartupService {
 
   // 注入 Firebase ACL 初始化服務
   private firebaseACLInitService = inject(FirebaseACLInitService); // Firebase ACL 初始化服務
+  private firebaseACLService = inject(FirebaseACLService);
 
   /**
    * 載入應用程式啟動資料
@@ -170,8 +173,8 @@ export class StartupService {
         setTimeout(() => this.router.navigateByUrl(`/exception/500`));
         return [];
       }),
-      // 處理載入成功的資料
-      map(([langData, appData]: [Record<string, string>, NzSafeAny, void]) => {
+      // 將 map(async ...) 改為 mergeMap 以正確處理 async/await
+      mergeMap(async ([langData, appData]: [Record<string, string>, NzSafeAny, void]) => {
         // 1. 設定語言資料到 i18n 服務
         this.i18n.use(defaultLang, langData);
 
@@ -194,6 +197,14 @@ export class StartupService {
           } else {
             this.aclService.set({ role: ['user'], ability: ['dashboard:read'] });
           }
+
+          // 新增：以 uid 查詢 Firebase 權限並同步 @delon/acl
+          if (token['uid']) {
+            const userACL = await firstValueFrom(this.firebaseACLService.loadUserACL(token['uid']));
+            if (userACL) {
+              this.firebaseACLService.applyACL(userACL);
+            }
+          }
         } else {
           console.log('StartupService: 使用靜態用戶配置');
           this.settingService.setUser(appData.user);
@@ -207,7 +218,8 @@ export class StartupService {
         // 5. 設定頁面標題的後綴
         this.titleService.default = '';
         this.titleService.suffix = appData.app.name;
-      })
+      }),
+      map(() => void 0)
     );
   }
 }

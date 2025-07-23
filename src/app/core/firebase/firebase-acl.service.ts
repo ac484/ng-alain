@@ -52,7 +52,7 @@ export class FirebaseACLService {
   userACL$: Observable<UserACL | null> = of(null);
 
   /**
-   * 載入用戶 ACL 資料
+   * 以 uid 查詢用戶 ACL
    */
   loadUserACL(uid: string): Observable<UserACL | null> {
     const userACLRef = doc(this.firestore, 'acl_users', uid);
@@ -60,7 +60,7 @@ export class FirebaseACLService {
   }
 
   /**
-   * 應用 ACL 到 @delon/acl 服務
+   * 將用戶 ACL 同步到 @delon/acl
    */
   applyACL(userACL: UserACL): void {
     this.aclSrv.set({
@@ -70,7 +70,22 @@ export class FirebaseACLService {
   }
 
   /**
-   * 清除 ACL
+   * 更新用戶 ACL
+   */
+  updateUserACL(uid: string, roles: string[], permissions: string[]): Observable<void> {
+    const userACLRef = doc(this.firestore, 'acl_users', uid);
+    const userACL: UserACL = {
+      uid,
+      roles,
+      permissions,
+      isActive: true,
+      updatedAt: new Date()
+    };
+    return from(setDoc(userACLRef, userACL, { merge: true }));
+  }
+
+  /**
+   * 清空 @delon/acl 權限
    */
   clearACL(): void {
     this.aclSrv.setFull(false);
@@ -93,22 +108,6 @@ export class FirebaseACLService {
     const permissionsRef = collection(this.firestore, 'acl_permissions');
     const q = query(permissionsRef, where('isActive', '==', true));
     return from(getDocs(q)).pipe(map(snapshot => snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as ACLPermission)));
-  }
-
-  /**
-   * 更新用戶 ACL
-   */
-  updateUserACL(uid: string, roles: string[], permissions: string[]): Observable<void> {
-    const userACLRef = doc(this.firestore, 'acl_users', uid);
-    const userACL: UserACL = {
-      uid,
-      roles,
-      permissions,
-      isActive: true,
-      updatedAt: new Date()
-    };
-
-    return from(setDoc(userACLRef, userACL, { merge: true }));
   }
 
   /**

@@ -5,7 +5,7 @@
  */
 
 import { NgFor } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SHARED_IMPORTS } from '@shared';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
@@ -62,7 +62,8 @@ import { FirebaseACLService, ACLRole, ACLPermission } from '../../../core/fireba
       </div>
     </div>
   `,
-  imports: [SHARED_IMPORTS, NgFor]
+  imports: [SHARED_IMPORTS, NgFor],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ACLAdminComponent implements OnInit {
   private readonly firebaseACLSrv = inject(FirebaseACLService);

@@ -8,7 +8,7 @@
  */
 
 import { AsyncPipe, JsonPipe, NgIf, NgFor } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { ACLService } from '@delon/acl';
@@ -20,7 +20,8 @@ import { FirebaseACLService, ACLRole } from '../../../core/firebase/firebase-acl
 @Component({
   selector: 'app-guard',
   templateUrl: './guard.component.html',
-  imports: [SHARED_IMPORTS, AsyncPipe, JsonPipe, NgIf, NgFor]
+  imports: [SHARED_IMPORTS, AsyncPipe, JsonPipe, NgIf, NgFor],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GuardComponent implements OnInit {
   private readonly aclSrv = inject(ACLService);
