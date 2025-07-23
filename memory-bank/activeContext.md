@@ -1,4 +1,27 @@
-# 當前工作重點
+# 當前工作上下文
+
+## 檔案結構與組織
+
+### Memory Bank 統一組織 ✅
+```
+memory-bank/
+├── projectbrief.md              # 項目核心簡介
+├── activeContext.md             # 當前工作上下文
+├── progress.md                  # 進度追蹤
+├── tasks.md                     # 任務清單（已移入）
+├── systemPatterns.md            # 系統架構模式
+├── techContext.md               # 技術上下文
+├── productContext.md            # 產品上下文
+├── creative_mode_think_tool.md  # 創意模式工具（已移入）
+└── creative-*.md                # 創意階段文件（待建立）
+└── reflect-*.md                 # 反思階段文件（待建立）
+```
+
+**優勢**:
+- 🎯 所有項目文檔集中管理
+- 📋 任務追蹤與上下文緊密結合
+- 🔍 便於搜索和維護
+- 📚 符合 Memory Bank 最佳實踐
 
 ## 目前狀態
 **專案階段**: Level 4 複雜系統開發 - 系統管理架構重構  
