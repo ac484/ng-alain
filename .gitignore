@@ -15,7 +15,7 @@ node_modules/
 npm-debug.log
 yarn-error.log
 package-lock.json
-yarn.lock
+# yarn.lock
 
 # Python
 .coverage
@@ -96,7 +96,7 @@ CLAUDE.md
 .history/*
 
 # Yarn
-yarn.lock
+# yarn.lock
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -124,6 +124,6 @@ Thumbs.db
 
 # lock
 /pnpm-lock.yaml
-/yarn.lock
+# /yarn.lock
 
 /delon-builds
