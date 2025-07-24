@@ -10,6 +10,32 @@
   },
   "menu": [
     {
+      "text": "Hub",
+      "i18n": "menu.hub",
+      "group": true,
+      "hideInBreadcrumb": true,
+      "children": [
+        {
+          "text": "Contract",
+          "link": "/contract",
+          "i18n": "menu.contract",
+          "icon": "anticon-file-text"
+        },
+        {
+          "text": "Tree",
+          "link": "/tree",
+          "i18n": "menu.tree",
+          "icon": "anticon-fork"
+        },
+        {
+          "text": "Workspace",
+          "link": "/workspace",
+          "i18n": "menu.workspace",
+          "icon": "anticon-team"
+        }
+      ]
+    },
+    {
       "text": "Business",
       "i18n": "menu.business",
       "group": true,
@@ -29,6 +55,11 @@
               "text": "Create Contract",
               "link": "/contract/create",
               "i18n": "menu.contract.create"
+            },
+            {
+              "text": "Contract Panel",
+              "link": "/contract/panel",
+              "i18n": "menu.contract.panel"
             },
             {
               "text": "Contract Detail",

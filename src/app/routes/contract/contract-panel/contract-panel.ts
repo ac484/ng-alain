@@ -1,40 +1,70 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzSplitterModule } from 'ng-zorro-antd/splitter';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
+import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-contract-panel',
   standalone: true,
-  imports: [CommonModule, NzCardModule, NzButtonModule, NzProgressModule, NzTagModule, NzTabsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzCardModule,
+    NzButtonModule,
+    NzProgressModule,
+    NzTagModule,
+    NzTableModule,
+    NzSplitterModule,
+    NzInputModule,
+    NzLayoutModule
+  ],
   templateUrl: './contract-panel.html',
   styleUrls: ['./contract-panel.less']
 })
 export class ContractPanelComponent implements OnInit {
-  contractId = '1'; // TODO: 實際應由路由取得
-  contract: any;
+  contracts: any[] = [];
   loading = false;
+  filter = '';
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit(): void {
-    this.loadContract();
+  ngOnInit() {
+    this.loadContracts();
   }
 
-  loadContract(): void {
+  loadContracts() {
     this.loading = true;
-    this.http.get(`/contract/${this.contractId}`).subscribe(result => {
-      this.contract = result;
+    // TODO: 實際應從 API 取得
+    this.http.get('/contract').subscribe((result: any) => {
+      this.contracts = result.list;
       this.loading = false;
     });
   }
 
-  // 狀態顏色與文字
-  getStatusColor(status?: string): string {
+  get filteredContracts() {
+    if (!this.filter) return this.contracts;
+    return this.contracts.filter(c => c.title.includes(this.filter) || c.client.includes(this.filter));
+  }
+
+  viewDetail(id: string) {
+    /* 跳轉詳情 */
+  }
+  editContract(id: string) {
+    /* 跳轉編輯 */
+  }
+  createContract() {
+    /* 跳轉新增 */
+  }
+
+  getStatusColor(status: string) {
     switch (status) {
       case 'draft':
         return 'default';
@@ -48,7 +78,7 @@ export class ContractPanelComponent implements OnInit {
         return 'default';
     }
   }
-  getStatusText(status?: string): string {
+  getStatusText(status: string) {
     switch (status) {
       case 'draft':
         return '草稿';
@@ -61,11 +91,5 @@ export class ContractPanelComponent implements OnInit {
       default:
         return '未知';
     }
-  }
-  getProgressStatus(progress: number): 'success' | 'normal' | 'active' | 'exception' {
-    if (progress >= 100) return 'success';
-    if (progress >= 80) return 'normal';
-    if (progress >= 50) return 'active';
-    return 'exception';
   }
 }

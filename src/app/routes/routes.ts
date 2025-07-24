@@ -115,6 +115,9 @@ export const routes: Routes = [
       // 工作區模組 - 懶載入
       { path: 'workspace', loadChildren: () => import('./workspace/routes').then(m => m.default) },
 
+      // Hub 模組 - 懶載入
+      { path: 'hub', loadChildren: () => import('./hub/routes').then(m => m.default) },
+
       // 系統管理模組 - 懶載入
       {
         path: 'system',
