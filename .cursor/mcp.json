@@ -19,7 +19,7 @@
       ]
     },
     "context7": {
-      "url": "https://context7-mrioow.fly.dev/mcp",
+      "url": "https://context7.fly.dev/mcp",
       "disabled": false,
       "autoApprove": [
         "resolve-library-id",
