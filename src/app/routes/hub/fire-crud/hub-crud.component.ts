@@ -9,11 +9,12 @@ import { Contract } from '../models/hub.model';
 import { FabComponent } from '../basic/widget/fab.component';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'hub-fire-crud',
   standalone: true,
-  imports: [FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, FabComponent, NzSelectModule],
+  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, FabComponent, NzSelectModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-fab (onAction)="addRow()"></app-fab>
@@ -34,27 +35,21 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
         @for (data of editRowTable.data; track data) {
           <tr class="editable-row">
             <td>
-              <div class="editable-cell" [hidden]="editId === data.key" (click)="startEdit(data.key!, 'contractSerial')">
+              <div class="editable-cell">
                 {{ data.contractSerial }}
               </div>
-              <input
-                [hidden]="editId !== data.key || editField !== 'contractSerial'"
-                type="text"
-                nz-input
-                [(ngModel)]="editValue"
-                (blur)="stopEdit(data, 'contractSerial')"
-              />
             </td>
             <td>
-              <div class="editable-cell" [hidden]="editId === data.key && editField === 'client'" (click)="startEdit(data.key!, 'client')">
+              <div class="editable-cell" *ngIf="!(editId === data.key && editField === 'client')" (click)="startEdit(data.key!, 'client')">
                 {{ data.client }}
               </div>
               <nz-select
                 *ngIf="editId === data.key && editField === 'client'"
                 [(ngModel)]="editValue"
                 (ngModelChange)="stopEdit(data, 'client')"
-                [nzOpen]="true"
                 nzSize="small"
+                [nzOpen]="true"
+                style="min-width: 100px"
               >
                 <nz-option *ngFor="let c of clients" [nzValue]="c" [nzLabel]="c"></nz-option>
               </nz-select>
