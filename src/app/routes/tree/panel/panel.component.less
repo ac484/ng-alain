@@ -1,79 +1,228 @@
 /* ============================================
-   精簡版樹狀面板樣式（僅保留結構與 Splitter 分頁器）
+   Tree Panel Minimalist Styles
+   Modern Flex Layout + Responsive
 ============================================ */
-@import 'src/assets/color.less';
 
 .tree-panel-container {
   display: flex;
-  height: 100vh;
-  background: @component-background;
+  height: calc(100vh - 100px);
+  min-height: 600px;
+  background: #fafafa;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   overflow: hidden;
 }
 
-/* Splitter 分頁器樣式 */
+.tree-exploration-panel {
+  flex: 0 0 60%;
+  min-width: 280px;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid #f0f0f0;
+  transition: all 0.3s;
+  &.collapsed {
+    flex: 0 0 60px;
+    min-width: 60px;
+    overflow: hidden;
+  }
+}
+
+.toolbar {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+  .add-root-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    &:hover {
+      background: #e6f7ff;
+      color: #1890ff;
+    }
+  }
+}
+
+.search-input { margin: 16px; }
+
+.tree-container { flex: 1; padding: 0 16px 16px; overflow: hidden; }
+
+nz-tree {
+  overflow: hidden;
+  height: 100%;
+  .ant-tree { background: transparent; }
+  .ant-tree-node-content-wrapper {
+    border-radius: 4px;
+    transition: all 0.2s;
+    &:hover { background: #f5f5f5; }
+    &.ant-tree-node-selected {
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+    }
+  }
+}
+
+.custom-node {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 4px 8px;
+  line-height: 28px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  &.selected {
+    background: linear-gradient(135deg,#e6f7ff 0%,#bae7ff 100%);
+    border-left: 3px solid #1890ff;
+    font-weight: 500;
+  }
+  &:hover { background: #f0f9ff; }
+  nz-icon { margin-right: 6px; font-size: 14px; }
+}
+
+.file-name, .folder-name {
+  margin-left: 6px;
+  font-size: 14px;
+  color: #262626;
+}
+.folder-name { font-weight: 500; color: #1890ff; }
+
+.task-name { margin-left: 6px; font-size: 14px; font-weight: 500; }
+.task-status {
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  &.task-pending { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+  &.task-in-progress { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+  &.task-completed { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+  &.task-cancelled { background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; }
+}
+.task-desc { margin-left: 8px; font-size: 12px; color: #8c8c8c; font-style: italic; }
+
 .resizer-handle {
-  background: @border-color-split;
-  transition: all 0.2s ease;
+  background: #f0f0f0;
   position: relative;
   &::before {
     content: '';
     position: absolute;
-    background: @border-color-split;
-    transition: all 0.2s ease;
+    background: #d9d9d9;
   }
   &:hover {
-    background: @primary-1;
-    &::before {
-      background: @primary-color;
-    }
+    background: #e6f7ff;
+    &::before { background: #1890ff; }
   }
 }
-.vertical-resizer {
-  width: 4px;
-  cursor: ew-resize;
-  &::before {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 40px;
-  }
-}
-.horizontal-resizer {
-  height: 4px;
-  cursor: ns-resize;
-  margin: 8px 0;
-  &::before {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    height: 2px;
-    width: 40px;
-  }
-}
+.vertical-resizer { width: 4px; cursor: ew-resize; &::before { top: 50%; left: 50%; transform: translate(-50%,-50%); width: 2px; height: 40px; } }
+.horizontal-resizer { height: 4px; cursor: ns-resize; margin: 8px 0; &::before { top: 50%; left: 50%; transform: translate(-50%,-50%); height: 2px; width: 40px; } }
 
-/* 主要內容區域最小化樣式 */
 .details-analysis-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: @white;
+  background: #fff;
   min-width: 300px;
 }
 
-/* 響應式設計（可選） */
-@media (max-width: 768px) {
-  .tree-panel-container {
-    flex-direction: column;
-    height: auto;
-    min-height: 80vh;
+.node-details-section {
+  flex: 0 0 60%;
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  overflow-y: auto;
+}
+
+.node-details {
+  .details-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+    h3 { margin: 0; font-size: 18px; font-weight: 600; color: #262626; display: flex; align-items: center; gap: 8px; nz-icon { font-size: 20px; color: #1890ff; } }
+    button { color: #8c8c8c; &:hover { color: #1890ff; background: #f0f9ff; } }
   }
-  .vertical-resizer {
-    display: none;
-  }
-  .details-analysis-panel {
-    min-height: 400px;
+  nz-descriptions { margin-bottom: 20px; }
+  .actions-section {
+    display: flex;
+    gap: 12px;
+    padding-top: 16px;
+    button {
+      flex: 1;
+      height: 40px;
+      border-radius: 6px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      &[nztype="primary"] {
+        background: linear-gradient(135deg,#1890ff 0%,#096dd9 100%);
+        border: none;
+        &:hover {
+          background: linear-gradient(135deg,#40a9ff 0%,#1890ff 100%);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(24,144,255,0.3);
+        }
+      }
+    }
   }
 }
+
+.task-list-section { flex: 1; padding: 20px; overflow-y: auto; }
+.task-list {
+  .task-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    h4 { margin: 0; font-size: 16px; font-weight: 600; color: #262626; }
+    button { height: 32px; border-radius: 6px; font-size: 12px; &:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(24,144,255,0.3); } }
+  }
+  nz-list {
+    .ant-list-item {
+      border-radius: 6px;
+      margin-bottom: 8px;
+      padding: 12px;
+      background: #fafafa;
+      transition: all 0.2s;
+      &:hover { background: #f0f9ff; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    }
+    .task-title { font-weight: 500; font-size: 14px; }
+  }
+}
+
+.empty-state { padding: 40px 20px; text-align: center; .ant-empty-description { color: #8c8c8c; font-size: 14px; } }
+
+@media (max-width: 1200px) {
+  .tree-exploration-panel { flex: 0 0 60%; min-width: 280px; }
+}
+@media (max-width: 768px) {
+  .tree-panel-container { flex-direction: column; height: auto; min-height: 80vh; }
+  .tree-exploration-panel { flex: 0 0 400px; border-right: none; border-bottom: 1px solid #f0f0f0; }
+  .vertical-resizer { display: none; }
+  .details-analysis-panel { flex: 1; min-height: 400px; }
+  .node-details-section { flex: 0 0 auto; min-height: 200px; }
+  .task-list-section { min-height: 200px; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.node-details, .task-list { animation: fadeInUp 0.3s ease; }
+
+.tree-container, .node-details-section, .task-list-section {
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: #f5f5f5; border-radius: 3px; }
+  &::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; &:hover { background: #bfbfbf; } }
+}
+

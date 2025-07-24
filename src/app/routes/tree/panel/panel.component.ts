@@ -17,7 +17,6 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTreeModule, NzTreeNode, NzFormatEmitEvent, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 import { Observable, BehaviorSubject, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, shareReplay, debounceTime } from 'rxjs/operators';
-import { NzLayoutModule } from 'ng-zorro-antd/layout';
 
 import { FirebaseCrudComponent } from '../firebase-crud/firebase-crud.component';
 import { FirebaseCrudService } from '../firebase-crud/firebase-crud.service';
@@ -40,8 +39,7 @@ import { SpaceNode } from '../models/models';
     NzTagModule,
     NzButtonModule,
     NzListModule,
-    NzEmptyModule,
-    NzLayoutModule // 新增
+    NzEmptyModule
   ],
   templateUrl: './panel.component.html',
   styleUrls: ['./panel.component.less'],
@@ -272,19 +270,13 @@ export class TreePanelComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   getTypeColor(type: string): string {
-    // 直接使用 ng-zorro-antd 主題色
-    switch (type) {
-      case 'root':
-        return 'purple';
-      case 'trunk':
-        return 'geekblue';
-      case 'branch':
-        return 'green';
-      case 'leaf':
-        return 'orange';
-      default:
-        return 'default';
-    }
+    const colors = {
+      root: 'purple',
+      trunk: 'blue',
+      branch: 'green',
+      leaf: 'orange'
+    };
+    return colors[type as keyof typeof colors] || 'default';
   }
 
   getTypeLabel(type: string): string {
@@ -299,37 +291,28 @@ export class TreePanelComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getStatusColor(status?: string): string {
     if (!status) return 'default';
-    switch (status) {
-      case 'active':
-        return 'success';
-      case 'inactive':
-        return 'default';
-      case 'archived':
-        return 'warning';
-      default:
-        return 'default';
-    }
+    const colors = {
+      active: 'green',
+      inactive: 'gray',
+      archived: 'orange'
+    };
+    return colors[status as keyof typeof colors] || 'default';
   }
 
-  getRelatedTasks(nodeId: string | undefined): SpaceNode[] {
-    if (!nodeId) return [];
+  getRelatedTasks(nodeId: string): SpaceNode[] {
     // 這裡應該從 treeData$ 中過濾出相關任務
+    // 暫時返回空陣列，後續會實現完整邏輯
     return [];
   }
 
   getTaskStatusColor(status: string): string {
-    switch (status) {
-      case 'pending':
-        return 'orange';
-      case 'in-progress':
-        return 'processing';
-      case 'completed':
-        return 'success';
-      case 'cancelled':
-        return 'error';
-      default:
-        return 'default';
-    }
+    const colors = {
+      pending: 'orange',
+      'in-progress': 'blue',
+      completed: 'green',
+      cancelled: 'red'
+    };
+    return colors[status as keyof typeof colors] || 'default';
   }
 
   getTaskStatusLabel(status: string): string {
