@@ -7,6 +7,7 @@ import { HubCrudService } from '../fire-crud/hub-crud.service';
 import { inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ContractService } from '../contract/contract.service';
 
 @Component({
   selector: 'hub-settings',
@@ -20,7 +21,7 @@ export class HubSettingsComponent implements OnInit {
   defaultClient: string = '';
   clientInput = '';
   isLoading = false;
-  private hubCrud = inject(HubCrudService);
+  private contractService = inject(ContractService);
 
   ngOnInit(): void {
     this.loadClients();
@@ -28,7 +29,7 @@ export class HubSettingsComponent implements OnInit {
 
   async loadClients() {
     this.isLoading = true;
-    const settings = await this.hubCrud.getClientsSettings();
+    const settings: { list: string[]; default: string } | null = await this.contractService.getClientsSettings();
     this.clients = settings?.list || [];
     this.defaultClient = settings?.default || '';
     this.isLoading = false;
@@ -55,6 +56,6 @@ export class HubSettingsComponent implements OnInit {
   }
 
   async saveClients() {
-    await this.hubCrud.setClientsSettings({ list: this.clients, default: this.defaultClient });
+    await this.contractService.setClientsSettings({ list: this.clients, default: this.defaultClient });
   }
 }

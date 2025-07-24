@@ -89,18 +89,6 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
         border-radius: 4px;
         padding: 4px 11px;
       }
-      .client-cell {
-        position: relative;
-        padding: 5px 12px;
-        background: transparent;
-        cursor: default;
-        border: none !important;
-      }
-      .editable-row:hover .client-cell {
-        border: none !important;
-        background: transparent;
-        cursor: default;
-      }
     `
   ]
 })
@@ -117,7 +105,7 @@ export class ContractListComponent implements OnInit {
 
   ngOnInit() {
     this.refresh();
-    this.hubCrud.getClientsSettings().then(settings => {
+    this.contractService.getClientsSettings().then((settings: { list: string[]; default: string } | null) => {
       this.clients = settings?.list || [];
     });
   }
@@ -127,7 +115,10 @@ export class ContractListComponent implements OnInit {
   }
 
   async addRow() {
-    const [defaultClient, contractSerial] = await Promise.all([this.hubCrud.getDefaultClient(), this.hubCrud.getNextContractSerial()]);
+    const [defaultClient, contractSerial] = await Promise.all([
+      this.contractService.getDefaultClient(),
+      this.contractService.getNextContractSerial()
+    ]);
     const newContract: Contract = {
       contractSerial,
       client: defaultClient,
