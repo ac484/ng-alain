@@ -5,6 +5,7 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormsModule } from '@angular/forms';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 
 export interface TreeNodeInterface {
   key: string;
@@ -19,7 +20,7 @@ export interface TreeNodeInterface {
 
 @Component({
   selector: 'nz-demo-table-expand-children',
-  imports: [NzTableModule, NzDropDownModule, NzIconModule, NzInputModule, FormsModule],
+  imports: [NzTableModule, NzDropDownModule, NzIconModule, NzInputModule, FormsModule, CdkDropList, CdkDrag],
   template: `
     <nz-table #expandTable [nzData]="filteredData" nzTableLayout="fixed">
       <thead>
@@ -48,11 +49,11 @@ export interface TreeNodeInterface {
           </th>
         </tr>
       </thead>
-      <tbody>
+      <tbody cdkDropList (cdkDropListDropped)="drop($event)">
         @for (data of expandTable.data; track data) {
           @for (item of mapOfExpandedData[data.key]; track item) {
             @if ((item.parent && item.parent.expand) || !item.parent) {
-              <tr>
+              <tr cdkDrag>
                 <td
                   [nzIndentSize]="item.level! * 20"
                   [nzShowExpand]="!!item.children"
@@ -112,6 +113,14 @@ export interface TreeNodeInterface {
       }
       .search-button {
         margin-right: 8px;
+      }
+      ::ng-deep .cdk-drag-preview {
+        display: table;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+      ::ng-deep .cdk-drag-placeholder {
+        opacity: 0;
       }
     `
   ]
@@ -276,6 +285,11 @@ export class HubContractComponent implements OnInit {
       hashMap[node.key] = true;
       array.push(node);
     }
+  }
+
+  // 新增拖曳排序方法
+  drop(event: CdkDragDrop<TreeNodeInterface[]>) {
+    moveItemInArray(this.filteredData, event.previousIndex, event.currentIndex);
   }
 
   ngOnInit(): void {
