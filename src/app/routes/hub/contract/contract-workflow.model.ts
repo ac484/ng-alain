@@ -1,4 +1,5 @@
 export interface WorkflowDefinition {
+  key?: string;
   id?: string;
   name: string;
   ownerIds: string[];

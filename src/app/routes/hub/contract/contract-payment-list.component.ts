@@ -55,7 +55,8 @@ export class ContractPaymentListComponent implements OnInit {
     // TODO: 新增請款邏輯
   }
 
-  startEdit(id: string) {
+  startEdit(id?: string) {
+    if (!id) return;
     this.editId = id;
   }
 
@@ -64,7 +65,8 @@ export class ContractPaymentListComponent implements OnInit {
     this.editId = null;
   }
 
-  deleteRow(id: string) {
+  deleteRow(id?: string) {
+    if (!id) return;
     // TODO: 刪除請款
   }
 }

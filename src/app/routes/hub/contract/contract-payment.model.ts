@@ -1,4 +1,5 @@
 export interface ContractPayment {
+  key?: string;
   id?: string;
   contractId: string;
   amount: number;
