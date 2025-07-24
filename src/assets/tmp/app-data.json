@@ -518,10 +518,7 @@
           "icon": "anticon-cloud",
           "children": [
             {
-              "text": "Relation",
-              "link": "/data-v/relation",
-              "i18n": "menu.report.relation",
-              "reuse": false
+
             }
           ]
         },

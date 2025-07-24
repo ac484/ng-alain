@@ -1,116 +1,102 @@
-import { Component, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { HubCrudService } from './hub-crud.service';
-import { FabComponent } from '../basic/widget/fab.component';
 import { Contract } from '../models/hub.model';
+import { FabComponent } from '../basic/widget/fab.component';
 
 @Component({
   selector: 'hub-fire-crud',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, NzTableModule, NzButtonModule, ReactiveFormsModule, DecimalPipe, FabComponent],
+  imports: [FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, FabComponent],
   template: `
-    <app-fab (onAction)="handleFabAction($event)"></app-fab>
-    <form *ngIf="showForm" [formGroup]="form" (ngSubmit)="add()" style="margin-bottom: 16px;">
-      <input nz-input placeholder="序號" formControlName="contractSerial" style="width: 100px; margin-right: 8px;" />
-      <input nz-input placeholder="業主" formControlName="client" style="width: 100px; margin-right: 8px;" />
-      <input nz-input placeholder="合約名稱" formControlName="contractName" style="width: 120px; margin-right: 8px;" />
-      <input nz-input placeholder="案號" formControlName="contractCode" style="width: 80px; margin-right: 8px;" />
-      <input nz-input placeholder="費用碼" formControlName="feeCode" style="width: 80px; margin-right: 8px;" />
-      <input nz-input type="number" placeholder="金額" formControlName="amount" style="width: 100px; margin-right: 8px;" />
-      <button nz-button nzType="primary" [disabled]="form.invalid">新增</button>
-    </form>
-    <nz-table [nzData]="contracts" nzTableLayout="fixed">
+    <app-fab (onAction)="addRow()"></app-fab>
+    <br /><br />
+    <nz-table #editRowTable nzBordered [nzData]="contracts">
       <thead>
         <tr>
           <th>序號</th>
           <th>業主</th>
           <th>合約名稱</th>
-          <th>案號</th>
-          <th>費用碼</th>
-          <th>金額</th>
+          <th>合約案號識別碼</th>
+          <th>合約費用識別碼</th>
+          <th>合約金額</th>
           <th>操作</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let c of contracts">
-          <td>{{ c.contractSerial }}</td>
-          <td>{{ c.client }}</td>
-          <td>{{ c.contractName }}</td>
-          <td>{{ c.contractCode }}</td>
-          <td>{{ c.feeCode }}</td>
-          <td>{{ c.amount | number: '1.0-0' }}</td>
+        <tr *ngFor="let data of contracts">
           <td>
-            <button nz-button nzType="default" nzDanger (click)="delete(c.key!)">刪除</button>
+            <input nz-input [(ngModel)]="data.contractSerial" (ngModelChange)="updateField(data, 'contractSerial', $event)" />
+          </td>
+          <td>
+            <input nz-input [(ngModel)]="data.client" (ngModelChange)="updateField(data, 'client', $event)" />
+          </td>
+          <td>
+            <input nz-input [(ngModel)]="data.contractName" (ngModelChange)="updateField(data, 'contractName', $event)" />
+          </td>
+          <td>
+            <input nz-input [(ngModel)]="data.contractCode" (ngModelChange)="updateField(data, 'contractCode', $event)" />
+          </td>
+          <td>
+            <input nz-input [(ngModel)]="data.feeCode" (ngModelChange)="updateField(data, 'feeCode', $event)" />
+          </td>
+          <td>
+            <input nz-input type="number" [(ngModel)]="data.amount" (ngModelChange)="updateField(data, 'amount', $event)" />
+          </td>
+          <td>
+            <a nz-popconfirm nzPopconfirmTitle="Sure to delete?" (nzOnConfirm)="deleteRow(data.key)">Delete</a>
           </td>
         </tr>
       </tbody>
     </nz-table>
-  `
+  `,
+  styles: [
+    `
+      .editable-cell {
+        position: relative;
+        padding: 5px 12px;
+        cursor: pointer;
+      }
+      .editable-row:hover .editable-cell {
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        padding: 4px 11px;
+      }
+    `
+  ]
 })
-export class HubFireCrudComponent implements OnDestroy {
+export class HubFireCrudComponent implements OnInit {
   contracts: Contract[] = [];
-  form: FormGroup;
-  showForm = false;
-  private destroy$ = new Subject<void>();
-  editKey: string | null = null;
-  editField: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private crud: HubCrudService
-  ) {
-    this.form = this.fb.group({
-      contractSerial: ['', Validators.required],
-      client: ['', Validators.required],
-      contractName: ['', Validators.required],
-      contractCode: [''],
-      feeCode: [''],
-      amount: [0, [Validators.required, Validators.min(1)]]
-    });
+  constructor(private crud: HubCrudService) {}
 
-    this.crud
-      .useCollection<Contract>('hub_contract')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((data: Contract[]) => (this.contracts = data));
+  ngOnInit() {
+    this.crud.useCollection<Contract>('hub_contract').subscribe(data => (this.contracts = data));
   }
 
-  async handleFabAction(type: string) {
-    if (type === 'add') {
-      // 自動產生唯一序號，建立空白合約
-      const serial = await this.crud.getNextContractSerial();
-      const defaultClient = await this.crud.getDefaultClient();
-      const newContract: Contract = {
-        contractSerial: serial,
-        client: defaultClient,
-        contractName: '',
-        contractCode: '',
-        feeCode: '',
-        amount: 0
-      };
-      const id = await this.crud.add<Contract>('hub_contract', newContract);
-      this.editKey = id;
-      this.editField = 'client'; // 可用於自動聚焦
-      this.showForm = false; // 不顯示表單，直接進入單格編輯
-    }
+  addRow() {
+    const newContract: Contract = {
+      contractSerial: '',
+      client: '',
+      contractName: '',
+      contractCode: '',
+      feeCode: '',
+      amount: 0
+    };
+    this.crud.add<Contract>('hub_contract', newContract);
   }
 
-  add() {
-    if (this.form.invalid) return;
-    this.crud.add<Contract>('hub_contract', this.form.value).then(() => this.form.reset());
+  updateField(data: Contract, field: keyof Contract, value: any) {
+    if (!data.key) return;
+    this.crud.update<Contract>('hub_contract', data.key, { [field]: value });
   }
 
-  delete(id: string) {
+  deleteRow(id: string | undefined) {
+    if (!id) return;
     this.crud.delete<Contract>('hub_contract', id);
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 }
