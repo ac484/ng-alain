@@ -6,7 +6,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { DecimalPipe } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { HubCrudService } from './hub-crud.service';
-import { FabComponent } from '../basic/widget/fab/fab.component';
+import { FabComponent } from '../basic/widget/fab.component';
 import { Contract } from '../models/hub.model';
 
 @Component({
