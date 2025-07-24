@@ -4,10 +4,10 @@ Thumbs.db
 desktop.ini
 
 # Editor specific files
-.vscode/
 .idea/
-*.swp
+.vscode/
 *.swo
+*.swp
 *~
 
 # Node.js
@@ -15,62 +15,115 @@ node_modules/
 npm-debug.log
 yarn-error.log
 package-lock.json
-yarn.lock
+# yarn.lock
 
 # Python
+.coverage
+.hypothesis/
+.nox/
+.pytest_cache/
+.tox/
 __pycache__/
+*.egg-info/
 *.py[cod]
 *$py.class
-.pytest_cache/
-.coverage
 htmlcov/
-.tox/
-.nox/
-.hypothesis/
-.pytest_cache/
-*.egg-info/
 
 # Ruby
-*.gem
-*.rbc
 /.config
-/coverage/
 /InstalledFiles
 /pkg/
-/spec/reports/
 /spec/examples.txt
+/spec/reports/
 /test/tmp/
 /test/version_tmp/
 /tmp/
+*.gem
+*.rbc
+/coverage/
 
 # Java
 *.class
-*.log
 *.jar
-*.war
+*.log
 *.nar
-*.ear
+*.war
 *.zip
 *.tar.gz
-*.rar
+*.ear
 hs_err_pid*
 
 # Logs
-logs/
 *.log
+logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # Runtime data
-pids
 *.pid
-*.seed
 *.pid.lock
+*.seed
+pids
 
 # Cursor specific
-.cursor/workspace/ 
+.cursor/workspace/
 
-#claude.code specific
+# claude.code specific
 .claude/
 CLAUDE.md
+
+# Compiled output
+/bazel-out
+/dist
+/out-tsc
+/tmp
+
+# IDEs and editors
+.c9/
+.classpath
+.launch
+.project
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.history/*
+
+# Yarn
+# yarn.lock
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# Firebase
+.firebase
+*-debug.log
+.env
+.runtimeconfig.json
+
+# Miscellaneous
+/.angular/cache
+/connect.lock
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+
+# lock
+/pnpm-lock.yaml
+# /yarn.lock
+
+/delon-builds
