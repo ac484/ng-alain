@@ -70,19 +70,12 @@
         "*"
       ]
     },
-    "allpepper-memory-bank": {
-      "command": "npx",
-      "args": ["-y", "@allpepper/memory-bank-mcp"],
-      "env": {
-        "MEMORY_BANK_ROOT": "<path-to-bank>"
-      },
-      "disabled": false,
-      "autoApprove": [
-        "memory_bank_read",
-        "memory_bank_write",
-        "memory_bank_update",
-        "list_projects",
-        "list_project_files"
+    "mcp-memory-bank": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/ipospelov/mcp-memory-bank",
+        "mcp_memory_bank"
       ]
     },
     "redis-mcp": {
