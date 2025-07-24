@@ -92,8 +92,8 @@ Alternatively, you can download the ZIP file from GitHub and extract it to your 
 
 This provides you with all the necessary files, including:
 - Rule files in `.cursor/rules/isolation_rules/`
-- Mode instruction files in `custom_modes/` directory
-- Template Memory Bank files in `custom_modes/`
+- Mode instruction files in `memory-bank/` directory
+- Template Memory Bank files in `memory-bank/`
 
 ### Step 2: Setting Up Custom Modes in Cursor
 
@@ -133,32 +133,32 @@ For each mode, configure as follows:
 1. **VAN MODE** (Initialization)
    - **Name**: 🔍 VAN
    - **Tools**: Enable "Codebase Search", "Read File", "Terminal", "List Directory"
-   - **Advanced options**: Paste from `custom_modes/van_instructions.md`
+   - **Advanced options**: Paste from `memory-bank/van_instructions.md`
 
 2. **PLAN MODE** (Task Planning)
    - **Name**: 📋 PLAN
    - **Tools**: Enable "Codebase Search", "Read File", "Terminal", "List Directory"
-   - **Advanced options**: Paste from `custom_modes/plan_instructions.md`
+   - **Advanced options**: Paste from `memory-bank/plan_instructions.md`
 
 3. **CREATIVE MODE** (Design Decisions)
    - **Name**: 🎨 CREATIVE
    - **Tools**: Enable "Codebase Search", "Read File", "Terminal", "List Directory", "Edit File"
-   - **Advanced options**: Paste from `custom_modes/creative_instructions.md`
+   - **Advanced options**: Paste from `memory-bank/creative_instructions.md`
 
 4. **IMPLEMENT MODE** (Code Implementation)
    - **Name**: ⚒️ IMPLEMENT
    - **Tools**: Enable all tools
-   - **Advanced options**: Paste from `custom_modes/implement_instructions.md`
+   - **Advanced options**: Paste from `memory-bank/implement_instructions.md`
 
 5. **REFLECT MODE** (Review)
    - **Name**: 🔍 REFLECT
    - **Tools**: Enable "Codebase Search", "Read File", "Terminal", "List Directory"
-   - **Advanced options**: Paste from `custom_modes/reflect_instructions.md`
+   - **Advanced options**: Paste from `memory-bank/reflect_instructions.md`
 
 6. **ARCHIVE MODE** (Documentation)
    - **Name**: 📚 ARCHIVE
    - **Tools**: Enable "Codebase Search", "Read File", "Terminal", "List Directory", "Edit File"
-   - **Advanced options**: Paste from `custom_modes/archive_instructions.md`
+   - **Advanced options**: Paste from `memory-bank/archive_instructions.md`
 
 For additional help on setting up custom modes in Cursor, refer to the [official Cursor documentation on custom modes](https://docs.cursor.com/chat/custom-modes).
 
@@ -253,7 +253,7 @@ The Memory Bank system is actively being developed and improved. Key points to u
 - [Cursor Custom Modes Documentation](https://docs.cursor.com/chat/custom-modes)
 - [Memory Bank Upgrade Guide](memory_bank_upgrade_guide.md)
 - [CREATIVE Mode and Claude's "Think" Tool](creative_mode_think_tool.md)
-- Mode-specific instruction files in the `custom_modes/` directory
+- Mode-specific instruction files in the `memory-bank/` directory
 
 ---
 

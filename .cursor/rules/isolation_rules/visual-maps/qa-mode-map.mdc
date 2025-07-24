@@ -239,12 +239,12 @@ graph TD
 
 ```bash
 # Check Memory Bank file existence and recency
-ls -la custom_modes/
-find custom_modes/ -type f -mtime -7 | sort
+ls -la memory-bank/
+find memory-bank/ -type f -mtime -7 | sort
 
 # Check for consistency between files
-grep -r "task" custom_modes/
-grep -r "requirement" custom_modes/
+grep -r "task" memory-bank/
+grep -r "requirement" memory-bank/
 ```
 
 ### Task Tracking Verification Commands:

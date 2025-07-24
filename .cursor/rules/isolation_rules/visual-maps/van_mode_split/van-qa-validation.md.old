@@ -82,7 +82,7 @@ graph TD
 
 ## 🔄 INTEGRATION WITH DESIGN DECISIONS
 
-Reads Creative Phase outputs (e.g., `custom_modes/systemPatterns.md`) to inform validation:
+Reads Creative Phase outputs (e.g., `memory-bank/systemPatterns.md`) to inform validation:
 
 ```mermaid
 graph TD

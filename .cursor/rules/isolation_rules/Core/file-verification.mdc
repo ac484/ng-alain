@@ -60,12 +60,12 @@ mkdir -p memory-bank docs/archive
 
 # Create all required files
 touch .cursorrules tasks.md \
-      custom_modes/projectbrief.md \
-      custom_modes/productContext.md \
-      custom_modes/systemPatterns.md \
-      custom_modes/techContext.md \
-      custom_modes/activeContext.md \
-      custom_modes/progress.md
+      memory-bank/projectbrief.md \
+      memory-bank/productContext.md \
+      memory-bank/systemPatterns.md \
+      memory-bank/techContext.md \
+      memory-bank/activeContext.md \
+      memory-bank/progress.md
 ```
 
 ## 📝 STREAMLINED VERIFICATION PROCESS

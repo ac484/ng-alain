@@ -12,7 +12,7 @@
 - **Architectural Alignment**: 基於 @delon/acl + @delon/auth + @angular/fire 的企業級權限管理系統
 - **Status**: **設計階段完成** ✅ → 準備進入 BUILD 階段
 - **Design Decision**: **混合重構模式** - 基於現有 Firebase 服務 + 全新 OnPush 組件設計
-- **Creative Document**: `custom_modes/creative-unified-system-architecture.md` ✅
+- **Creative Document**: `memory-bank/creative-unified-system-architecture.md` ✅
 
 ### Milestones
 - MILE-001: 核心架構完成 - 目標: 2週內 - **設計完成** ✅
@@ -293,7 +293,7 @@
 
 ### ✅ **CREATIVE PHASE COMPLETE**
 - **狀態**: 已完成 ✅
-- **設計文件**: `custom_modes/creative-unified-system-architecture.md`
+- **設計文件**: `memory-bank/creative-unified-system-architecture.md`
 - **決策方案**: 混合重構模式
 - **技術驗證**: VAN QA 通過 ✅
 - **任務更新**: 已同步至 tasks.md ✅

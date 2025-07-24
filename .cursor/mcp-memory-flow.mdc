@@ -10,7 +10,7 @@ globs: mcp-memory-flow.mdc
 |-------------|------------------|-------------------------------------|
 | VAN         | 狀態初始化/查詢  | 讀取 session/activeContext，補全上下文 |
 | PLAN        | 規劃/決策        | 寫入/更新 session，積累新規劃/決策     |
-| CREATIVE    | 設計/多方案      | 設計決策同步至 session/custom_modes    |
+| CREATIVE    | 設計/多方案      | 設計決策同步至 session/memory-bank    |
 | IMPLEMENT   | 進度/狀態同步    | 實作進度、bug、技術債同步至 session   |
 | REFLECT     | 回顧/優化        | 回顧教訓、優化建議積累至 session      |
 | ARCHIVE     | 歷史/清理        | 歷史狀態歸檔、過時記憶自動清理        |
@@ -31,7 +31,7 @@ flowchart TD
 ## ✅ 標準步驟（對應各 mode）
 1. **VAN**：進入專案時自動讀取 session/activeContext，補全上下文
 2. **PLAN**：新規劃/決策寫入 session，積累至 memory-bank
-3. **CREATIVE**：設計決策同步至 session/custom_modes
+3. **CREATIVE**：設計決策同步至 session/memory-bank
 4. **IMPLEMENT**：進度、bug、技術債同步至 session
 5. **REFLECT**：回顧教訓、優化建議積累至 session
 6. **ARCHIVE**：定期自動清理過時、冗餘、低頻資訊
@@ -59,7 +59,7 @@ flowchart TD
 - ARCHIVE：週期性自動清理
 
 ## 🔗 整合建議
-- 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 memory-flow
+- 在 memory-bank/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 memory-flow
 - 每個 mode 進入/切換時自動同步 session 與 memory-bank
 - 定期自動清理過時記憶，維持 session 健康
 
@@ -99,7 +99,7 @@ tool = "memory"
 |-------------|------------------|-------------------------------------|
 | VAN         | 狀態初始化/查詢  | 讀取 session/activeContext，補全上下文 |
 | PLAN        | 規劃/決策        | 寫入/更新 session，積累新規劃/決策     |
-| CREATIVE    | 設計/多方案      | 設計決策同步至 session/custom_modes    |
+| CREATIVE    | 設計/多方案      | 設計決策同步至 session/memory-bank    |
 | IMPLEMENT   | 進度/狀態同步    | 實作進度、bug、技術債同步至 session   |
 | REFLECT     | 回顧/優化        | 回顧教訓、優化建議積累至 session      |
 | ARCHIVE     | 歷史/清理        | 歷史狀態歸檔、過時記憶自動清理        |
@@ -120,7 +120,7 @@ flowchart TD
 ## ✅ 標準步驟（對應各 mode）
 1. **VAN**：進入專案時自動讀取 session/activeContext，補全上下文
 2. **PLAN**：新規劃/決策寫入 session，積累至 memory-bank
-3. **CREATIVE**：設計決策同步至 session/custom_modes
+3. **CREATIVE**：設計決策同步至 session/memory-bank
 4. **IMPLEMENT**：進度、bug、技術債同步至 session
 5. **REFLECT**：回顧教訓、優化建議積累至 session
 6. **ARCHIVE**：定期自動清理過時、冗餘、低頻資訊
@@ -148,7 +148,7 @@ flowchart TD
 - ARCHIVE：週期性自動清理
 
 ## 🔗 整合建議
-- 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 memory-flow
+- 在 memory-bank/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 memory-flow
 - 每個 mode 進入/切換時自動同步 session 與 memory-bank
 - 定期自動清理過時記憶，維持 session 健康
 
