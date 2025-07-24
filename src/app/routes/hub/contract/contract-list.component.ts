@@ -9,11 +9,12 @@ import { ContractService } from './contract.service';
 import { Contract } from './contract.model';
 import { FabComponent } from '../basic/widget/fab.component';
 import { HubCrudService } from '../fire-crud/hub-crud.service';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 @Component({
   selector: 'contract-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, FabComponent],
+  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, NzDropDownModule, FabComponent],
   template: `
     <app-fab (onAction)="addRow()"></app-fab>
     <br />
@@ -35,8 +36,8 @@ import { HubCrudService } from '../fire-crud/hub-crud.service';
           <tr class="editable-row">
             <td>{{ c.contractSerial }}</td>
             <td>
-              <div class="client-cell">
-                {{ c.client }}
+              <div nz-dropdown nzTrigger="click" [nzDropdownMenu]="menuRef" (nzClick)="currentDropdownRow = c">
+                <a nz-dropdown (click)="currentDropdownRow = c">{{ c.client }} <span nz-icon nzType="down"></span></a>
               </div>
             </td>
             <td>
@@ -70,6 +71,11 @@ import { HubCrudService } from '../fire-crud/hub-crud.service';
         }
       </tbody>
     </nz-table>
+    <nz-dropdown-menu #menuRef="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item *ngFor="let cl of clients" (click)="changeClient(currentDropdownRow, cl)">{{ cl }}</li>
+      </ul>
+    </nz-dropdown-menu>
   `,
   styles: [
     `
@@ -102,6 +108,7 @@ export class ContractListComponent implements OnInit {
   contracts: Contract[] = [];
   editId: string | null = null;
   clients: string[] = [];
+  currentDropdownRow: Contract | null = null;
 
   constructor(
     private contractService: ContractService,
@@ -156,5 +163,12 @@ export class ContractListComponent implements OnInit {
     if (!id) return;
     await this.contractService.delete(id);
     this.contracts = this.contracts.filter(d => d.key !== id);
+  }
+
+  async changeClient(c: Contract | null, client: string) {
+    if (c && c.key && c.client !== client) {
+      c.client = client;
+      await this.contractService.update(c.key, { client });
+    }
   }
 }
