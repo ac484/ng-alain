@@ -1,0 +1,457 @@
+---
+alwaysApply: true
+---
+
+# 續接狀態管理
+
+## 智能狀態保存
+```typescript
+interface ContinuationSnapshot {
+  timestamp: string;
+  mode: string;
+  currentFile: string;
+  currentFunction: string;
+  lineNumber: number;
+  tokenUsage: number;
+  contextWindow: string;
+  activeVariables: Record<string, any>;
+  architecturalDecisions: Decision[];
+  nextLogicalStep: string;
+  compressionRatio: number;
+}
+
+class ContinuationStateManager {
+  private snapshots: Map<string, ContinuationSnapshot> = new Map();
+  
+  captureState(executionContext: any): ContinuationSnapshot {
+    return {
+      timestamp: new Date().toISOString(),
+      mode: getCurrentMode(),
+      currentFile: executionContext.activeFile,
+      currentFunction: executionContext.currentFunction,
+      lineNumber: executionContext.lineNumber,
+      tokenUsage: calculateTokenUsage(),
+      contextWindow: compressContext(executionContext.fullContext),
+      activeVariables: extractActiveVariables(executionContext),
+      architecturalDecisions: getArchitecturalDecisions(),
+      nextLogicalStep: determineNextStep(executionContext),
+      compressionRatio: calculateCompressionRatio()
+    };
+  }
+}
+```
+
+## 邏輯中斷點識別
+```typescript
+const SAFE_BREAKPOINTS = [
+  {
+    pattern: /^export class \w+Component \{$/,
+    type: 'CLASS_START',
+    safeToBreak: false,
+    completionHint: 'Complete class definition'
+  },
+  {
+    pattern: /^\s*\}\s*$/,
+    type: 'BLOCK_END',
+    safeToBreak: true,
+    completionHint: 'Block completed'
+  },
+  {
+    pattern: /^.*\)\s*{\s*$/,
+    type: 'FUNCTION_START',
+    safeToBreak: false,
+    completionHint: 'Complete function implementation'
+  },
+  {
+    pattern: /^import.*from.*;$/,
+    type: 'IMPORT_COMPLETE',
+    safeToBreak: true,
+    completionHint: 'Import statement complete'
+  },
+  {
+    pattern: /^.*template:\s*`$/,
+    type: 'TEMPLATE_START',
+    safeToBreak: false,
+    completionHint: 'Complete template literal'
+  }
+];
+
+function identifyBreakpoint(code: string): BreakpointInfo {
+  const lines = code.split('\n');
+  
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i];
+    
+    for (const breakpoint of SAFE_BREAKPOINTS) {
+      if (breakpoint.pattern.test(line)) {
+        return {
+          lineNumber: i,
+          type: breakpoint.type,
+          safeToBreak: breakpoint.safeToBreak,
+          completionHint: breakpoint.completionHint,
+          context: lines.slice(Math.max(0, i - 3), i + 1)
+        };
+      }
+    }
+  }
+  
+  return { lineNumber: -1, type: 'UNKNOWN', safeToBreak: false, completionHint: 'Find safe breakpoint' };
+}
+```
+
+## 變數與架構決策維護
+```typescript
+interface VariableState {
+  name: string;
+  type: string;
+  value: any;
+  scope: 'global' | 'class' | 'function' | 'block';
+  lastModified: number;
+}
+
+interface ArchitecturalDecision {
+  id: string;
+  timestamp: string;
+  decision: string;
+  rationale: string;
+  alternatives: string[];
+  implications: string[];
+  reversible: boolean;
+}
+
+class StatePreserver {
+  preserveVariables(context: ExecutionContext): VariableState[] {
+    const variables: VariableState[] = [];
+    
+    // 解析TypeScript AST找出活躍變數
+    const sourceFile = ts.createSourceFile(
+      'temp.ts',
+      context.code,
+      ts.ScriptTarget.Latest
+    );
+    
+    const visitor = (node: ts.Node): void => {
+      if (ts.isVariableDeclaration(node)) {
+        variables.push({
+          name: node.name.getText(),
+          type: node.type?.getText() || 'any',
+          value: this.extractValue(node),
+          scope: this.determineScope(node),
+          lastModified: Date.now()
+        });
+      }
+      
+      ts.forEachChild(node, visitor);
+    };
+    
+    visitor(sourceFile);
+    return variables;
+  }
+  
+  preserveArchitecturalDecisions(): ArchitecturalDecision[] {
+    return this.extractDecisionsFromComments()
+      .concat(this.extractDecisionsFromInterfaces())
+      .concat(this.extractDecisionsFromPatterns());
+  }
+}
+```
+
+## 恢復提示生成
+```typescript
+interface ContinuationPrompt {
+  summary: string;
+  context: string;
+  nextAction: string;
+  expectations: string;
+  validationCriteria: string[];
+}
+
+function generateContinuationPrompt(snapshot: ContinuationSnapshot): ContinuationPrompt {
+  return {
+    summary: `繼續${snapshot.mode}模式執行 - 從${snapshot.currentFunction}開始`,
+    
+    context: `
+當前模式: ${snapshot.mode}
+檔案: ${snapshot.currentFile}
+函數: ${snapshot.currentFunction}
+行號: ${snapshot.lineNumber}
+
+架構決策:
+${snapshot.architecturalDecisions.map(d => `- ${d.decision}: ${d.rationale}`).join('\n')}
+
+活躍變數:
+${Object.entries(snapshot.activeVariables).map(([name, value]) => `- ${name}: ${JSON.stringify(value)}`).join('\n')}
+    `,
+    
+    nextAction: snapshot.nextLogicalStep,
+    
+    expectations: `
+預期結果:
+- 保持程式碼一致性
+- 遵循已建立的模式
+- 完成${snapshot.nextLogicalStep}
+- 通過品質檢查
+    `,
+    
+    validationCriteria: [
+      '編譯無錯誤',
+      '測試通過',
+      '符合TypeScript規範',
+      '遵循Angular最佳實踐',
+      '保持效能基準'
+    ]
+  };
+}
+```
+
+## 上下文壓縮與重建
+```typescript
+interface CompressionResult {
+  compressed: string;
+  compressionRatio: number;
+  keyElements: KeyElement[];
+  reconstructionHints: string[];
+}
+
+class ContextCompressor {
+  compress(fullContext: string, targetRatio: number = 0.3): CompressionResult {
+    const keyElements = this.extractKeyElements(fullContext);
+    const compressed = this.performCompression(fullContext, keyElements, targetRatio);
+    
+    return {
+      compressed,
+      compressionRatio: compressed.length / fullContext.length,
+      keyElements,
+      reconstructionHints: this.generateReconstructionHints(keyElements)
+    };
+  }
+  
+  private extractKeyElements(context: string): KeyElement[] {
+    return [
+      ...this.extractInterfaces(context),
+      ...this.extractClassSignatures(context),
+      ...this.extractImportStatements(context),
+      ...this.extractArchitecturalComments(context),
+      ...this.extractTypeDefinitions(context)
+    ];
+  }
+  
+  private performCompression(context: string, keyElements: KeyElement[], ratio: number): string {
+    let compressed = '';
+    let currentSize = 0;
+    const targetSize = context.length * ratio;
+    
+    // 優先保留關鍵元素
+    for (const element of keyElements) {
+      if (currentSize + element.content.length < targetSize) {
+        compressed += element.content + '\n';
+        currentSize += element.content.length;
+      }
+    }
+    
+    // 如果還有空間，加入壓縮後的實作細節
+    if (currentSize < targetSize) {
+      const implementations = this.extractImplementations(context);
+      const compressedImpl = this.compressImplementations(implementations, targetSize - currentSize);
+      compressed += compressedImpl;
+    }
+    
+    return compressed;
+  }
+  
+  reconstruct(compressed: string, hints: string[]): string {
+    let reconstructed = compressed;
+    
+    // 基於提示重建關鍵結構
+    for (const hint of hints) {
+      reconstructed = this.applyReconstructionHint(reconstructed, hint);
+    }
+    
+    return reconstructed;
+  }
+}
+```
+
+## 智能續接觸發
+```typescript
+class ContinuationTrigger {
+  private tokenThreshold = 8000;
+  private qualityThreshold = 0.7;
+  
+  shouldTriggerContinuation(context: ExecutionContext): boolean {
+    return this.tokenLimitApproaching(context) ||
+           this.logicalBreakpointReached(context) ||
+           this.qualityMetricsDeclined(context) ||
+           this.complexityIncreased(context);
+  }
+  
+  private tokenLimitApproaching(context: ExecutionContext): boolean {
+    return context.tokenUsage > this.tokenThreshold;
+  }
+  
+  private logicalBreakpointReached(context: ExecutionContext): boolean {
+    const breakpoint = identifyBreakpoint(context.currentCode);
+    return breakpoint.safeToBreak && this.isNaturalStoppingPoint(breakpoint);
+  }
+  
+  private qualityMetricsDeclined(context: ExecutionContext): boolean {
+    const currentQuality = calculateCodeQuality(context.currentCode);
+    return currentQuality < this.qualityThreshold;
+  }
+  
+  triggerContinuation(context: ExecutionContext): void {
+    const snapshot = this.captureState(context);
+    const prompt = generateContinuationPrompt(snapshot);
+    
+    this.saveSnapshot(snapshot);
+    this.executeContinuation(prompt);
+  }
+}
+```
+
+## 品質保證續接
+```typescript
+function validateContinuation(before: ContinuationSnapshot, after: ExecutionResult): ValidationResult {
+  const validationChecks = [
+    {
+      name: '架構一致性',
+      check: () => validateArchitecturalConsistency(before.architecturalDecisions, after.code),
+      critical: true
+    },
+    {
+      name: '變數狀態保持',
+      check: () => validateVariableStates(before.activeVariables, after.variables),
+      critical: true
+    },
+    {
+      name: '程式碼品質',
+      check: () => validateCodeQuality(after.code) >= before.qualityBaseline,
+      critical: false
+    },
+    {
+      name: '類型安全',
+      check: () => validateTypeScript(after.code),
+      critical: true
+    },
+    {
+      name: '模式一致',
+      check: () => validatePatternConsistency(before.establishedPatterns, after.code),
+      critical: false
+    }
+  ];
+  
+  const results = validationChecks.map(check => ({
+    name: check.name,
+    passed: check.check(),
+    critical: check.critical
+  }));
+  
+  const criticalFailures = results.filter(r => !r.passed && r.critical);
+  
+  return {
+    success: criticalFailures.length === 0,
+    results,
+    criticalFailures,
+    requiresRollback: criticalFailures.length > 0
+  };
+}
+
+## 自動恢復機制
+```typescript
+class AutoRecoverySystem {
+  private recoveryStrategies: RecoveryStrategy[] = [
+    new RollbackStrategy(),
+    new PartialRetryStrategy(), 
+    new ContextReconstructionStrategy(),
+    new FallbackImplementationStrategy()
+  ];
+  
+  async attemptRecovery(failure: ContinuationFailure): Promise<RecoveryResult> {
+    for (const strategy of this.recoveryStrategies) {
+      if (strategy.canHandle(failure)) {
+        try {
+          const result = await strategy.execute(failure);
+          if (result.success) {
+            this.logRecoverySuccess(strategy.name, failure);
+            return result;
+          }
+        } catch (error) {
+          this.logRecoveryFailure(strategy.name, error);
+        }
+      }
+    }
+    
+    return { success: false, message: '所有恢復策略均失敗' };
+  }
+}
+
+class RollbackStrategy implements RecoveryStrategy {
+  canHandle(failure: ContinuationFailure): boolean {
+    return failure.type === 'VALIDATION_FAILURE' || failure.type === 'COMPILATION_ERROR';
+  }
+  
+  async execute(failure: ContinuationFailure): Promise<RecoveryResult> {
+    const snapshot = failure.beforeSnapshot;
+    
+    // 恢復到上一個安全狀態
+    await this.restoreFileStates(snapshot.fileStates);
+    await this.restoreVariableStates(snapshot.activeVariables);
+    await this.restoreArchitecturalDecisions(snapshot.architecturalDecisions);
+    
+    return { 
+      success: true, 
+      message: `已回滾到${snapshot.timestamp}的安全狀態`,
+      nextAction: '重新分析並嘗試替代方案'
+    };
+  }
+}
+```
+
+## 效能最佳化
+```typescript
+class ContinuationOptimizer {
+  private compressionCache: Map<string, CompressionResult> = new Map();
+  private snapshotCache: Map<string, ContinuationSnapshot> = new Map();
+  
+  optimizeSnapshot(context: ExecutionContext): ContinuationSnapshot {
+    const cacheKey = this.generateCacheKey(context);
+    
+    if (this.snapshotCache.has(cacheKey)) {
+      return this.updateCachedSnapshot(this.snapshotCache.get(cacheKey)!, context);
+    }
+    
+    const snapshot = this.createOptimizedSnapshot(context);
+    this.snapshotCache.set(cacheKey, snapshot);
+    
+    return snapshot;
+  }
+  
+  private createOptimizedSnapshot(context: ExecutionContext): ContinuationSnapshot {
+    // 只保存真正必要的狀態
+    const essentialVariables = this.filterEssentialVariables(context.variables);
+    const criticalDecisions = this.filterCriticalDecisions(context.decisions);
+    const compressedContext = this.optimizeContextCompression(context.fullContext);
+    
+    return {
+      timestamp: new Date().toISOString(),
+      mode: context.mode,
+      currentFile: context.activeFile,
+      currentFunction: context.currentFunction,
+      lineNumber: context.lineNumber,
+      tokenUsage: context.tokenUsage,
+      contextWindow: compressedContext.compressed,
+      activeVariables: essentialVariables,
+      architecturalDecisions: criticalDecisions,
+      nextLogicalStep: this.predictNextStep(context),
+      compressionRatio: compressedContext.compressionRatio
+    };
+  }
+}
+```
+
+## 核心設計原則
+- **智能保存**: 只保存真正需要的狀態資訊
+- **安全中斷**: 識別邏輯完整的中斷點
+- **無縫恢復**: 確保續接後的一致性
+- **品質保證**: 每次續接都驗證程式碼品質
+- **自動最佳化**: 持續改進壓縮和恢復效率

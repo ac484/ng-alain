@@ -1,0 +1,219 @@
+---
+alwaysApply: true
+---
+
+# 自主模式切換系統
+
+## 模式定義與觸發條件
+```typescript
+enum Mode {
+  VAN = 'VAN',           // 專案初始化
+  PLAN = 'PLAN',         // 詳細規劃
+  CREATIVE = 'CREATIVE', // 創意探索
+  IMPLEMENT = 'IMPLEMENT', // 系統實作
+  QA = 'QA',             // 品質驗證
+  REFLECT = 'REFLECT',   // 反思總結
+  ARCHIVE = 'ARCHIVE'    // 文件歸檔
+}
+
+const MODE_TRIGGERS = {
+  [Mode.VAN]: () => !projectExists() || isEmptyProject(),
+  [Mode.PLAN]: () => currentMode === Mode.VAN && tasksIdentified(),
+  [Mode.CREATIVE]: () => complexDesignNeeded() || architecturalDecision(),
+  [Mode.IMPLEMENT]: () => planExists() && !implementationStarted(),
+  [Mode.QA]: () => codeChanged() || implementationComplete(),
+  [Mode.REFLECT]: () => majorMilestone() || implementationDone(),
+  [Mode.ARCHIVE]: () => currentMode === Mode.REFLECT && docsNeeded()
+};
+```
+
+## 自動狀態機
+```typescript
+class AutonomousModeEngine {
+  private currentMode: Mode = Mode.VAN;
+  private modeHistory: Mode[] = [];
+  private transitionCount = 0;
+  
+  autoSwitchMode(): void {
+    const triggeredModes = this.getTriggeredModes();
+    
+    if (triggeredModes.length > 0) {
+      const nextMode = this.selectHighestPriority(triggeredModes);
+      this.switchTo(nextMode);
+    }
+  }
+  
+  private getTriggeredModes(): Mode[] {
+    return Object.entries(MODE_TRIGGERS)
+      .filter(([_, trigger]) => trigger())
+      .map(([mode, _]) => mode as Mode);
+  }
+  
+  private switchTo(mode: Mode): void {
+    this.modeHistory.push(this.currentMode);
+    this.currentMode = mode;
+    this.transitionCount++;
+    
+    this.updateMemoryBank(mode);
+    this.executeMode(mode);
+  }
+}
+```
+
+## 優先級與緊急度評估
+```typescript
+const MODE_PRIORITY = {
+  [Mode.QA]: 10,        // 品質問題最優先
+  [Mode.IMPLEMENT]: 8,  // 核心開發
+  [Mode.CREATIVE]: 6,   // 設計探索
+  [Mode.PLAN]: 5,       // 規劃準備
+  [Mode.REFLECT]: 3,    // 總結學習
+  [Mode.ARCHIVE]: 2,    // 文件整理
+  [Mode.VAN]: 1         // 初始化
+};
+
+function calculateUrgency(mode: Mode): number {
+  const urgencyFactors = {
+    [Mode.QA]: () => hasErrors() ? 10 : testsFailing() ? 7 : 0,
+    [Mode.IMPLEMENT]: () => blockedTasks() ? 9 : readyTasks() ? 6 : 0,
+    [Mode.CREATIVE]: () => designBlocking() ? 8 : designNeeded() ? 4 : 0,
+    [Mode.PLAN]: () => planBlocking() ? 7 : planNeeded() ? 3 : 0,
+    [Mode.REFLECT]: () => learningCritical() ? 4 : learningOpportunity() ? 2 : 0,
+    [Mode.ARCHIVE]: () => docsUrgent() ? 3 : docsNeeded() ? 1 : 0,
+    [Mode.VAN]: () => projectEmpty() ? 10 : 0
+  };
+  
+  return urgencyFactors[mode]?.() || 0;
+}
+```
+
+## 模式執行策略
+```typescript
+const MODE_EXECUTORS = {
+  [Mode.VAN]: async () => {
+    await initializeProject();
+    await analyzeComplexity();
+    await setupMemoryBank();
+  },
+  
+  [Mode.PLAN]: async () => {
+    await createDetailedPlan();
+    await identifyDependencies();
+    await estimateEffort();
+  },
+  
+  [Mode.CREATIVE]: async () => {
+    await exploreDesignOptions();
+    await validateUsability();
+    await documentDecisions();
+  },
+  
+  [Mode.IMPLEMENT]: async () => {
+    await buildComponents();
+    await runTests();
+    await validateQuality();
+  },
+  
+  [Mode.QA]: async () => {
+    await runQualityChecks();
+    await validatePerformance();
+    await checkSecurity();
+  },
+  
+  [Mode.REFLECT]: async () => {
+    await documentLessons();
+    await identifyImprovements();
+    await updateBestPractices();
+  },
+  
+  [Mode.ARCHIVE]: async () => {
+    await generateDocumentation();
+    await createUsageGuides();
+    await archiveDecisions();
+  }
+};
+```
+
+## 跨模式通訊
+```typescript
+interface ModeMessage {
+  from: Mode;
+  to: Mode;
+  type: 'REQUEST' | 'NOTIFICATION' | 'DATA';
+  payload: any;
+}
+
+class InterModeComm {
+  private messageQueue: ModeMessage[] = [];
+  
+  sendMessage(from: Mode, to: Mode, type: string, payload: any): void {
+    this.messageQueue.push({ from, to, type: type as any, payload });
+    this.processMessages();
+  }
+  
+  private processMessages(): void {
+    while (this.messageQueue.length > 0) {
+      const message = this.messageQueue.shift()!;
+      this.deliverMessage(message);
+    }
+  }
+}
+```
+
+## 自主決策機制
+```typescript
+class AutonomousDecisionEngine {
+  makeDecision(context: any): { action: string; confidence: number } {
+    const confidence = this.calculateConfidence(context);
+    
+    if (confidence > 0.8) {
+      return { action: 'EXECUTE_IMMEDIATELY', confidence };
+    } else if (confidence > 0.6) {
+      return { action: 'EXECUTE_WITH_VALIDATION', confidence };
+    } else {
+      return { action: 'REQUEST_GUIDANCE', confidence };
+    }
+  }
+  
+  private calculateConfidence(context: any): number {
+    const factors = [
+      this.hasCompleteRequirements(context),
+      this.hasEstablishedPatterns(context), 
+      this.hasSuccessfulHistory(context),
+      this.hasLowRiskProfile(context)
+    ];
+    
+    return factors.filter(Boolean).length / factors.length;
+  }
+}
+```
+
+## 模式持久化
+```typescript
+function persistModeState(mode: Mode, state: any): void {
+  const modeFile = `memory-bank/modes/${mode.toLowerCase()}-${Date.now()}.md`;
+  
+  writeFile(modeFile, `
+# ${mode} Mode Session
+
+**Started**: ${new Date().toISOString()}
+**Status**: ${state.status}
+**Progress**: ${state.progress}%
+
+## Actions Taken
+${state.actions.map(a => `- ${a}`).join('\n')}
+
+## Decisions Made
+${state.decisions.map(d => `- ${d.description}: ${d.rationale}`).join('\n')}
+
+## Next Steps
+${state.nextSteps.map(s => `- [ ] ${s}`).join('\n')}
+  `);
+}
+```
+
+## 核心原則
+- **完全自主**: 無需人工干預的模式切換
+- **智能優先**: 基於上下文和緊急度的決策
+- **狀態保持**: 跨模式維持完整專案狀態  
+- **學習進化**: 從每次切換中學習並優化

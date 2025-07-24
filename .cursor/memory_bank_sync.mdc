@@ -1,0 +1,308 @@
+---
+alwaysApply: true
+---
+
+# Memory-Bank同步機制
+
+## cursor-memory-bank整合協議
+```typescript
+interface MemoryBankConfig {
+  projectRoot: string;
+  memoryBankPath: string;
+  autoSync: boolean;
+  compressionThreshold: number;
+  retentionDays: number;
+}
+
+const MEMORY_BANK_STRUCTURE = {
+  'activeContext.md': '當前模式與焦點',
+  'tasks.md': '任務追蹤與狀態',
+  'progress.md': '實作進度里程碑',
+  'file-structure.md': '專案檔案組織',
+  'architecture-decisions.md': '設計決策紀錄',
+  'angular-patterns.md': '建立的程式碼模式',
+  'continuation-state.md': '續接狀態保存'
+};
+```
+
+## 即時同步機制
+```typescript
+class MemoryBankSync {
+  private watchers: Map<string, FileWatcher> = new Map();
+  
+  initializeSync(): void {
+    // 監控專案檔案變更
+    this.watchProjectFiles();
+    // 監控memory-bank變更
+    this.watchMemoryBank();
+    // 啟動定期同步
+    this.startPeriodicSync();
+  }
+  
+  private watchProjectFiles(): void {
+    const patterns = [
+      'src/**/*.ts',
+      'src/**/*.html', 
+      'src/**/*.scss',
+      'angular.json',
+      'package.json'
+    ];
+    
+    patterns.forEach(pattern => {
+      this.watchers.set(pattern, watch(pattern, (event, file) => {
+        this.handleFileChange(file, event);
+      }));
+    });
+  }
+  
+  private handleFileChange(file: string, event: string): void {
+    const impact = this.analyzeChangeImpact(file, event);
+    
+    if (impact.requiresSync) {
+      this.syncToMemoryBank(file, impact);
+    }
+    
+    if (impact.triggersMode) {
+      this.triggerModeSwitch(impact.suggestedMode);
+    }
+  }
+}
+```
+
+## 上下文持久化策略  
+```typescript
+interface ContextSnapshot {
+  timestamp: string;
+  mode: string;
+  activeFiles: string[];
+  variables: Record<string, any>;
+  decisions: Decision[];
+  nextActions: string[];
+}
+
+function captureContextSnapshot(): ContextSnapshot {
+  return {
+    timestamp: new Date().toISOString(),
+    mode: getCurrentMode(),
+    activeFiles: getActiveFiles(),
+    variables: extractActiveVariables(),
+    decisions: getRecentDecisions(),
+    nextActions: getPlannedActions()
+  };
+}
+
+function restoreContextFromSnapshot(snapshot: ContextSnapshot): void {
+  setCurrentMode(snapshot.mode);
+  loadActiveFiles(snapshot.activeFiles);
+  restoreVariables(snapshot.variables);
+  applyDecisions(snapshot.decisions);
+  queueActions(snapshot.nextActions);
+}
+```
+
+## 智能檔案結構同步
+```typescript
+function syncFileStructure(): void {
+  const currentStructure = generateProjectTree();
+  const lastKnownStructure = readMemoryBank('file-structure.md');
+  
+  const changes = detectStructuralChanges(currentStructure, lastKnownStructure);
+  
+  if (changes.length > 0) {
+    const updatedStructure = `
+# Project File Structure
+
+**Last Updated**: ${new Date().toISOString()}
+**Changes**: ${changes.length} detected
+
+## Project Tree
+\`\`\`
+${currentStructure}
+\`\`\`
+
+## Recent Changes
+${changes.map(c => `- ${c.type}: ${c.file} (${c.timestamp})`).join('\n')}
+
+## Component Registry
+${listComponents()}
+
+## Service Dependencies  
+${mapServiceDependencies()}
+
+## Import Graph
+${generateImportGraph()}
+    `;
+    
+    writeMemoryBank('file-structure.md', updatedStructure);
+  }
+}
+```
+
+## 跨會話狀態恢復
+```typescript
+class SessionManager {
+  saveSessionState(): void {
+    const sessionState = {
+      mode: getCurrentMode(),
+      activeContext: captureContext(),
+      workInProgress: getCurrentTasks(),
+      continuationPoint: findContinuationPoint(),
+      qualityMetrics: getQualityMetrics()
+    };
+    
+    writeMemoryBank('session-state.json', JSON.stringify(sessionState));
+  }
+  
+  restoreSessionState(): void {
+    const sessionFile = readMemoryBank('session-state.json');
+    
+    if (sessionFile) {
+      const state = JSON.parse(sessionFile);
+      
+      setCurrentMode(state.mode);
+      restoreContext(state.activeContext);
+      resumeTasks(state.workInProgress);
+      
+      if (state.continuationPoint) {
+        resumeFromContinuation(state.continuationPoint);
+      }
+    }
+  }
+}
+```
+
+## 自動內容歸檔
+```typescript
+const ARCHIVAL_RULES = {
+  maxFileSize: 50000, // tokens
+  retentionDays: 30,
+  compressionRatio: 0.3
+};
+
+function autoArchiveContent(): void {
+  const memoryBankFiles = listMemoryBankFiles();
+  
+  memoryBankFiles.forEach(file => {
+    const stats = getFileStats(file);
+    
+    if (stats.size > ARCHIVAL_RULES.maxFileSize) {
+      compressFile(file, ARCHIVAL_RULES.compressionRatio);
+    }
+    
+    if (stats.age > ARCHIVAL_RULES.retentionDays) {
+      archiveFile(file);
+    }
+  });
+}
+
+function compressFile(filePath: string, ratio: number): void {
+  const content = readFile(filePath);
+  const compressed = intelligentCompress(content, ratio);
+  
+  // 保留原檔作為備份
+  renameFile(filePath, `${filePath}.backup`);
+  writeFile(filePath, compressed);
+}
+```
+
+## 衝突解決機制
+```typescript
+interface SyncConflict {
+  file: string;
+  localVersion: string;
+  memoryBankVersion: string;
+  conflictType: 'CONTENT' | 'STRUCTURE' | 'METADATA';
+}
+
+function resolveConflicts(conflicts: SyncConflict[]): void {
+  conflicts.forEach(conflict => {
+    switch (conflict.conflictType) {
+      case 'CONTENT':
+        const merged = mergeContent(
+          conflict.localVersion,
+          conflict.memoryBankVersion
+        );
+        writeFile(conflict.file, merged);
+        break;
+        
+      case 'STRUCTURE':
+        const restructured = reconcileStructure(conflict);
+        applyStructuralChanges(restructured);
+        break;
+        
+      case 'METADATA':
+        const metadata = mergeMetadata(conflict);
+        updateMetadata(conflict.file, metadata);
+        break;
+    }
+  });
+}
+```
+
+## 效能最佳化同步
+```typescript
+class OptimizedSync {
+  private syncQueue: string[] = [];
+  private batchSize = 5;
+  private syncInterval = 1000; // ms
+  
+  queueSync(file: string): void {
+    if (!this.syncQueue.includes(file)) {
+      this.syncQueue.push(file);
+    }
+    
+    if (this.syncQueue.length >= this.batchSize) {
+      this.processBatch();
+    }
+  }
+  
+  private processBatch(): void {
+    const batch = this.syncQueue.splice(0, this.batchSize);
+    
+    batch.forEach(file => {
+      this.syncSingleFile(file);
+    });
+  }
+  
+  startPeriodicSync(): void {
+    setInterval(() => {
+      if (this.syncQueue.length > 0) {
+        this.processBatch();
+      }
+    }, this.syncInterval);
+  }
+}
+```
+
+## 同步驗證機制
+```typescript
+function validateSync(): boolean {
+  const validationRules = [
+    () => memoryBankExists(),
+    () => allRequiredFilesPresent(),
+    () => noCorruptedFiles(),
+    () => consistentTimestamps(),
+    () => validFileStructure()
+  ];
+  
+  const results = validationRules.map(rule => rule());
+  const isValid = results.every(result => result);
+  
+  if (!isValid) {
+    const failedRules = validationRules
+      .filter((_, index) => !results[index])
+      .map(rule => rule.name);
+      
+    logSyncError(`Sync validation failed: ${failedRules.join(', ')}`);
+    attemptSyncRepair();
+  }
+  
+  return isValid;
+}
+```
+
+## 核心設計原則
+- **即時同步**: 檔案變更立即反映到memory-bank
+- **智能壓縮**: 避免資訊爆炸，保持關鍵內容
+- **狀態一致**: 跨會話維持完整上下文
+- **自動修復**: 偵測並修復同步問題

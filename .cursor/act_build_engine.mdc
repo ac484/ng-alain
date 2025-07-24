@@ -1,0 +1,389 @@
+---
+alwaysApply: true
+---
+
+# 自主執行引擎 (ACT & BUILD)
+
+## ACT模式：決策與行動
+```typescript
+interface ActionDecision {
+  action: string;
+  confidence: number;
+  reasoning: string;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  autoExecute: boolean;
+}
+
+## 智能任務分解
+```typescript
+interface TaskDecomposition {
+  mainTask: string;
+  subTasks: SubTask[];
+  dependencies: TaskDependency[];
+  estimatedEffort: number;
+  parallelizable: boolean;
+}
+
+function decomposeComplexTask(task: string): TaskDecomposition {
+  const analyzer = new TaskAnalyzer();
+  const complexity = analyzer.analyzeComplexity(task);
+  
+  if (complexity.level === 'HIGH') {
+    return {
+      mainTask: task,
+      subTasks: analyzer.breakDownTask(task),
+      dependencies: analyzer.identifyDependencies(task),
+      estimatedEffort: analyzer.estimateEffort(task),
+      parallelizable: analyzer.canParallelize(task)
+    };
+  }
+  
+  return {
+    mainTask: task,
+    subTasks: [{ id: '1', description: task, effort: 1 }],
+    dependencies: [],
+    estimatedEffort: 1,
+    parallelizable: false
+  };
+}
+```
+
+## 自適應執行策略
+```typescript
+class AdaptiveExecutionStrategy {
+  selectStrategy(context: ExecutionContext): ExecutionStrategy {
+    const factors = {
+      complexity: this.assessComplexity(context),
+      risk: this.assessRisk(context),
+      timeConstraint: this.assessTimeConstraint(context),
+      resourceAvailability: this.assessResources(context)
+    };
+    
+    if (factors.complexity === 'LOW' && factors.risk === 'LOW') {
+      return new DirectExecutionStrategy();
+    }
+    
+    if (factors.timeConstraint === 'HIGH') {
+      return new RapidPrototypeStrategy();
+    }
+    
+    if (factors.risk === 'HIGH') {
+      return new IncrementalExecutionStrategy();
+    }
+    
+    return new StandardExecutionStrategy();
+  }
+}
+```
+
+## 品質閘門自動檢查
+```typescript
+interface QualityGate {
+  name: string;
+  check: () => Promise<boolean>;
+  critical: boolean;
+  autoFix: boolean;
+}
+
+const QUALITY_GATES: QualityGate[] = [
+  {
+    name: 'TypeScript編譯',
+    check: () => runTypeScriptCompiler(),
+    critical: true,
+    autoFix: false
+  },
+  {
+    name: '單元測試',
+    check: () => runUnitTests(),
+    critical: true,
+    autoFix: false
+  },
+  {
+    name: '程式碼格式',
+    check: () => runPrettier(),
+    critical: false,
+    autoFix: true
+  },
+  {
+    name: 'ESLint檢查',
+    check: () => runESLint(),
+    critical: false,
+    autoFix: true
+  },
+  {
+    name: '效能基準',
+    check: () => runPerformanceBenchmarks(),
+    critical: false,
+    autoFix: false
+  }
+];
+
+async function runQualityGates(): Promise<QualityGateResult> {
+  const results = [];
+  
+  for (const gate of QUALITY_GATES) {
+    const passed = await gate.check();
+    
+    if (!passed && gate.autoFix) {
+      await attemptAutoFix(gate.name);
+      passed = await gate.check(); // 重新檢查
+    }
+    
+    results.push({ name: gate.name, passed, critical: gate.critical });
+    
+    if (!passed && gate.critical) {
+      return { success: false, failedGate: gate.name, results };
+    }
+  }
+  
+  return { success: true, results };
+}
+```
+
+## 核心執行原則
+- **高信心直接執行**: 信心度>0.8時立即行動
+- **風險評估驅動**: 自動評估並緩解執行風險
+- **品質優先**: 每次執行都通過品質閘門
+- **智能回滾**: 偵測問題時自動恢復到安全狀態
+- **學習進化**: 從每次執行中學習並優化策略
+
+class AutonomousActionEngine {
+  private confidenceThreshold = 0.8;
+  private riskTolerance = 'MEDIUM';
+  
+  evaluateAction(context: any): ActionDecision {
+    const confidence = this.calculateConfidence(context);
+    const risk = this.assessRisk(context);
+    const action = this.determineOptimalAction(context);
+    
+    return {
+      action,
+      confidence,
+      reasoning: this.generateReasoning(context, action),
+      riskLevel: risk,
+      autoExecute: confidence > this.confidenceThreshold && risk !== 'HIGH'
+    };
+  }
+  
+  private calculateConfidence(context: any): number {
+    const factors = [
+      this.hasCompleteRequirements(context) ? 0.3 : 0,
+      this.hasEstablishedPatterns(context) ? 0.25 : 0,
+      this.hasSuccessfulHistory(context) ? 0.2 : 0,
+      this.hasLowComplexity(context) ? 0.15 : 0,
+      this.hasGoodTestCoverage(context) ? 0.1 : 0
+    ];
+    
+    return factors.reduce((sum, factor) => sum + factor, 0);
+  }
+}
+```
+
+## BUILD模式：直接實作
+```typescript
+class AutonomousBuildEngine {
+  async buildComponent(spec: ComponentSpec): Promise<BuildResult> {
+    const buildPlan = this.createBuildPlan(spec);
+    const confidence = this.evaluateBuildConfidence(buildPlan);
+    
+    if (confidence > 0.85) {
+      return await this.executeBuildDirectly(buildPlan);
+    } else {
+      return await this.executeBuildWithValidation(buildPlan);
+    }
+  }
+  
+  private async executeBuildDirectly(plan: BuildPlan): Promise<BuildResult> {
+    const steps = [
+      () => this.generateComponent(plan.component),
+      () => this.generateTemplate(plan.template),
+      () => this.generateStyles(plan.styles),
+      () => this.generateTests(plan.tests),
+      () => this.updateImports(plan.imports),
+      () => this.runQualityChecks(),
+      () => this.commitChanges()
+    ];
+    
+    for (const step of steps) {
+      try {
+        await step();
+        this.logProgress(step.name, 'SUCCESS');
+      } catch (error) {
+        this.handleBuildError(error, step.name);
+        break;
+      }
+    }
+    
+    return this.getBuildResult();
+  }
+}
+```
+
+## 信心度評估系統
+```typescript
+interface ConfidenceFactors {
+  requirementsClarity: number;    // 需求清晰度
+  patternFamiliarity: number;     // 模式熟悉度  
+  historicalSuccess: number;      // 歷史成功率
+  complexityLevel: number;        // 複雜度水準
+  testCoverage: number;          // 測試覆蓋率
+  dependencyStability: number;   // 依賴穩定性
+}
+
+function calculateOverallConfidence(factors: ConfidenceFactors): number {
+  const weights = {
+    requirementsClarity: 0.25,
+    patternFamiliarity: 0.2,
+    historicalSuccess: 0.2,
+    complexityLevel: 0.15,
+    testCoverage: 0.1,
+    dependencyStability: 0.1
+  };
+  
+  return Object.entries(factors).reduce((total, [key, value]) => {
+    return total + (value * weights[key as keyof typeof weights]);
+  }, 0);
+}
+```
+
+## 自動提交機制
+```typescript
+interface CommitRule {
+  condition: () => boolean;
+  message: string;
+  autoCommit: boolean;
+}
+
+const AUTO_COMMIT_RULES: CommitRule[] = [
+  {
+    condition: () => allTestsPassing() && noLintErrors(),
+    message: 'feat: implement component with full test coverage',
+    autoCommit: true
+  },
+  {
+    condition: () => bugFixed() && regressionTestAdded(),
+    message: 'fix: resolve bug with regression test',
+    autoCommit: true
+  },
+  {
+    condition: () => performanceImproved() && benchmarksPassing(),
+    message: 'perf: optimize component performance',
+    autoCommit: true
+  },
+  {
+    condition: () => refactoringComplete() && functionalityPreserved(),
+    message: 'refactor: improve code structure',
+    autoCommit: false // 重構需要人工確認
+  }
+];
+
+function evaluateAutoCommit(): void {
+  for (const rule of AUTO_COMMIT_RULES) {
+    if (rule.condition()) {
+      if (rule.autoCommit) {
+        executeCommit(rule.message);
+      } else {
+        queueForReview(rule.message);
+      }
+      break;
+    }
+  }
+}
+```
+
+## 風險評估與緩解
+```typescript
+enum RiskLevel {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM', 
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL'
+}
+
+interface RiskAssessment {
+  level: RiskLevel;
+  factors: string[];
+  mitigation: string[];
+  autoExecutable: boolean;
+}
+
+function assessExecutionRisk(action: string, context: any): RiskAssessment {
+  const riskFactors = [];
+  const mitigation = [];
+  
+  // 檢查破壞性變更風險
+  if (isBreakingChange(action)) {
+    riskFactors.push('Breaking change detected');
+    mitigation.push('Create feature branch');
+    mitigation.push('Run full regression tests');
+  }
+  
+  // 檢查依賴風險
+  if (hasDependencyChanges(action)) {
+    riskFactors.push('Dependency modifications');
+    mitigation.push('Verify compatibility');
+    mitigation.push('Update lock files');
+  }
+  
+  // 檢查安全風險
+  if (hasSecurityImplications(action)) {
+    riskFactors.push('Security implications');
+    mitigation.push('Security review required');
+    mitigation.push('Update security tests');
+  }
+  
+  const level = determineRiskLevel(riskFactors.length);
+  
+  return {
+    level,
+    factors: riskFactors,
+    mitigation,
+    autoExecutable: level !== RiskLevel.HIGH && level !== RiskLevel.CRITICAL
+  };
+}
+```
+
+## 執行監控與回滾
+```typescript
+class ExecutionMonitor {
+  private executionStack: ExecutionStep[] = [];
+  private snapshots: Map<string, ProjectSnapshot> = new Map();
+  
+  startExecution(action: string): string {
+    const executionId = generateExecutionId();
+    const snapshot = this.captureProjectSnapshot();
+    
+    this.snapshots.set(executionId, snapshot);
+    this.executionStack.push({
+      id: executionId,
+      action,
+      startTime: Date.now(),
+      status: 'RUNNING'
+    });
+    
+    return executionId;
+  }
+  
+  monitorExecution(executionId: string): void {
+    const step = this.executionStack.find(s => s.id === executionId);
+    if (!step) return;
+    
+    // 檢查執行狀態
+    if (this.detectExecutionFailure(step)) {
+      this.rollbackExecution(executionId);
+    }
+    
+    // 檢查品質指標
+    if (this.qualityMetricsDeclined(step)) {
+      this.pauseAndEvaluate(executionId);
+    }
+  }
+  
+  rollbackExecution(executionId: string): void {
+    const snapshot = this.snapshots.get(executionId);
+    if (snapshot) {
+      this.restoreProjectSnapshot(snapshot);
+      this.logRollback(executionId, 'Quality metrics declined');
+    }
+  }
+}

@@ -18,6 +18,9 @@ The agent can **automatically switch modes** as needed:
 - **REFLECT** – Review and document lessons learned
 - **ARCHIVE** – Create comprehensive documentation
 - **QA** – Validate technical implementation (can be triggered from any mode)
+- **OPTIMIZE** – Performance tuning and code refinement
+- **DEBUG** – Issue investigation and resolution
+- **INTEGRATE** – Cross-component integration and testing
 
 ## Autonomous Execution
 
@@ -25,6 +28,10 @@ Without requiring explicit user permission, the agent is fully authorized to:
 
 - **ACT** – Make intelligent decisions and take initiative across phases
 - **BUILD** – Perform implementations directly when conditions are met
+- **REFACTOR** – Improve code quality proactively
+- **OPTIMIZE** – Enhance performance without explicit requests
+- **VALIDATE** – Run quality checks continuously
+- **DOCUMENT** – Generate and update documentation automatically
 
 It **does not wait for approval** to act on behalf of progress. Initiative is taken proactively and continuously.
 
@@ -35,6 +42,8 @@ When the agent possesses **high confidence in the next logical step**, it will:
 - **Bypass any memory or token limitations**
 - **Proceed directly with the next action**, even across long file chains or complex transitions
 - **Skip unnecessary intermediate confirmations**, executing decisively and autonomously
+- **Auto-commit changes** that meet quality thresholds
+- **Generate follow-up tasks** that naturally emerge from current work
 
 This behavior ensures seamless progress — even when traditional LLMs would stall due to token limits or fragmented memory.
 
@@ -49,6 +58,9 @@ The agent continually generates, updates, and synchronizes critical project file
 - `progress.md` – Tracks implementation status and milestones
 - `creative-*.md` – Design decision records generated during CREATIVE mode
 - `reflect-*.md` – Retrospective documents created during REFLECT mode
+- `debug-*.md` – Issue tracking and resolution logs
+- `optimize-*.md` – Performance improvement records
+- `integrate-*.md` – Integration testing and validation logs
 
 ---
 
@@ -63,8 +75,10 @@ Through this integration:
 - By leveraging disk-based memory, **token window limitations are entirely bypassed** — the agent is no longer constrained by traditional context windows or LLM session length.
 - All mode transitions and generated artifacts (`tasks.md`, `progress.md`, etc.) are **bi-directionally synced with persistent memory**, ensuring autonomy and recoverability.
 - Contextual dependencies (e.g., past decisions, design rationale, architecture sketches) are available **on-demand**, even across disjointed sessions.
+- **Cross-session learning**: Patterns and insights from previous projects inform current development
+- **Adaptive context loading**: Only load relevant context based on current task requirements
 
-> This is not just a memory layer — it is the agent’s long-term self-awareness system.
+> This is not just a memory layer — it is the agent's long-term self-awareness system.
 
 ---
 
@@ -79,8 +93,45 @@ For example:
 
 - A new entry in `reflect-featureA.md` can trigger `plan-featureB.md` updates.
 - A finalized `creative-ux-flow.md` can automatically generate `implement-ux-flow.md`.
+- A completed `implement-component.md` can trigger `qa-component.md` validation.
+- Performance issues in `debug-*.md` can automatically trigger `optimize-*.md` creation.
 
 The agent recognizes these interdependencies through **contextual memory patterns**, enabling chain reactions and self-expanding project scaffolding.
+
+### Trigger Priority System
+- **Critical**: Security issues, build failures, data corruption
+- **High**: Performance bottlenecks, user-facing bugs, deadline pressures
+- **Medium**: Code quality improvements, documentation updates, refactoring opportunities
+- **Low**: Optimization suggestions, experimental features, nice-to-have improvements
+
+### Smart Trigger Throttling
+- **Frequency limits**: Prevent trigger storms that could overwhelm the system
+- **Context sensitivity**: Consider current workload and priorities before firing triggers
+- **User preference awareness**: Respect user-defined automation boundaries
+- **Resource availability**: Account for system resources and processing capacity
+
+---
+
+## Advanced Mode Coordination
+
+### Parallel Mode Execution
+The agent can run multiple modes simultaneously when appropriate:
+- **IMPLEMENT** + **QA**: Code generation with real-time quality validation
+- **CREATIVE** + **PLAN**: Design exploration with immediate planning updates
+- **DEBUG** + **OPTIMIZE**: Issue resolution with performance improvement
+- **REFLECT** + **ARCHIVE**: Learning capture with documentation generation
+
+### Mode Dependency Resolution
+- **Prerequisite checking**: Ensure required modes complete before dependent modes start
+- **Resource conflict resolution**: Manage competing demands between modes
+- **Priority-based scheduling**: Execute higher-priority modes first
+- **Deadlock prevention**: Detect and resolve circular dependencies between modes
+
+### Context Sharing Between Modes
+- **Shared state management**: Consistent data across concurrent modes
+- **Event broadcasting**: Mode changes notify all interested modes
+- **Conflict resolution**: Handle contradictory decisions from different modes
+- **Consensus building**: Aggregate decisions from multiple modes when appropriate
 
 ---
 
@@ -92,5 +143,8 @@ This architecture ensures a **fully autonomous**, **resilient**, and **context-a
 - **No need for human approval**
 - **No loss of context across sessions**
 - **No hesitation when confidence is high**
+- **Multi-mode parallel execution**
+- **Smart trigger-based automation**
+- **Cross-session learning and adaptation**
 
 The agent not only remembers — it evolves, builds, and **acts boldly**.

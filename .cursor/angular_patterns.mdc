@@ -1,0 +1,384 @@
+---
+alwaysApply: true
+---
+
+# Angular v20 專業模板
+
+## Standalone Components 標準模板
+```typescript
+// 續接安全的組件模板
+import { Component, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+
+@Component({
+  selector: 'app-{{kebab-case-name}}',
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatCardModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <mat-card class="{{kebab-case-name}}-container">
+      <mat-card-header>
+        <mat-card-title>{{ title() }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- CONTINUATION_POINT: Content -->
+      </mat-card-content>
+      <mat-card-actions>
+        <!-- CONTINUATION_POINT: Actions -->
+      </mat-card-actions>
+    </mat-card>
+  `,
+  styles: [`
+    .{{kebab-case-name}}-container {
+      margin: 16px;
+      /* CONTINUATION_POINT: Styles */
+    }
+  `]
+})
+export class {{PascalCaseName}}Component {
+  // CONTINUATION_POINT: Signals & Logic
+  private readonly service = inject({{PascalCaseName}}Service);
+  
+  protected readonly title = signal('{{Display Name}}');
+  protected readonly loading = signal(false);
+  protected readonly data = signal<{{DataType}}[]>([]);
+  
+  // CONTINUATION_POINT: Computed values
+  protected readonly isEmpty = computed(() => this.data().length === 0);
+  
+  // CONTINUATION_POINT: Methods
+}
+```
+
+## 服務模板 (Signal-based)
+```typescript
+import { Injectable, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+@Injectable({ providedIn: 'root' })
+export class {{PascalCaseName}}Service {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = '{{API_BASE_URL}}';
+  
+  // CONTINUATION_POINT: State signals
+  private readonly _loading = signal(false);
+  private readonly _data = signal<{{DataType}}[]>([]);
+  private readonly _error = signal<string | null>(null);
+  
+  // CONTINUATION_POINT: Public readonly signals
+  readonly loading = this._loading.asReadonly();
+  readonly data = this._data.asReadonly();
+  readonly error = this._error.asReadonly();
+  
+  // CONTINUATION_POINT: Computed signals
+  readonly hasData = computed(() => this._data().length > 0);
+  readonly hasError = computed(() => this._error() !== null);
+  
+  // CONTINUATION_POINT: Methods
+  async load{{EntityName}}s(): Promise<void> {
+    this._loading.set(true);
+    this._error.set(null);
+    
+    try {
+      const data = await this.http.get<{{DataType}}[]>(`${this.baseUrl}/{{endpoint}}`).toPromise();
+      this._data.set(data || []);
+    } catch (error) {
+      this._error.set(error instanceof Error ? error.message : 'Unknown error');
+    } finally {
+      this._loading.set(false);
+    }
+  }
+}
+```
+
+## 響應式表單模板
+```typescript
+import { Component, signal, inject, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  selector: 'app-{{kebab-case-name}}-form',
+  standalone: true,
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  template: `
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="{{kebab-case-name}}-form">
+      <!-- CONTINUATION_POINT: Form fields -->
+      <mat-form-field>
+        <mat-label>{{Field Label}}</mat-label>
+        <input matInput formControlName="{{fieldName}}" />
+        @if (form.get('{{fieldName}}')?.errors?.['required']) {
+          <mat-error>此欄位為必填</mat-error>
+        }
+      </mat-form-field>
+      
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || submitting()">
+          {{ submitting() ? '處理中...' : '提交' }}
+        </button>
+      </div>
+    </form>
+  `,
+  styles: [`
+    .{{kebab-case-name}}-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 400px;
+    }
+  `]
+})
+export class {{PascalCaseName}}FormComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  
+  protected readonly submitting = signal(false);
+  
+  form: FormGroup = this.fb.group({
+    // CONTINUATION_POINT: Form controls
+  });
+  
+  ngOnInit(): void {
+    // CONTINUATION_POINT: Form initialization
+  }
+  
+  async onSubmit(): Promise<void> {
+    if (this.form.valid) {
+      this.submitting.set(true);
+      try {
+        // CONTINUATION_POINT: Submit logic
+        await this.submitForm(this.form.value);
+      } finally {
+        this.submitting.set(false);
+      }
+    }
+  }
+  
+  private async submitForm(data: any): Promise<void> {
+    // CONTINUATION_POINT: Implementation
+  }
+}
+```
+
+## 資料表格模板 
+```typescript
+import { Component, signal, inject, ViewChild, AfterViewInit } from '@angular/core';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  selector: 'app-{{kebab-case-name}}-table',
+  standalone: true,
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, MatInputModule, MatButtonModule],
+  template: `
+    <div class="table-container">
+      <mat-form-field>
+        <mat-label>搜尋</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="輸入關鍵字..." />
+      </mat-form-field>
+      
+      <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-1">
+        <!-- CONTINUATION_POINT: Column definitions -->
+        <ng-container matColumnDef="{{columnName}}">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{Column Label}}</th>
+          <td mat-cell *matCellDef="let element">{{ element.{{columnName}} }}</td>
+        </ng-container>
+        
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>操作</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button (click)="onEdit(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDelete(element)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  `,
+  styles: [`
+    .table-container {
+      margin: 16px;
+    }
+    
+    table {
+      width: 100%;
+    }
+    
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+  `]
+})
+export class {{PascalCaseName}}TableComponent implements AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+  
+  protected readonly loading = signal(false);
+  
+  displayedColumns: string[] = [/* CONTINUATION_POINT: Column names */];
+  dataSource = new MatTableDataSource<{{DataType}}>([]);
+  
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+  
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+  
+  onEdit(element: {{DataType}}): void {
+    // CONTINUATION_POINT: Edit logic
+  }
+  
+  onDelete(element: {{DataType}}): void {
+    // CONTINUATION_POINT: Delete logic
+  }
+}
+```
+
+## 路由與延遲載入模板
+```typescript
+// app.routes.ts
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: '/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
+  },
+  {
+    path: '{{feature-path}}',
+    loadChildren: () => import('./{{feature-path}}/{{feature-path}}.routes').then(m => m.{{FEATURE_NAME}}_ROUTES)
+  }
+  // CONTINUATION_POINT: Additional routes
+];
+
+// feature.routes.ts
+import { Routes } from '@angular/router';
+
+export const {{FEATURE_NAME}}_ROUTES: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./{{feature-name}}.component').then(m => m.{{FeatureName}}Component)
+  },
+  {
+    path: 'create',
+    loadComponent: () => import('./create/create.component').then(m => m.CreateComponent)
+  }
+  // CONTINUATION_POINT: Feature routes
+];
+```
+
+## 狀態管理模式 (Signal Store)
+```typescript
+import { Injectable, signal, computed } from '@angular/core';
+
+export interface {{EntityName}}State {
+  items: {{EntityName}}[];
+  loading: boolean;
+  error: string | null;
+  selectedId: string | null;
+}
+
+@Injectable({ providedIn: 'root' })
+export class {{EntityName}}Store {
+  // CONTINUATION_POINT: Private state signals
+  private readonly _state = signal<{{EntityName}}State>({
+    items: [],
+    loading: false,
+    error: null,
+    selectedId: null
+  });
+  
+  // CONTINUATION_POINT: Public selectors
+  readonly items = computed(() => this._state().items);
+  readonly loading = computed(() => this._state().loading);
+  readonly error = computed(() => this._state().error);
+  readonly selectedItem = computed(() => {
+    const state = this._state();
+    return state.items.find(item => item.id === state.selectedId) || null;
+  });
+  
+  // CONTINUATION_POINT: Actions
+  setLoading(loading: boolean): void {
+    this._state.update(state => ({ ...state, loading }));
+  }
+  
+  setItems(items: {{EntityName}}[]): void {
+    this._state.update(state => ({ ...state, items, error: null }));
+  }
+  
+  setError(error: string): void {
+    this._state.update(state => ({ ...state, error, loading: false }));
+  }
+  
+  selectItem(id: string): void {
+    this._state.update(state => ({ ...state, selectedId: id }));
+  }
+  
+  addItem(item: {{EntityName}}): void {
+    this._state.update(state => ({
+      ...state,
+      items: [...state.items, item]
+    }));
+  }
+  
+  updateItem(id: string, updates: Partial<{{EntityName}}>): void {
+    this._state.update(state => ({
+      ...state,
+      items: state.items.map(item => 
+        item.id === id ? { ...item, ...updates } : item
+      )
+    }));
+  }
+  
+  removeItem(id: string): void {
+    this._state.update(state => ({
+      ...state,
+      items: state.items.filter(item => item.id !== id)
+    }));
+  }
+}
+```
+
+## 模式識別標記
+```typescript
+// 在每個模板中加入識別標記，便於自動化處理
+const PATTERN_MARKERS = {
+  COMPONENT: '// PATTERN: STANDALONE_COMPONENT',
+  SERVICE: '// PATTERN: SIGNAL_SERVICE', 
+  FORM: '// PATTERN: REACTIVE_FORM',
+  TABLE: '// PATTERN: DATA_TABLE',
+  STORE: '// PATTERN: SIGNAL_STORE'
+};
+
+// 續接安全標記
+const CONTINUATION_MARKERS = {
+  SAFE_BREAK: '// CONTINUATION_POINT:',
+  TEMPLATE_BREAK: '<!-- CONTINUATION_POINT:',
+  STYLE_BREAK: '/* CONTINUATION_POINT:'
+};
+```

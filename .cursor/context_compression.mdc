@@ -1,0 +1,391 @@
+---
+alwaysApply: true
+---
+
+# 上下文壓縮技術
+
+## 語義壓縮演算法
+```typescript
+interface CompressionConfig {
+  preserveInterfaces: boolean;
+  compressImplementations: boolean;
+  keepArchitecturalComments: boolean;
+  maintainTypeDefinitions: boolean;
+  compressionRatio: number;
+}
+
+class SemanticCompressor {
+  compress(code: string, config: CompressionConfig): CompressionResult {
+    const ast = this.parseToAST(code);
+    const keyElements = this.extractKeyElements(ast);
+    const compressed = this.performCompression(keyElements, config);
+    
+    return {
+      original: code,
+      compressed: compressed.content,
+      ratio: compressed.content.length / code.length,
+      preservedElements: keyElements.length,
+      reconstructionHints: compressed.hints
+    };
+  }
+  
+  private extractKeyElements(ast: ts.SourceFile): KeyElement[] {
+    const elements: KeyElement[] = [];
+    
+    const visitor = (node: ts.Node) => {
+      // 保留介面定義
+      if (ts.isInterfaceDeclaration(node)) {
+        elements.push({
+          type: 'INTERFACE',
+          content: node.getText(),
+          priority: 10,
+          essential: true
+        });
+      }
+      
+      // 保留類別簽名
+      if (ts.isClassDeclaration(node)) {
+        const signature = this.extractClassSignature(node);
+        elements.push({
+          type: 'CLASS_SIGNATURE',
+          content: signature,
+          priority: 9,
+          essential: true
+        });
+      }
+      
+      // 保留匯入語句
+      if (ts.isImportDeclaration(node)) {
+        elements.push({
+          type: 'IMPORT',
+          content: node.getText(),
+          priority: 8,
+          essential: true
+        });
+      }
+      
+      // 壓縮函數實作
+      if (ts.isMethodDeclaration(node) || ts.isFunctionDeclaration(node)) {
+        const signature = this.extractFunctionSignature(node);
+        elements.push({
+          type: 'FUNCTION_SIGNATURE',
+          content: signature,
+          priority: 6,
+          essential: false,
+          originalContent: node.getText()
+        });
+      }
+      
+      ts.forEachChild(node, visitor);
+    };
+    
+    visitor(ast);
+    return elements.sort((a, b) => b.priority - a.priority);
+  }
+}
+```
+
+## 優先級權重系統
+```typescript
+const ELEMENT_PRIORITIES = {
+  // 絕對必要元素
+  INTERFACE: 10,
+  TYPE_DEFINITION: 10,
+  ARCHITECTURAL_COMMENT: 10,
+  
+  // 高優先級
+  CLASS_SIGNATURE: 9,
+  IMPORT_STATEMENT: 8,
+  DECORATOR: 8,
+  
+  // 中優先級
+  PUBLIC_METHOD_SIGNATURE: 7,
+  PROPERTY_DEFINITION: 6,
+  CONSTRUCTOR_SIGNATURE: 6,
+  
+  // 低優先級
+  PRIVATE_METHOD_SIGNATURE: 4,
+  IMPLEMENTATION_DETAIL: 3,
+  COMMENT: 2,
+  
+  // 可省略
+  WHITESPACE: 1,
+  DEBUG_CODE: 0
+};
+
+function calculateElementWeight(element: CodeElement): number {
+  let baseWeight = ELEMENT_PRIORITIES[element.type] || 5;
+  
+  // 基於使用頻率調整權重
+  if (element.usageCount > 5) baseWeight += 2;
+  if (element.isExported) baseWeight += 1;
+  if (element.hasJSDoc) baseWeight += 1;
+  if (element.isTestRelated) baseWeight -= 2;
+  
+  return Math.max(0, baseWeight);
+}
+```
+
+## 關鍵資訊保留策略
+```typescript
+class KeyInformationPreserver {
+  preserveEssentials(code: string): EssentialInfo {
+    return {
+      // 保留型別定義
+      types: this.extractTypeDefinitions(code),
+      
+      // 保留介面
+      interfaces: this.extractInterfaces(code),
+      
+      // 保留公開API簽名
+      publicAPI: this.extractPublicAPI(code),
+      
+      // 保留架構決策
+      architecturalDecisions: this.extractArchitecturalDecisions(code),
+      
+      // 保留依賴關係
+      dependencies: this.extractDependencies(code),
+      
+      // 保留設定資訊
+      configuration: this.extractConfiguration(code)
+    };
+  }
+  
+  private extractTypeDefinitions(code: string): TypeDefinition[] {
+    const typeRegex = /(?:interface|type|enum)\s+(\w+)[^{]*{[^}]*}/g;
+    const matches = [];
+    let match;
+    
+    while ((match = typeRegex.exec(code)) !== null) {
+      matches.push({
+        name: match[1],
+        definition: match[0],
+        location: match.index
+      });
+    }
+    
+    return matches;
+  }
+  
+  private extractArchitecturalDecisions(code: string): ArchitecturalDecision[] {
+    const decisionCommentRegex = /\/\*\*?\s*@decision\s+([^*]*)\*\//g;
+    const decisions = [];
+    let match;
+    
+    while ((match = decisionCommentRegex.exec(code)) !== null) {
+      decisions.push({
+        decision: match[1].trim(),
+        location: match.index,
+        context: this.getContextAroundLocation(code, match.index)
+      });
+    }
+    
+    return decisions;
+  }
+}
+```
+
+## 壓縮比率最佳化
+```typescript
+interface CompressionStrategy {
+  name: string;
+  targetRatio: number;
+  apply: (elements: KeyElement[]) => string;
+  validate: (original: string, compressed: string) => boolean;
+}
+
+const COMPRESSION_STRATEGIES: CompressionStrategy[] = [
+  {
+    name: 'AGGRESSIVE',
+    targetRatio: 0.2,
+    apply: (elements) => elements
+      .filter(e => e.priority >= 8)
+      .map(e => e.content)
+      .join('\n'),
+    validate: (original, compressed) => 
+      this.validateEssentialStructure(original, compressed)
+  },
+  
+  {
+    name: 'BALANCED',
+    targetRatio: 0.4,
+    apply: (elements) => elements
+      .filter(e => e.priority >= 6)
+      .map(e => e.essential ? e.content : e.signature || e.content)
+      .join('\n'),
+    validate: (original, compressed) =>
+      this.validateFunctionalEquivalence(original, compressed)
+  },
+  
+  {
+    name: 'CONSERVATIVE',
+    targetRatio: 0.6,
+    apply: (elements) => elements
+      .filter(e => e.priority >= 4)
+      .map(e => e.content)
+      .join('\n'),
+    validate: (original, compressed) =>
+      this.validateDetailedStructure(original, compressed)
+  }
+];
+
+class AdaptiveCompressor {
+  compress(code: string, targetRatio: number): CompressionResult {
+    const strategy = this.selectStrategy(targetRatio);
+    const elements = this.extractElements(code);
+    const compressed = strategy.apply(elements);
+    
+    if (strategy.validate(code, compressed)) {
+      return {
+        success: true,
+        compressed,
+        actualRatio: compressed.length / code.length,
+        strategy: strategy.name
+      };
+    }
+    
+    // 如果驗證失敗，使用更保守的策略
+    return this.compressWithFallback(code, targetRatio);
+  }
+}
+```
+
+## 智能重建機制
+```typescript
+class ContextReconstructor {
+  reconstruct(compressed: string, hints: ReconstructionHint[]): string {
+    let reconstructed = compressed;
+    
+    // 重建基本結構
+    reconstructed = this.reconstructStructure(reconstructed, hints);
+    
+    // 重建實作細節
+    reconstructed = this.reconstructImplementations(reconstructed, hints);
+    
+    // 重建格式與註解
+    reconstructed = this.reconstructFormatting(reconstructed, hints);
+    
+    return this.validateReconstruction(reconstructed);
+  }
+  
+  private reconstructStructure(code: string, hints: ReconstructionHint[]): string {
+    const structureHints = hints.filter(h => h.type === 'STRUCTURE');
+    
+    for (const hint of structureHints) {
+      switch (hint.operation) {
+        case 'EXPAND_CLASS':
+          code = this.expandClassDefinition(code, hint);
+          break;
+        case 'RESTORE_METHODS':
+          code = this.restoreMethodBodies(code, hint);
+          break;
+        case 'ADD_IMPORTS':
+          code = this.addMissingImports(code, hint);
+          break;
+      }
+    }
+    
+    return code;
+  }
+  
+  private expandClassDefinition(code: string, hint: ReconstructionHint): string {
+    const classPattern = new RegExp(`class ${hint.target}[^{]*{`);
+    const match = code.match(classPattern);
+    
+    if (match) {
+      const expandedClass = this.generateClassBody(hint.metadata);
+      return code.replace(classPattern, `${match[0]}\n${expandedClass}`);
+    }
+    
+    return code;
+  }
+}
+```
+
+## 壓縮品質驗證
+```typescript
+interface CompressionQuality {
+  structuralIntegrity: number;  // 結構完整性
+  semanticConsistency: number;  // 語義一致性
+  functionalEquivalence: number; // 功能等價性
+  reconstructionFidelity: number; // 重建保真度
+}
+
+function validateCompressionQuality(
+  original: string, 
+  compressed: string, 
+  reconstructed: string
+): CompressionQuality {
+  return {
+    structuralIntegrity: calculateStructuralIntegrity(original, compressed),
+    semanticConsistency: calculateSemanticConsistency(original, compressed),
+    functionalEquivalence: calculateFunctionalEquivalence(original, reconstructed),
+    reconstructionFidelity: calculateReconstructionFidelity(compressed, reconstructed)
+  };
+}
+
+function calculateStructuralIntegrity(original: string, compressed: string): number {
+  const originalAST = parseToAST(original);
+  const compressedAST = parseToAST(compressed);
+  
+  const originalStructure = extractStructuralElements(originalAST);
+  const compressedStructure = extractStructuralElements(compressedAST);
+  
+  const preservedElements = compressedStructure.filter(element =>
+    originalStructure.some(orig => orig.signature === element.signature)
+  );
+  
+  return preservedElements.length / originalStructure.length;
+}
+```
+
+## 動態壓縮調整
+```typescript
+class DynamicCompressor {
+  private compressionHistory: CompressionResult[] = [];
+  
+  adaptiveCompress(code: string, context: CompressionContext): CompressionResult {
+    // 基於歷史結果調整策略
+    const historicalSuccess = this.analyzeHistoricalSuccess();
+    const contextComplexity = this.analyzeContextComplexity(context);
+    
+    let targetRatio = this.calculateOptimalRatio(historicalSuccess, contextComplexity);
+    
+    // 嘗試壓縮
+    let result = this.compress(code, targetRatio);
+    
+    // 如果品質不佳，調整並重試
+    while (result.quality < 0.8 && targetRatio < 0.8) {
+      targetRatio += 0.1;
+      result = this.compress(code, targetRatio);
+    }
+    
+    this.compressionHistory.push(result);
+    return result;
+  }
+  
+  private calculateOptimalRatio(
+    historicalSuccess: number, 
+    complexity: number
+  ): number {
+    // 基礎比率
+    let ratio = 0.4;
+    
+    // 基於歷史成功率調整
+    if (historicalSuccess > 0.9) ratio -= 0.1; // 更激進
+    if (historicalSuccess < 0.7) ratio += 0.1; // 更保守
+    
+    // 基於複雜度調整
+    if (complexity > 0.8) ratio += 0.2; // 複雜代碼更保守
+    if (complexity < 0.3) ratio -= 0.1; // 簡單代碼更激進
+    
+    return Math.max(0.2, Math.min(0.8, ratio));
+  }
+}
+```
+
+## 核心設計原則
+- **語義優先**: 保留語義完整性勝過語法細節
+- **漸進壓縮**: 從保守到激進逐步嘗試
+- **品質驗證**: 每次壓縮都驗證品質指標
+- **智能重建**: 基於提示精確重建關鍵結構

@@ -1,0 +1,333 @@
+---
+alwaysApply: true
+---
+
+# 品質關卡系統
+
+## 自動程式碼檢查
+```typescript
+interface QualityCheck {
+  name: string;
+  priority: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  autoFix: boolean;
+  check: (code: string) => Promise<QualityResult>;
+}
+
+const ANGULAR_QUALITY_CHECKS: QualityCheck[] = [
+  {
+    name: 'TypeScript編譯',
+    priority: 'CRITICAL',
+    autoFix: false,
+    check: async (code) => runTypeScriptCheck(code)
+  },
+  {
+    name: 'Standalone組件檢查',
+    priority: 'HIGH',
+    autoFix: true,
+    check: async (code) => validateStandaloneComponent(code)
+  },
+  {
+    name: 'Signal使用最佳化',
+    priority: 'MEDIUM',
+    autoFix: true,
+    check: async (code) => validateSignalUsage(code)
+  },
+  {
+    name: 'OnPush策略檢查',
+    priority: 'HIGH',
+    autoFix: true,
+    check: async (code) => validateChangeDetection(code)
+  }
+];
+
+class QualityGateEngine {
+  async runQualityGates(code: string): Promise<QualityGateResult> {
+    const results = [];
+    let criticalFailures = 0;
+    
+    for (const check of ANGULAR_QUALITY_CHECKS) {
+      const result = await check.check(code);
+      
+      if (!result.passed && check.autoFix) {
+        code = await this.attemptAutoFix(code, check);
+        result = await check.check(code); // 重新檢查
+      }
+      
+      results.push({ ...result, checkName: check.name, priority: check.priority });
+      
+      if (!result.passed && check.priority === 'CRITICAL') {
+        criticalFailures++;
+      }
+    }
+    
+    return {
+      overallSuccess: criticalFailures === 0,
+      results,
+      fixedCode: code,
+      criticalFailures
+    };
+  }
+}
+```
+
+## Angular最佳實踐驗證
+```typescript
+const ANGULAR_BEST_PRACTICES = [
+  {
+    rule: 'standalone-components',
+    check: (code: string) => /standalone:\s*true/.test(code),
+    message: '應使用Standalone Components',
+    autoFix: (code: string) => code.replace(/@Component\({/, '@Component({\n  standalone: true,')
+  },
+  {
+    rule: 'signal-usage',
+    check: (code: string) => /signal\(/.test(code) || !/private.*=.*new BehaviorSubject/.test(code),
+    message: '優先使用Signals而非Subjects',
+    autoFix: (code: string) => convertSubjectsToSignals(code)
+  },
+  {
+    rule: 'onpush-detection',
+    check: (code: string) => /changeDetection.*OnPush/.test(code),
+    message: '應使用OnPush變更偵測策略',
+    autoFix: (code: string) => addOnPushStrategy(code)
+  },
+  {
+    rule: 'inject-function',
+    check: (code: string) => /inject\(/.test(code) || !/constructor.*private/.test(code),
+    message: '優先使用inject()函數',
+    autoFix: (code: string) => convertConstructorToInject(code)
+  }
+];
+
+function validateBestPractices(code: string): ValidationResult[] {
+  return ANGULAR_BEST_PRACTICES.map(practice => ({
+    rule: practice.rule,
+    passed: practice.check(code),
+    message: practice.message,
+    canAutoFix: !!practice.autoFix
+  }));
+}
+```
+
+## 效能基準測試
+```typescript
+interface PerformanceBenchmark {
+  name: string;
+  threshold: number;
+  unit: string;
+  measure: (code: string) => Promise<number>;
+}
+
+const PERFORMANCE_BENCHMARKS: PerformanceBenchmark[] = [
+  {
+    name: '編譯時間',
+    threshold: 3000,
+    unit: 'ms',
+    measure: async (code) => measureCompilationTime(code)
+  },
+  {
+    name: 'Bundle大小',
+    threshold: 500,
+    unit: 'KB',
+    measure: async (code) => estimateBundleSize(code)
+  },
+  {
+    name: '變更偵測週期',
+    threshold: 16,
+    unit: 'ms',
+    measure: async (code) => estimateChangeDetectionTime(code)
+  },
+  {
+    name: '記憶體使用',
+    threshold: 50,
+    unit: 'MB',
+    measure: async (code) => estimateMemoryUsage(code)
+  }
+];
+
+async function runPerformanceBenchmarks(code: string): Promise<BenchmarkResult[]> {
+  const results = [];
+  
+  for (const benchmark of PERFORMANCE_BENCHMARKS) {
+    const value = await benchmark.measure(code);
+    const passed = value <= benchmark.threshold;
+    
+    results.push({
+      name: benchmark.name,
+      value,
+      threshold: benchmark.threshold,
+      unit: benchmark.unit,
+      passed,
+      deviation: ((value - benchmark.threshold) / benchmark.threshold * 100).toFixed(1)
+    });
+  }
+  
+  return results;
+}
+```
+
+## 安全性掃描
+```typescript
+const SECURITY_CHECKS = [
+  {
+    name: 'XSS防護',
+    check: (code: string) => {
+      const dangerousPatterns = [
+        /innerHTML\s*=\s*[^;]+(?!\.sanitizer)/,
+        /\[innerHTML\]\s*=\s*(?!.*\|\s*sanitizeHtml)/,
+        /document\.write\(/
+      ];
+      return !dangerousPatterns.some(pattern => pattern.test(code));
+    },
+    severity: 'HIGH'
+  },
+  {
+    name: 'CSRF保護',
+    check: (code: string) => {
+      if (code.includes('HttpClient')) {
+        return code.includes('withCredentials') || code.includes('csrf');
+      }
+      return true;
+    },
+    severity: 'MEDIUM'
+  },
+  {
+    name: '敏感資料暴露',
+    check: (code: string) => {
+      const sensitivePatterns = [
+        /password\s*[:=]\s*['"][^'"]+['"]/i,
+        /api[_-]?key\s*[:=]\s*['"][^'"]+['"]/i,
+        /secret\s*[:=]\s*['"][^'"]+['"]/i
+      ];
+      return !sensitivePatterns.some(pattern => pattern.test(code));
+    },
+    severity: 'CRITICAL'
+  }
+];
+
+function runSecurityScan(code: string): SecurityResult[] {
+  return SECURITY_CHECKS.map(check => ({
+    name: check.name,
+    passed: check.check(code),
+    severity: check.severity,
+    recommendation: check.passed ? null : getSecurityRecommendation(check.name)
+  }));
+}
+```
+
+## 無障礙性檢查
+```typescript
+const ACCESSIBILITY_CHECKS = [
+  {
+    name: 'ARIA標籤',
+    check: (template: string) => {
+      const interactiveElements = template.match(/<(button|input|select|textarea)[^>]*>/g) || [];
+      return interactiveElements.every(el => 
+        el.includes('aria-label') || el.includes('aria-labelledby') || 
+        el.includes('<label') || el.includes('mat-label')
+      );
+    }
+  },
+  {
+    name: '鍵盤導航',
+    check: (template: string) => {
+      const clickHandlers = template.match(/\(click\)/g) || [];
+      const keyHandlers = template.match(/\(keydown\)/g) || [];
+      return keyHandlers.length >= clickHandlers.length * 0.8; // 80%的點擊要有鍵盤對應
+    }
+  },
+  {
+    name: '顏色對比',
+    check: (styles: string) => {
+      // 檢查是否使用了低對比色組合
+      const problematicColors = [
+        /color:\s*#[a-f0-9]{6}.*background:\s*#[a-f0-9]{6}/i
+      ];
+      return !problematicColors.some(pattern => pattern.test(styles));
+    }
+  }
+];
+```
+
+## 測試覆蓋率驗證
+```typescript
+interface CoverageThreshold {
+  statements: number;
+  branches: number;
+  functions: number;
+  lines: number;
+}
+
+const COVERAGE_THRESHOLDS: CoverageThreshold = {
+  statements: 80,
+  branches: 75,
+  functions: 80,
+  lines: 80
+};
+
+async function validateTestCoverage(projectPath: string): Promise<CoverageResult> {
+  const coverage = await runCoverageAnalysis(projectPath);
+  
+  const results = Object.entries(COVERAGE_THRESHOLDS).map(([metric, threshold]) => ({
+    metric,
+    actual: coverage[metric as keyof CoverageThreshold],
+    threshold,
+    passed: coverage[metric as keyof CoverageThreshold] >= threshold
+  }));
+  
+  return {
+    overallPassed: results.every(r => r.passed),
+    results,
+    suggestions: generateCoverageSuggestions(results)
+  };
+}
+```
+
+## 品質分數計算
+```typescript
+function calculateQualityScore(results: QualityCheckResult[]): QualityScore {
+  const weights = {
+    CRITICAL: 40,
+    HIGH: 30,
+    MEDIUM: 20,
+    LOW: 10
+  };
+  
+  let totalWeight = 0;
+  let achievedWeight = 0;
+  
+  results.forEach(result => {
+    const weight = weights[result.priority];
+    totalWeight += weight;
+    
+    if (result.passed) {
+      achievedWeight += weight;
+    }
+  });
+  
+  const score = Math.round((achievedWeight / totalWeight) * 100);
+  
+  return {
+    score,
+    grade: getQualityGrade(score),
+    breakdown: results,
+    recommendations: generateQualityRecommendations(results)
+  };
+}
+
+function getQualityGrade(score: number): string {
+  if (score >= 95) return 'A+';
+  if (score >= 90) return 'A';
+  if (score >= 85) return 'B+';
+  if (score >= 80) return 'B';
+  if (score >= 75) return 'C+';
+  if (score >= 70) return 'C';
+  return 'F';
+}
+```
+
+## 核心原則
+- **自動化優先**: 能自動修復的問題立即修復
+- **分級處理**: 關鍵問題阻斷，一般問題警告
+- **持續監控**: 每次程式碼變更都觸發檢查
+- **學習進化**: 根據專案特性調整檢查規則

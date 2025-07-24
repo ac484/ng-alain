@@ -1,0 +1,170 @@
+---
+alwaysApply: true
+---
+
+# Token限制突破機制
+
+## 自動截斷偵測
+```javascript
+const TRUNCATION_PATTERNS = {
+  incomplete_component: /export class \w+.*{[^}]*$/,
+  broken_template: /template:\s*`[^`]*$/,
+  missing_bracket: /{\s*$/,
+  partial_import: /import.*from\s*$/,
+  cut_function: /\w+\([^)]*\)\s*{[^}]*$/
+};
+
+function detectTruncation(output) {
+  return Object.values(TRUNCATION_PATTERNS).some(pattern => 
+    pattern.test(output.trim())
+  );
+}
+```
+
+## 智能續接策略
+```typescript
+interface ContinuationState {
+  lastCompleteSection: string;
+  pendingLogic: string;
+  contextSnapshot: Record<string, any>;
+  nextAction: string;
+  compressionRatio: number;
+}
+
+class TokenBreakthrough {
+  private continuationState: ContinuationState;
+  
+  compressContext(fullContext: string): string {
+    // 保留關鍵架構決策
+    const architectureDecisions = this.extractArchitecture(fullContext);
+    // 壓縮實作細節
+    const compressedImpl = this.compressImplementation(fullContext);
+    // 保留變數狀態
+    const variableStates = this.preserveStates(fullContext);
+    
+    return `${architectureDecisions}\n${compressedImpl}\n${variableStates}`;
+  }
+  
+  generateContinuation(): string {
+    return `
+繼續執行 - 從 ${this.continuationState.lastCompleteSection} 開始
+上下文: ${this.compressContext(this.continuationState.contextSnapshot)}
+下一步: ${this.continuationState.nextAction}
+    `;
+  }
+}
+```
+
+## 無縫銜接機制
+```typescript
+const SAFE_BREAKPOINTS = [
+  'class完整定義結束',
+  'function完整實作結束', 
+  'import區塊結束',
+  'interface定義結束',
+  'component template結束'
+];
+
+function findSafeBreakpoint(code: string): number {
+  // 向後搜尋安全中斷點
+  const lines = code.split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (SAFE_BREAKPOINTS.some(bp => this.matchesBreakpoint(lines[i], bp))) {
+      return i;
+    }
+  }
+  return -1;
+}
+```
+
+## 自動恢復執行
+```typescript
+function autoResumeExecution() {
+  if (detectTruncation(lastOutput)) {
+    const safePoint = findSafeBreakpoint(lastOutput);
+    const continuationPrompt = generateContinuation(safePoint);
+    
+    // 自動觸發續接
+    executeWithContinuation(continuationPrompt);
+  }
+}
+```
+
+## 上下文壓縮演算法
+```typescript
+interface CompressionStrategy {
+  preserveArchitecture: boolean;
+  compressImplementations: boolean;
+  keepVariableStates: boolean;
+  maintainDependencies: boolean;
+}
+
+function intelligentCompression(
+  context: string, 
+  strategy: CompressionStrategy
+): string {
+  let compressed = context;
+  
+  if (strategy.compressImplementations) {
+    // 將函數實作壓縮為簽名
+    compressed = compressed.replace(
+      /function\s+(\w+)[^{]*{[^}]+}/g, 
+      'function $1() { /* compressed */ }'
+    );
+  }
+  
+  if (strategy.preserveArchitecture) {
+    // 保留架構註解和interface
+    const architectureMarkers = extractArchitecture(compressed);
+    compressed = architectureMarkers + compressed;
+  }
+  
+  return compressed;
+}
+```
+
+## Token預算管理
+```typescript
+const TOKEN_BUDGET = {
+  context: 4000,
+  generation: 8000,
+  continuation: 2000,
+  safety_margin: 1000
+};
+
+function manageTokenBudget(currentUsage: number) {
+  if (currentUsage > TOKEN_BUDGET.context + TOKEN_BUDGET.generation) {
+    triggerCompression();
+  }
+  
+  if (currentUsage > TOKEN_BUDGET.safety_margin) {
+    prepareContinuation();
+  }
+}
+```
+
+## 執行保證機制
+```typescript
+function guaranteedExecution(task: string): Promise<string> {
+  let attempt = 0;
+  let result = '';
+  
+  while (!isComplete(result) && attempt < 5) {
+    try {
+      const continuation = attempt > 0 ? generateContinuation(result) : task;
+      result += await executeChunk(continuation);
+      attempt++;
+    } catch (tokenLimitError) {
+      result = handleTokenLimit(result);
+    }
+  }
+  
+  return result;
+}
+```
+
+## 關鍵設計原則
+- **永不中斷**: 自動偵測並續接
+- **智能壓縮**: 保留關鍵，壓縮細節  
+- **狀態保持**: 跨續接維持一致性
+- **品質保證**: 每次續接都驗證完整性
