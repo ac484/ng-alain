@@ -34,7 +34,7 @@ flowchart TD
 2. **IMPLEMENT**：實作遇到新 API/技術時查詢 context7
 3. **REFLECT/ARCHIVE**：回顧/文檔化時查詢 context7 對比最佳實踐
 4. **合併回應**：將 context7 結果與本地知識合併，標註來源
-5. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/Memory-Bank），提升下次命中率
+5. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/custom_modes），提升下次命中率
 
 ## 📝 範例命令/調用格式
 - `resolve-library-id`: 解析庫標識符
@@ -101,7 +101,7 @@ flowchart TD
 2. **IMPLEMENT**：實作遇到新 API/技術時查詢 context7
 3. **REFLECT/ARCHIVE**：回顧/文檔化時查詢 context7 對比最佳實踐
 4. **合併回應**：將 context7 結果與本地知識合併，標註來源
-5. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/Memory-Bank），提升下次命中率
+5. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/custom_modes），提升下次命中率
 
 ## 📝 範例命令/調用格式
 - `resolve-library-id`: 解析庫標識符
