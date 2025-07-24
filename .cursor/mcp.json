@@ -19,18 +19,13 @@
       ]
     },
     "context7": {
-      "command": "npx",
-      "args": [
-        "tsx",
-        "C:/Users/ac7x/Documents/GitHub/mcp/context7-master/src/index.ts"
-      ],
+      "url": "https://context7-mrioow.fly.dev/mcp",
       "disabled": false,
       "autoApprove": [
         "resolve-library-id",
         "get-library-docs",
-        "get-examples",
-        "build",
-        "*"
+        "topic",
+        "tokens"
       ]
     },
     "filesystem": {
