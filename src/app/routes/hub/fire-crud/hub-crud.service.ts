@@ -51,23 +51,65 @@ export class HubCrudService {
     await deleteDoc(ref);
   }
 
-  // 取得下一個唯一合約序號（企業級 counter，存於 hub/meta/counters/contractSerial）
+  // 取得下一個唯一合約序號（支援序號回收，存於 hub/meta/counters/contractSerial）
+  /**
+   * 取得下一個唯一合約序號（支援序號回收，存於 hub/meta/counters/contractSerial）
+   * Firestore 結構：
+   *   value: number // 目前最大序號
+   *   available: number[] // 可回收再用的序號（已排序，最小優先）
+   */
   async getNextContractSerial(): Promise<string> {
-    // Firestore 路徑：hub/meta/counters/contractSerial（企業級結構，偶數段）
     const counterRef = doc(this.firestore, 'hub/meta/counters/contractSerial');
     let nextValue = 1;
     await runTransaction(this.firestore, async transaction => {
       const counterSnap = await transaction.get(counterRef);
+      let value = 0;
+      let available: number[] = [];
       if (!counterSnap.exists()) {
-        transaction.set(counterRef, { value: 1 });
-        nextValue = 1;
+        value = 1;
+        available = [];
+        transaction.set(counterRef, { value, available });
+        nextValue = value;
       } else {
-        const current = counterSnap.data()['value'] || 0;
-        nextValue = current + 1;
-        transaction.update(counterRef, { value: nextValue });
+        const data = counterSnap.data();
+        value = data['value'] || 0;
+        available = Array.isArray(data['available']) ? [...data['available']] : [];
+        if (available.length > 0) {
+          // 取最小可用序號
+          available.sort((a, b) => a - b);
+          nextValue = available.shift()!;
+          transaction.update(counterRef, { available });
+        } else {
+          nextValue = value + 1;
+          transaction.update(counterRef, { value: nextValue });
+        }
       }
     });
     return 'C' + String(nextValue).padStart(5, '0');
+  }
+
+  /**
+   * 刪除合約時回收序號
+   * @param contractSerial 合約序號（如 C00001）
+   */
+  async recycleContractSerial(contractSerial: string): Promise<void> {
+    const num = Number(contractSerial.replace(/^C/, ''));
+    if (!num || isNaN(num)) return;
+    const counterRef = doc(this.firestore, 'hub/meta/counters/contractSerial');
+    await runTransaction(this.firestore, async transaction => {
+      const counterSnap = await transaction.get(counterRef);
+      if (!counterSnap.exists()) {
+        transaction.set(counterRef, { value: num, available: [num] });
+      } else {
+        const data = counterSnap.data();
+        let available: number[] = Array.isArray(data['available']) ? [...data['available']] : [];
+        if (!available.includes(num)) {
+          available.push(num);
+          available.sort((a, b) => a - b);
+          transaction.update(counterRef, { available });
+        }
+      }
+    });
   }
 
   // 取得業主清單與預設值

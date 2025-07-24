@@ -127,13 +127,6 @@ export const routes: Routes = [
     ]
   },
 
-  // 數據視覺化路由 - 使用空白佈局
-  {
-    path: 'data-v',
-    component: LayoutBlankComponent, // 空白佈局元件
-    children: [{ path: '', loadChildren: () => import('./data-v/routes').then(m => m.routes) }]
-  },
-
   // 認證模組路由 - 獨立配置
   { path: '', loadChildren: () => import('./passport/routes').then(m => m.routes) },
 

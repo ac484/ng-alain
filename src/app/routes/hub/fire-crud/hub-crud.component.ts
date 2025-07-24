@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -7,11 +7,14 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { HubCrudService } from './hub-crud.service';
 import { Contract } from '../models/hub.model';
 import { FabComponent } from '../basic/widget/fab.component';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 @Component({
   selector: 'hub-fire-crud',
   standalone: true,
-  imports: [FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, FabComponent],
+  imports: [FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, FabComponent, NzSelectModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-fab (onAction)="addRow()"></app-fab>
     <br /><br />
@@ -28,29 +31,99 @@ import { FabComponent } from '../basic/widget/fab.component';
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of contracts">
-          <td>
-            <input nz-input [(ngModel)]="data.contractSerial" (ngModelChange)="updateField(data, 'contractSerial', $event)" />
-          </td>
-          <td>
-            <input nz-input [(ngModel)]="data.client" (ngModelChange)="updateField(data, 'client', $event)" />
-          </td>
-          <td>
-            <input nz-input [(ngModel)]="data.contractName" (ngModelChange)="updateField(data, 'contractName', $event)" />
-          </td>
-          <td>
-            <input nz-input [(ngModel)]="data.contractCode" (ngModelChange)="updateField(data, 'contractCode', $event)" />
-          </td>
-          <td>
-            <input nz-input [(ngModel)]="data.feeCode" (ngModelChange)="updateField(data, 'feeCode', $event)" />
-          </td>
-          <td>
-            <input nz-input type="number" [(ngModel)]="data.amount" (ngModelChange)="updateField(data, 'amount', $event)" />
-          </td>
-          <td>
-            <a nz-popconfirm nzPopconfirmTitle="Sure to delete?" (nzOnConfirm)="deleteRow(data.key)">Delete</a>
-          </td>
-        </tr>
+        @for (data of editRowTable.data; track data) {
+          <tr class="editable-row">
+            <td>
+              <div class="editable-cell" [hidden]="editId === data.key" (click)="startEdit(data.key!, 'contractSerial')">
+                {{ data.contractSerial }}
+              </div>
+              <input
+                [hidden]="editId !== data.key || editField !== 'contractSerial'"
+                type="text"
+                nz-input
+                [(ngModel)]="editValue"
+                (blur)="stopEdit(data, 'contractSerial')"
+              />
+            </td>
+            <td>
+              <div class="editable-cell" [hidden]="editId === data.key && editField === 'client'" (click)="startEdit(data.key!, 'client')">
+                {{ data.client }}
+              </div>
+              <nz-select
+                *ngIf="editId === data.key && editField === 'client'"
+                [(ngModel)]="editValue"
+                (ngModelChange)="stopEdit(data, 'client')"
+                [nzOpen]="true"
+                nzSize="small"
+              >
+                <nz-option *ngFor="let c of clients" [nzValue]="c" [nzLabel]="c"></nz-option>
+              </nz-select>
+            </td>
+            <td>
+              <div
+                class="editable-cell"
+                [hidden]="editId === data.key && editField === 'contractName'"
+                (click)="startEdit(data.key!, 'contractName')"
+              >
+                {{ data.contractName }}
+              </div>
+              <input
+                [hidden]="editId !== data.key || editField !== 'contractName'"
+                type="text"
+                nz-input
+                [(ngModel)]="editValue"
+                (blur)="stopEdit(data, 'contractName')"
+              />
+            </td>
+            <td>
+              <div
+                class="editable-cell"
+                [hidden]="editId === data.key && editField === 'contractCode'"
+                (click)="startEdit(data.key!, 'contractCode')"
+              >
+                {{ data.contractCode }}
+              </div>
+              <input
+                [hidden]="editId !== data.key || editField !== 'contractCode'"
+                type="text"
+                nz-input
+                [(ngModel)]="editValue"
+                (blur)="stopEdit(data, 'contractCode')"
+              />
+            </td>
+            <td>
+              <div
+                class="editable-cell"
+                [hidden]="editId === data.key && editField === 'feeCode'"
+                (click)="startEdit(data.key!, 'feeCode')"
+              >
+                {{ data.feeCode }}
+              </div>
+              <input
+                [hidden]="editId !== data.key || editField !== 'feeCode'"
+                type="text"
+                nz-input
+                [(ngModel)]="editValue"
+                (blur)="stopEdit(data, 'feeCode')"
+              />
+            </td>
+            <td>
+              <div class="editable-cell" [hidden]="editId === data.key && editField === 'amount'" (click)="startEdit(data.key!, 'amount')">
+                {{ data.amount }}
+              </div>
+              <input
+                [hidden]="editId !== data.key || editField !== 'amount'"
+                type="number"
+                nz-input
+                [(ngModel)]="editValue"
+                (blur)="stopEdit(data, 'amount')"
+              />
+            </td>
+            <td>
+              <a nz-popconfirm nzPopconfirmTitle="Sure to delete?" (nzOnConfirm)="deleteRow(data.key)">Delete</a>
+            </td>
+          </tr>
+        }
       </tbody>
     </nz-table>
   `,
@@ -71,32 +144,81 @@ import { FabComponent } from '../basic/widget/fab.component';
 })
 export class HubFireCrudComponent implements OnInit {
   contracts: Contract[] = [];
+  editId: string | null = null;
+  editField: keyof Contract | null = null;
+  editValue: any = '';
+  clients: string[] = [];
 
-  constructor(private crud: HubCrudService) {}
+  constructor(
+    private crud: HubCrudService,
+    private message: NzMessageService
+  ) {}
 
   ngOnInit() {
-    this.crud.useCollection<Contract>('hub_contract').subscribe(data => (this.contracts = data));
+    this.crud.useCollection<Contract>('hub_contract').subscribe(data => {
+      this.contracts = [...data]; // immutable
+    });
+    // 取得業主清單
+    this.loadClients();
   }
 
-  addRow() {
+  async loadClients() {
+    const settings = await this.crud.getClientsSettings();
+    this.clients = settings?.list || [];
+  }
+
+  async addRow() {
+    // 並行取得預設業主與下一個合約序號
+    const [defaultClient, contractSerial] = await Promise.all([this.crud.getDefaultClient(), this.crud.getNextContractSerial()]);
     const newContract: Contract = {
-      contractSerial: '',
-      client: '',
+      contractSerial,
+      client: defaultClient,
       contractName: '',
       contractCode: '',
       feeCode: '',
       amount: 0
     };
-    this.crud.add<Contract>('hub_contract', newContract);
+    const id = await this.crud.add<Contract>('hub_contract', newContract);
+    // 取得新資料後自動進入編輯
+    setTimeout(() => {
+      this.startEdit(id, 'contractName');
+    }, 200);
   }
 
-  updateField(data: Contract, field: keyof Contract, value: any) {
-    if (!data.key) return;
-    this.crud.update<Contract>('hub_contract', data.key, { [field]: value });
+  startEdit(id: string | undefined, field: keyof Contract) {
+    if (!id) {
+      this.message.error('資料異常，請重新整理');
+      return;
+    }
+    this.editId = id;
+    this.editField = field;
+    const row = this.contracts.find(c => c.key === id);
+    this.editValue = row ? row[field] : '';
+    setTimeout(() => {
+      const input = document.querySelector('input[nz-input]:not([hidden])');
+      if (input) (input as HTMLInputElement).focus();
+    }, 50);
   }
 
-  deleteRow(id: string | undefined) {
+  async stopEdit(data: Contract, field: keyof Contract) {
+    if (data.key && this.editValue !== data[field]) {
+      const updated = { ...data, [field]: this.editValue };
+      this.contracts = this.contracts.map(c => (c.key === data.key ? updated : c));
+      await this.crud.update<Contract>('hub_contract', data.key, { [field]: this.editValue });
+    }
+    this.editId = null;
+    this.editField = null;
+    this.editValue = '';
+  }
+
+  async deleteRow(id: string | undefined) {
     if (!id) return;
-    this.crud.delete<Contract>('hub_contract', id);
+    const contract = this.contracts.find(d => d.key === id);
+    this.contracts = this.contracts.filter(d => d.key !== id);
+    await this.crud.delete<Contract>('hub_contract', id);
+    // 回收 contractSerial
+    if (contract?.contractSerial) {
+      await this.crud.recycleContractSerial(contract.contractSerial);
+    }
   }
 }
