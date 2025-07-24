@@ -9,7 +9,8 @@ import {
   updateDoc,
   deleteDoc,
   CollectionReference,
-  DocumentData
+  DocumentData,
+  runTransaction
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -20,7 +21,6 @@ export class HubCrudService {
   // 語法糖：取得集合（自動型別）
   useCollection<T extends { key?: string }>(collectionName: string): Observable<T[]> {
     const col = collection(this.firestore, collectionName) as CollectionReference<T>;
-    // idField: 'key' 只要 T 有 key 屬性即可
     return collectionData(col, { idField: 'key' as keyof T }) as Observable<T[]>;
   }
 
@@ -47,5 +47,24 @@ export class HubCrudService {
   async delete<T>(collectionName: string, id: string): Promise<void> {
     const ref = doc(this.firestore, collectionName, id);
     await deleteDoc(ref);
+  }
+
+  // 取得下一個唯一合約序號（企業級 counter，存於 hub/meta/counters/contractSerial）
+  async getNextContractSerial(): Promise<string> {
+    // Firestore 路徑：hub/meta/counters/contractSerial（企業級結構，偶數段）
+    const counterRef = doc(this.firestore, 'hub/meta/counters/contractSerial');
+    let nextValue = 1;
+    await runTransaction(this.firestore, async transaction => {
+      const counterSnap = await transaction.get(counterRef);
+      if (!counterSnap.exists()) {
+        transaction.set(counterRef, { value: 1 });
+        nextValue = 1;
+      } else {
+        const current = counterSnap.data()['value'] || 0;
+        nextValue = current + 1;
+        transaction.update(counterRef, { value: nextValue });
+      }
+    });
+    return 'C' + String(nextValue).padStart(5, '0');
   }
 }

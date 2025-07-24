@@ -58,6 +58,8 @@ export class HubFireCrudComponent implements OnDestroy {
   form: FormGroup;
   showForm = false;
   private destroy$ = new Subject<void>();
+  editKey: string | null = null;
+  editField: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -78,10 +80,22 @@ export class HubFireCrudComponent implements OnDestroy {
       .subscribe((data: Contract[]) => (this.contracts = data));
   }
 
-  handleFabAction(type: string) {
+  async handleFabAction(type: string) {
     if (type === 'add') {
-      this.showForm = !this.showForm;
-      if (this.showForm) this.form.reset();
+      // 自動產生唯一序號，建立空白合約
+      const serial = await this.crud.getNextContractSerial();
+      const newContract: Contract = {
+        contractSerial: serial,
+        client: '',
+        contractName: '',
+        contractCode: '',
+        feeCode: '',
+        amount: 0
+      };
+      const id = await this.crud.add<Contract>('hub_contract', newContract);
+      this.editKey = id;
+      this.editField = 'client'; // 可用於自動聚焦
+      this.showForm = false; // 不顯示表單，直接進入單格編輯
     }
   }
 

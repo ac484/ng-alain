@@ -11,6 +11,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { FabComponent } from '../basic/widget/fab/fab.component';
 import { CommonModule } from '@angular/common';
 import { Contract } from '../models/hub.model'; // 假設 Contract 型別已在 hub.model.ts 定義
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'hub-contract',
@@ -133,6 +134,8 @@ export class HubContractComponent {
   isSubmitting = false;
   form: FormGroup;
   showForm = false;
+  editKey: string | null = null;
+  editField: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -152,9 +155,21 @@ export class HubContractComponent {
     });
   }
 
-  handleFabAction(type: string) {
+  async handleFabAction(type: string) {
     if (type === 'add') {
-      this.toggleForm();
+      const serial = await this.hubCrud.getNextContractSerial();
+      const newContract: Contract = {
+        contractSerial: serial,
+        client: '',
+        contractName: '',
+        contractCode: '',
+        feeCode: '',
+        amount: 0
+      };
+      const id = await this.hubCrud.add<Contract>('hub_contract', newContract);
+      this.editKey = id;
+      this.editField = 'client';
+      this.showForm = false;
     }
   }
 
