@@ -78,26 +78,6 @@
               "i18n": "menu.tree.list"
             },
             {
-              "text": "Create Tree",
-              "link": "/tree/template/create",
-              "i18n": "menu.tree.create"
-            },
-            {
-              "text": "Tree Search",
-              "link": "/tree/template/search",
-              "i18n": "menu.tree.search"
-            },
-            {
-              "text": "Import/Export",
-              "link": "/tree/template/import-export",
-              "i18n": "menu.tree.import-export"
-            },
-            {
-              "text": "PDF Import",
-              "link": "/tree/template/pdf-import",
-              "i18n": "menu.tree.pdf-import"
-            },
-            {
               "text": "PDF Scan",
               "link": "/tree/pdf-scan",
               "i18n": "menu.tree.pdf-scan"
@@ -111,21 +91,6 @@
               "text": "Task Detail",
               "link": "/tree/task-detail",
               "i18n": "menu.tree.task-detail"
-            },
-            {
-              "text": "Tree Settings",
-              "link": "/tree/template/settings",
-              "i18n": "menu.tree.settings"
-            },
-            {
-              "text": "Drag",
-              "link": "/tree/template/drag",
-              "i18n": "menu.tree.drag"
-            },
-            {
-              "text": "Context Menu",
-              "link": "/tree/template/context",
-              "i18n": "menu.tree.context"
             },
             {
               "text": "TreePanel",
