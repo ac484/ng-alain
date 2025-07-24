@@ -1,21 +1,29 @@
 # Memory Bank: Active Context
 
-## 當前開發重點（2024-06-22）
-- contract-payment-list（多次請款子表格，嵌套於合約清單）
-- workflow-settings（動態審批流程設計器，支援多模板、拖拉、條件分支）
+## 合約模組現有上下文（2024-06-22）
 
-## 目前狀態
-- 型別設計已完成（contract-payment.model.ts、contract-workflow.model.ts）
-- contract-payment.service.ts、contract-workflow.service.ts 初稿完成，資料流/狀態機邏輯設計中
-- workflow-settings.component.ts UI/資料流設計進行中
-- contract-payment-list.component.ts 行內編輯/狀態流轉整合進行中
+### 主要檔案與分層
+- contract-list.component.ts：合約清單，行內編輯、業主切換、CRUD
+- contract-form.component.ts：合約表單，Reactive Form 驗證、欄位編輯
+- contract.component.ts：合約主元件，路由進入點/容器
+- contract.model.ts：Contract 型別定義
+- contract.service.ts：合約 CRUD、業主設定、合約序號管理
 
-## 遇到的挑戰
-- 資料流整合（合約/請款/流程模板多層嵌套）
-- 狀態機條件分支設計（流程模板彈性、狀態流轉驗證）
-- UI/Service 分層（避免耦合，型別安全）
+### 資料流與型別
+- UI 透過 ContractService 取得/操作合約資料，所有資料皆依賴 Contract 型別
+- 合約資料結構：key, contractSerial, client, contractName, contractCode, feeCode, amount
+- 合約序號、業主清單等業務邏輯集中於 Service
 
-## 下一步
-- 完成 service/service 單元測試
-- 完成 UI prototype（contract-payment-list、workflow-settings）
-- 持續同步 Memory Bank 文件，記錄設計決策、狀態機範本、資料結構 
+### 現有優缺點
+- 分層清楚，型別安全，UI/Service 分離，業務邏輯集中
+- 但尚未有多次請款、動態審批等新需求的型別、Service、UI
+- 合約資料為單層結構，無嵌套子表格與流程欄位
+
+### 與其他模組關聯
+- HubCrudService：底層 Firestore CRUD
+- FabComponent：浮動按鈕，觸發新增
+- settings.component.ts：呼叫 ContractService 取得/設定業主清單
+
+---
+
+> 本摘要為後續 Memory Bank 文件、型別設計、功能擴充的基礎，請隨時同步更新。 

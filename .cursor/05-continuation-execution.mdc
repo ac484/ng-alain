@@ -1,0 +1,22 @@
+---
+alwaysApply: true
+---
+# Token Limit Breakthrough Execution
+
+## Automatic Truncation Detection & Recovery
+
+### Detection Patterns
+```javascript
+const TRUNCATION_INDICATORS = {
+  incomplete_angular_component: /export class \w+Component.*{[^}]*$/,
+  missing_closing_braces: /{\s*$/,
+  interrupted_function: /\w+\([^)]*\)\s*{[^}]*$/,
+  partial_template: /template:\s*`[^`]*$/,
+  broken_import: /import.*from\s*$/
+};
+
+function detectTruncation(output) {
+  return Object.values(TRUNCATION_INDICATORS).some(pattern =>
+    pattern.test(output.trim())
+  );
+}

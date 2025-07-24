@@ -1,0 +1,30 @@
+---
+alwaysApply: true
+---
+# Performance Monitoring & Optimization
+
+## Token Usage Optimization
+
+### Efficiency Metrics
+- **Token efficiency**: Output quality per token used
+- **Continuation success rate**: Seamless resumption percentage
+- **Context retention**: Information preserved across cycles
+- **Mode transition speed**: Time between mode switches
+
+### Memory-Bank Size Management
+```javascript
+const MEMORY_LIMITS = {
+  activeContext: 2000,      // tokens
+  taskTracking: 5000,       // tokens
+  fileStructure: 3000,      // tokens
+  patterns: 4000,           // tokens
+  continuationState: 1500   // tokens
+};
+
+function optimizeMemoryBank() {
+  Object.entries(MEMORY_LIMITS).forEach(([file, limit]) => {
+    if (getFileSize(file) > limit) {
+      compressFile(file, limit * 0.8);
+    }
+  });
+}

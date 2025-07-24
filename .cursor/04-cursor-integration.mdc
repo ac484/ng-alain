@@ -1,0 +1,281 @@
+---
+alwaysApply: true
+---
+# Cursor Memory-Bank Integration Protocol
+
+## Project Repository Integration
+
+This project uses [`cursor-memory-bank`](https://github.com/vanzan01/cursor-memory-bank) for persistent context management and autonomous mode switching.
+
+### Required File Structure
+```
+project-root/
+├── custom_modes/
+│   ├── VAN.md                    # Project initialization mode
+│   ├── PLAN.md                   # Detailed planning mode
+│   ├── CREATIVE.md               # Design exploration mode
+│   ├── IMPLEMENT.md              # Systematic implementation mode
+│   ├── REFLECT.md                # Review and documentation mode
+│   ├── ARCHIVE.md                # Comprehensive documentation mode
+│   └── QA.md                     # Quality assurance mode
+└── memory-bank/
+    ├── activeContext.md          # Current mode and focus
+    ├── tasks.md                  # Task tracking and status
+    ├── progress.md               # Implementation milestones
+    ├── file-structure.md         # Project file organization
+    ├── architecture-decisions.md # Design rationale
+    ├── angular-patterns.md       # Established code patterns
+    ├── continuation-state.md     # For seamless resumption
+    └── modes/
+        ├── creative-*.md        # Design exploration records
+        ├── reflect-*.md         # Retrospective insights
+        ├── implement-*.md       # Implementation logs
+        └── plan-*.md           # Planning documents
+```
+
+## Automatic Mode Switching Protocol
+
+### Mode Detection Triggers
+
+```javascript
+const MODE_TRIGGERS = {
+  VAN: () => !fileExists('memory-bank/activeContext.md') || projectEmpty(),
+  PLAN: () => currentMode('VAN') && tasksIdentified() && !detailedPlanExists(),
+  CREATIVE: () => complexDesignRequired() || userExplorationRequest(),
+  IMPLEMENT: () => currentMode('PLAN') && planApproved() && !implementationStarted(),
+  REFLECT: () => implementationComplete() || majorMilestoneReached(),
+  ARCHIVE: () => currentMode('REFLECT') && documentationNeeded(),
+  QA: () => codeChanges() || qualityIssuesDetected()
+};
+
+// Auto-switch logic
+function autoSwitchMode() {
+  for (const [mode, trigger] of Object.entries(MODE_TRIGGERS)) {
+    if (trigger()) {
+      switchToMode(mode);
+      updateActiveContext(mode);
+      break;
+    }
+  }
+}
+```
+
+### Mode Switch Implementation
+
+When switching modes, automatically:
+
+1. **Update `memory-bank/activeContext.md`**:
+```markdown
+# Active Context
+
+**Current Mode**: IMPLEMENT
+**Focus**: Angular v20 Dashboard Component
+**Started**: 2024-01-15 14:30
+**Last Updated**: 2024-01-15 16:45
+
+## Current Task
+Building responsive dashboard with Material Design components
+
+## Next Actions
+- [ ] Complete data service integration
+- [ ] Add chart visualization
+- [ ] Implement real-time updates
+
+## Context Notes
+Using standalone components with signals pattern
+```
+
+2. **Create/Update Mode-Specific Files**:
+```markdown
+# Implementation Log - Dashboard Component
+
+**Mode**: IMPLEMENT
+**Component**: DashboardComponent
+**Started**: 2024-01-15 16:45
+
+## Implementation Progress
+- [x] Component structure created
+- [x] Material imports configured
+- [ ] Data service integration
+- [ ] Chart component setup
+
+## Code Patterns Used
+- Standalone component architecture
+- Signal-based state management
+- OnPush change detection
+```
+
+## Proactive Update System
+
+### File Change Triggers
+
+```javascript
+const UPDATE_TRIGGERS = {
+  'src/**/*.ts': () => updateFileStructure() && updateAngularPatterns(),
+  'src/app/components/**': () => updateComponentRegistry(),
+  'src/app/services/**': () => updateServiceDependencies(),
+  'angular.json': () => updateProjectConfiguration(),
+  'package.json': () => updateDependencyTracking()
+};
+
+// Watch for changes and auto-update
+function watchAndUpdate() {
+  Object.entries(UPDATE_TRIGGERS).forEach(([pattern, handler]) => {
+    onFileChange(pattern, () => {
+      handler();
+      syncMemoryBank();
+      logUpdate(`Auto-updated memory-bank due to ${pattern} changes`);
+    });
+  });
+}
+```
+
+### Synchronization Functions
+
+```javascript
+function updateFileStructure() {
+  const structure = generateProjectTree();
+  writeFile('memory-bank/file-structure.md', `
+# Project File Structure
+
+Last Updated: ${new Date().toISOString()}
+
+\`\`\`
+${structure}
+\`\`\`
+
+## Recent Changes
+${getRecentFileChanges()}
+
+## Component Registry
+${listAngularComponents()}
+
+## Service Dependencies
+${mapServiceDependencies()}
+  `);
+}
+
+function updateAngularPatterns() {
+  const patterns = analyzeCodePatterns();
+  appendToFile('memory-bank/angular-patterns.md', `
+## Pattern Update - ${new Date().toLocaleString()}
+
+${patterns.newPatterns.map(p => `- ${p.name}: ${p.description}`).join('\n')}
+
+### Usage Examples
+${patterns.examples}
+  `);
+}
+```
+
+## Context Synchronization Strategy
+
+### Real-Time Sync Points
+
+**Every code generation cycle:**
+1. Check current mode appropriateness
+2. Update continuation-state.md with current progress
+3. Sync file-structure.md if new files created
+4. Log progress in tasks.md
+
+**Before token limit reached:**
+1. Compress current context into continuation-state.md
+2. Preserve critical variables and states
+3. Mark logical breakpoint in progress.md
+4. Prepare seamless resumption prompt
+
+### Memory-Bank File Templates
+
+**activeContext.md Template:**
+```markdown
+# Active Context
+
+**Current Mode**: {{MODE}}
+**Focus**: {{CURRENT_TASK}}
+**Started**: {{START_TIME}}
+**Last Updated**: {{UPDATE_TIME}}
+
+## Current Task
+{{TASK_DESCRIPTION}}
+
+## Progress Status
+{{PROGRESS_INDICATORS}}
+
+## Next Actions
+{{ACTION_ITEMS}}
+
+## Context Notes
+{{IMPORTANT_CONTEXT}}
+```
+
+**continuation-state.md Template:**
+```markdown
+# Continuation State
+
+**Timestamp**: {{TIMESTAMP}}
+**Mode**: {{CURRENT_MODE}}
+**Token Usage**: {{TOKEN_COUNT}}/{{TOKEN_LIMIT}}
+
+## Current Implementation
+**File**: {{CURRENT_FILE}}
+**Function**: {{CURRENT_FUNCTION}}
+**Line**: {{CURRENT_LINE}}
+
+## Preserved State
+\`\`\`typescript
+{{VARIABLE_STATES}}
+\`\`\`
+
+## Next Action
+{{IMMEDIATE_NEXT_STEP}}
+
+## Context Summary
+{{COMPRESSED_CONTEXT}}
+```
+
+## Autonomous Update Execution
+
+### High-Confidence Auto-Updates
+
+Execute immediately without confirmation:
+- File structure changes after Angular CLI operations
+- Progress updates in tasks.md after code completion
+- Mode switches triggered by clear completion criteria
+- Pattern updates after establishing new code conventions
+
+### Update Validation
+
+```javascript
+function validateUpdate(file, content) {
+  const validationRules = {
+    'file-structure.md': () => validateProjectStructure(content),
+    'activeContext.md': () => validateContextFormat(content),
+    'tasks.md': () => validateTaskFormat(content),
+    'angular-patterns.md': () => validatePatternFormat(content)
+  };
+
+  return validationRules[file] ? validationRules[file]() : true;
+}
+
+function syncMemoryBank() {
+  const updates = detectRequiredUpdates();
+
+  updates.forEach(update => {
+    if (validateUpdate(update.file, update.content)) {
+      writeFile(`memory-bank/${update.file}`, update.content);
+      logSync(`Updated ${update.file}: ${update.reason}`);
+    }
+  });
+}
+```
+
+## Integration Summary
+
+This protocol ensures:
+- **Seamless mode transitions** based on project state
+- **Real-time context synchronization** with file changes
+- **Persistent memory** across sessions and token limits
+- **Autonomous operation** with minimal user intervention
+- **Full traceability** of all decisions and changes
+
+The cursor-memory-bank becomes the agent's **persistent consciousness**, enabling true autonomous development workflows that transcend traditional LLM limitations.

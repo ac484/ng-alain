@@ -1,0 +1,36 @@
+---
+alwaysApply: true
+---
+# Angular v20 Implementation Templates
+
+## Continuation-Safe Component Template
+```typescript
+// CONTINUATION_SAFE: Standalone Component Pattern
+import { Component, signal, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+
+@Component({
+  selector: 'app-{{component-name}}',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatCardModule
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <mat-card class="{{component-name}}-container">
+      <!-- CONTINUATION_POINT: Template content -->
+    </mat-card>
+  `,
+  styles: [`
+    .{{component-name}}-container {
+      /* CONTINUATION_POINT: Styles */
+    }
+  `]
+})
+export class {{ComponentName}}Component {
+  // CONTINUATION_POINT: Component logic
+}

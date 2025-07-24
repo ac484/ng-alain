@@ -1,0 +1,32 @@
+---
+alwaisApply: true
+---
+# Autonomous Quality Assurance
+
+## Code Quality Gates
+
+### Automatic Validation Triggers
+- Every component generation
+- Before mode transitions
+- After continuation cycles
+- On file structure changes
+
+### Angular v20 Compliance Checks
+```javascript
+const QUALITY_RULES = {
+  standalone_components: /standalone:\s*true/,
+  signal_usage: /signal\(.*\)/,
+  onpush_detection: /OnPush/,
+  proper_imports: /import.*from '@angular/,
+  material_integration: /Mat\w+Module/
+};
+
+function validateAngularCode(code) {
+  const violations = [];
+  Object.entries(QUALITY_RULES).forEach(([rule, pattern]) => {
+    if (!pattern.test(code)) {
+      violations.push(`Missing: ${rule}`);
+    }
+  });
+  return violations;
+}
