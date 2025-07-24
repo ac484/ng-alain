@@ -10,7 +10,9 @@ import {
   deleteDoc,
   CollectionReference,
   DocumentData,
-  runTransaction
+  runTransaction,
+  getDoc,
+  setDoc
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
@@ -66,5 +68,25 @@ export class HubCrudService {
       }
     });
     return 'C' + String(nextValue).padStart(5, '0');
+  }
+
+  // 取得業主清單與預設值
+  async getClientsSettings(): Promise<{ list: string[]; default: string } | null> {
+    const ref = doc(this.firestore, 'hub/meta/settings/clients');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return snap.data() as { list: string[]; default: string };
+  }
+
+  // 設定業主清單與預設值
+  async setClientsSettings(data: { list: string[]; default: string }): Promise<void> {
+    const ref = doc(this.firestore, 'hub/meta/settings/clients');
+    await setDoc(ref, data);
+  }
+
+  // 取得預設業主
+  async getDefaultClient(): Promise<string> {
+    const settings = await this.getClientsSettings();
+    return settings?.default || '';
   }
 }

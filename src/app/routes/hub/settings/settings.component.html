@@ -1,4 +1,22 @@
 <div class="settings-page">
   <h2>系統設定（Settings）</h2>
-  <p>這裡是系統設定的佔位內容。</p>
+  <section class="client-settings">
+    <h3>業主清單管理</h3>
+    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+      <input nz-input placeholder="新增業主" [(ngModel)]="clientInput" (keyup.enter)="addClient()" style="width: 180px;" />
+      <button nz-button nzType="primary" (click)="addClient()" [disabled]="!clientInput.trim()">新增</button>
+    </div>
+    <ul style="padding-left: 0; list-style: none;">
+      <li *ngFor="let client of clients" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+        <span>{{ client }}</span>
+        <button nz-button nzType="default" nzSize="small" (click)="removeClient(client)">刪除</button>
+      </li>
+    </ul>
+    <div style="margin-top: 12px;">
+      <label>預設業主：</label>
+      <nz-select [(ngModel)]="defaultClient" (ngModelChange)="setDefaultClient($event)" style="width: 180px;">
+        <nz-option *ngFor="let client of clients" [nzValue]="client" [nzLabel]="client"></nz-option>
+      </nz-select>
+    </div>
+  </section>
 </div>

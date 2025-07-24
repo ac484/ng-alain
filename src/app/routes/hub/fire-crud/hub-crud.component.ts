@@ -84,9 +84,10 @@ export class HubFireCrudComponent implements OnDestroy {
     if (type === 'add') {
       // 自動產生唯一序號，建立空白合約
       const serial = await this.crud.getNextContractSerial();
+      const defaultClient = await this.crud.getDefaultClient();
       const newContract: Contract = {
         contractSerial: serial,
-        client: '',
+        client: defaultClient,
         contractName: '',
         contractCode: '',
         feeCode: '',

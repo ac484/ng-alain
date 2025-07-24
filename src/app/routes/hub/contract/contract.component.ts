@@ -158,9 +158,10 @@ export class HubContractComponent {
   async handleFabAction(type: string) {
     if (type === 'add') {
       const serial = await this.hubCrud.getNextContractSerial();
+      const defaultClient = await this.hubCrud.getDefaultClient();
       const newContract: Contract = {
         contractSerial: serial,
-        client: '',
+        client: defaultClient,
         contractName: '',
         contractCode: '',
         feeCode: '',
