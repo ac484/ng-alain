@@ -93,3 +93,4 @@
 - `nz-segmented`（分段控制）
 - `nz-resizable`（可調整大小）
 - `nz-qrcode`（二維碼） 
+ 
