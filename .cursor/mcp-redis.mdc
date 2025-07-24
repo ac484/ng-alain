@@ -57,7 +57,7 @@ flowchart TD
 - ARCHIVE：週期性自動清理
 
 ## 🔗 整合建議
-- 在各 custom_modes/memory-bank 的查詢/積累步驟自動觸發 redis-mcp
+- 在各 memory-bank 的查詢/積累步驟自動觸發 redis-mcp
 - 每個 mode 進入/切換時自動同步高頻知識至 Redis
 - 定期自動清理過期/低質量資料，維持 Redis 健康
 
@@ -179,7 +179,7 @@ flowchart TD
 - ARCHIVE：週期性自動清理
 
 ## 🔗 整合建議
-- 在各 custom_modes 的查詢/積累步驟自動觸發 redis-mcp
+- 在各 memory-bank 的查詢/積累步驟自動觸發 redis-mcp
 - 每個 mode 進入/切換時自動同步高頻知識至 Redis
 - 定期自動清理過期/低質量資料，維持 Redis 健康
 
