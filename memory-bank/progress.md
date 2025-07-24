@@ -1,13 +1,17 @@
 # Memory Bank: Progress
 
-## Overall Progress
-[請填寫目前專案的整體進度百分比與階段]
+## 整體進度（2024-06-22）
+- 30%（型別設計、service 初稿完成，UI/資料流/狀態機設計中）
 
-## Completed Milestones
-- [YYYY-MM-DD] [已完成的里程碑/功能]
+## 已完成
+- [2024-06-20] 完成 contract-payment.model.ts、contract-workflow.model.ts 型別設計
+- [2024-06-21] 完成 contract-payment.service.ts、contract-workflow.service.ts 初稿
 
-## In Progress
-- [YYYY-MM-DD] [進行中的功能/模組]
+## 進行中
+- [2024-06-22] workflow-settings.component.ts UI/資料流設計
+- [2024-06-22] contract-payment-list.component.ts 行內編輯/狀態流轉整合
 
-## Next Steps
-- [YYYY-MM-DD] [下一步計畫] 
+## 下一步
+- [2024-06-23] 完成 service/service 測試
+- [2024-06-23] 完成 UI prototype
+- [2024-06-23] Memory Bank 文件同步 

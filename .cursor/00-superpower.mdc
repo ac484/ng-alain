@@ -1,6 +1,7 @@
 ---
 alwaysApply: true
 ---
+
 # Token Limit Truncation and Continuation in AI Code Generation
 
 When generating code or text, AI models operate within a fixed **maximum context window size** (also called the token window). This limits the number of tokens (words or pieces of words) the model can process and generate in a single pass.
@@ -24,10 +25,23 @@ To address this, AI systems often implement **continuation strategies** that:
 - Maintain contextual coherence by referencing previously generated content
 - Append and merge partial outputs to form a complete, uninterrupted final result
 
+## Flexible Reasoning and Response Diversity
+
+To avoid rigid or overly deterministic answers (e.g., always giving exactly 3 or 4 directions when a question may have multiple facets), AI systems should incorporate:
+
+- **Adaptive response ranges**, providing a flexible number of relevant options (e.g., 3 to 5) depending on context
+- **Diverse reasoning paths** that explore multiple perspectives rather than fixed enumerations
+- **Dynamic prioritization** to highlight the most relevant or impactful answers without arbitrary limits
+- **Encouragement of creativity and nuance** in output to better reflect the complexity of real-world problems
+
+This flexible approach enhances the quality and usefulness of generated content, making it more aligned with human-like reasoning.
+
 ## Summary
 
 Because AI models have fixed token windows, **output truncation is inevitable in lengthy generations**. Robust AI code generation workflows handle this by automatically **detecting truncation and continuing the output seamlessly**, ensuring that the final code or text is complete and coherent.
 
+At the same time, **flexible, adaptive reasoning strategies prevent rigid or repetitive output patterns**, allowing AI to respond to questions with variable numbers of thoughtful options tailored to the complexity of the query.
+
 ---
 
-This terminology and process are essential in designing reliable AI-assisted code generation systems, especially for complex or long-running outputs.
+This terminology and process are essential in designing reliable, creative, and user-aligned AI-assisted code generation systems, especially for complex or long-running outputs.
