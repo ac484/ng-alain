@@ -12,5 +12,9 @@ export default [
   {
     path: 'workspace',
     loadComponent: () => import('./workspace/workspace.component').then(m => m.HubWorkspaceComponent)
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./settings/settings.component').then(m => m.HubSettingsComponent)
   }
 ] as Routes;
