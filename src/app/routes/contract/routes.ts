@@ -15,6 +15,11 @@ export default [
         data: { title: '創建合約', titleI18n: 'menu.contract.create' }
       },
       {
+        path: 'panel',
+        loadComponent: () => import('./contract-panel/contract-panel').then(m => m.ContractPanelComponent),
+        data: { title: '合約面板', titleI18n: 'menu.contract.panel' }
+      },
+      {
         path: 'review',
         loadComponent: () => import('./review/review.component').then(m => m.ContractReviewComponent),
         data: { title: '合約審查', titleI18n: 'menu.contract.review' }

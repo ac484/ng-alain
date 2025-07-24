@@ -1,0 +1,84 @@
+<nz-card *ngIf="contract" [nzLoading]="loading">
+  <!-- 合約摘要區 -->
+  <div class="panel-summary">
+    <div class="panel-title">{{ contract.title }}</div>
+    <div class="panel-meta">
+      <nz-tag [nzColor]="getStatusColor(contract.status)">{{ getStatusText(contract.status) }}</nz-tag>
+      <span>金額：{{ contract.currentAmount | currency: 'TWD' : 'symbol' : '1.0-0' }}</span>
+      <span>進度：</span>
+      <nz-progress [nzPercent]="contract.progress" [nzStatus]="getProgressStatus(contract.progress)" [nzStrokeWidth]="12" style="width: 120px;"></nz-progress>
+    </div>
+    <div class="panel-actions">
+      <button nz-button nzType="primary">編輯</button>
+      <button nz-button>新增請款</button>
+      <button nz-button>新增變更</button>
+      <button nz-button>上傳附件</button>
+      <button nz-button>審核</button>
+    </div>
+  </div>
+  <nz-tabset>
+    <nz-tab nzTitle="請款摘要">
+      <ng-container *ngIf="contract.paymentRounds?.length; else noPayment">
+        <table class="panel-table">
+          <thead>
+            <tr>
+              <th>輪次</th><th>金額</th><th>進度</th><th>請款狀態</th><th>付款狀態</th><th>日期</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of contract.paymentRounds">
+              <td>{{ p.round }}</td>
+              <td>{{ p.amount | currency: 'TWD' : 'symbol' : '1.0-0' }}</td>
+              <td><nz-progress [nzPercent]="p.progress" [nzSize]="'small'" [nzShowInfo]="false"></nz-progress> {{ p.progress }}%</td>
+              <td><nz-tag [nzColor]="p.paymentStatus === 'completed' ? 'success' : 'processing'">{{ p.paymentStatus }}</nz-tag></td>
+              <td><nz-tag [nzColor]="p.status === 'paid' ? 'success' : 'default'">{{ p.status === 'paid' ? '已付款' : '待付款' }}</nz-tag></td>
+              <td>{{ p.date | date: 'yyyy-MM-dd' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>
+      <ng-template #noPayment><div class="panel-empty">尚無請款資料</div></ng-template>
+    </nz-tab>
+    <nz-tab nzTitle="變更摘要">
+      <ng-container *ngIf="contract.changes?.length; else noChange">
+        <table class="panel-table">
+          <thead>
+            <tr><th>類型</th><th>描述</th><th>金額</th><th>版本</th><th>日期</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of contract.changes">
+              <td><nz-tag [nzColor]="c.type === '追加' ? 'success' : 'error'">{{ c.type }}</nz-tag></td>
+              <td>{{ c.description }}</td>
+              <td>{{ c.amount | currency: 'TWD' : 'symbol' : '1.0-0' }}</td>
+              <td>{{ c.version }}</td>
+              <td>{{ c.date | date: 'yyyy-MM-dd' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>
+      <ng-template #noChange><div class="panel-empty">尚無變更紀錄</div></ng-template>
+    </nz-tab>
+    <nz-tab nzTitle="附件">
+      <ng-container *ngIf="contract.attachments?.length; else noAttachment">
+        <ul class="panel-attachment-list">
+          <li *ngFor="let a of contract.attachments">
+            <span>{{ a.name }}</span>
+            <button nz-button nzType="link" nzSize="small">預覽</button>
+            <button nz-button nzType="link" nzSize="small">下載</button>
+          </li>
+        </ul>
+      </ng-container>
+      <ng-template #noAttachment><div class="panel-empty">尚無附件</div></ng-template>
+    </nz-tab>
+    <nz-tab nzTitle="審核">
+      <div class="panel-review">
+        <div>狀態：<nz-tag [nzColor]="getStatusColor(contract.status)">{{ getStatusText(contract.status) }}</nz-tag></div>
+        <div>審核歷史：
+          <ul>
+            <li *ngFor="let r of contract.reviews">{{ r.date | date: 'yyyy-MM-dd' }} - {{ r.reviewer }} - {{ r.status }}</li>
+          </ul>
+        </div>
+      </div>
+    </nz-tab>
+  </nz-tabset>
+</nz-card>
