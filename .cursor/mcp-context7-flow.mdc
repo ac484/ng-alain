@@ -1,0 +1,139 @@
+---
+alwaysApply: true
+globs: mcp-context7-flow.mdc
+---
+
+
+## 🧩 與 Cursor custom modes 的對應關係
+
+| Custom Mode | 主要行為         | context7-flow 參與方式         |
+|-------------|------------------|-------------------------------|
+| VAN         | 知識查詢         | 自動查詢 context7，補全知識缺口 |
+| PLAN        | 規劃/查缺補漏    | 查詢 context7，補足規劃依據     |
+| CREATIVE    | 設計決策         | 查詢 context7，獲取設計範例     |
+| IMPLEMENT   | 實作/同步        | 查詢 context7，積累新知識       |
+| REFLECT     | 回顧/優化        | 查詢 context7，對比最佳實踐     |
+| ARCHIVE     | 文檔化           | context7 查詢歷史知識           |
+
+## 🗺️ 流程圖
+```mermaid
+flowchart TD
+    VAN[🔍 VAN: 知識查詢] -->|信心低| context7[查 context7]
+    PLAN[📋 PLAN: 規劃查缺] -->|需補全| context7
+    CREATIVE[🎨 CREATIVE: 設計查詢] -->|需範例| context7
+    IMPLEMENT[⚒️ IMPLEMENT: 實作查詢] -->|需補充| context7
+    REFLECT[🔍 REFLECT: 回顧查詢] -->|需對比| context7
+    ARCHIVE[📦 ARCHIVE: 歷史查詢] -->|需補全| context7
+    context7 --> 合併[合併本地與 context7 結果]
+    合併 --> 回應[回傳合併答案]
+    context7 -->|查到新知| 積累[積累回本地知識庫]
+```
+
+## ✅ 標準步驟（對應各 mode）
+1. **VAN/PLAN/CREATIVE**：遇到知識缺口、信心分數低時自動查詢 context7
+2. **IMPLEMENT**：實作遇到新 API/技術時查詢 context7
+3. **REFLECT/ARCHIVE**：回顧/文檔化時查詢 context7 對比最佳實踐
+4. **合併回應**：將 context7 結果與本地知識合併，標註來源
+5. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/Memory-Bank），提升下次命中率
+
+## 📝 範例命令/調用格式
+- `resolve-library-id`: 解析庫標識符
+- `get-library-docs`: 獲取庫文檔
+- `get-examples`: 獲取程式碼範例
+- `build`: 執行建構流程
+
+## 🌟 最佳實踐
+- 先解析庫ID確保目標正確
+- 組合使用文檔與範例提升理解
+- 建構前確認依賴項完整
+- 查詢結果自動積累回本地知識庫
+- 合併回應時標註來源，讓用戶可辨識新舊知識
+
+## 🚦 典型觸發情境
+- VAN：遇到未知 API、自動查詢 context7
+- PLAN：規劃新功能時，查詢 context7 補足依據
+- CREATIVE：設計新元件時，查詢 context7 取得範例
+- IMPLEMENT：實作過程遇到新問題時查詢 context7
+- REFLECT：回顧 bug 或優化時查詢 context7
+- ARCHIVE：文檔化時查詢 context7 歷史知識
+
+## 🔗 整合建議
+- 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 context7-flow
+- 查詢結果自動積累回本地知識庫（memory-bank/redis）
+- 推薦於每個 mode 進入時自動檢查知識缺口並觸發 context7 查詢
+
+[[calls]]
+match = """context7|library docs|get examples|resolve library"""
+tool = "context7"
+
+
+[[calls]]
+match = """context7|library docs|get examples|resolve library"""
+tool = "context7"
+
+## 🧩 與 Cursor custom modes 的對應關係
+
+| Custom Mode | 主要行為         | context7-flow 參與方式         |
+|-------------|------------------|-------------------------------|
+| VAN         | 知識查詢         | 自動查詢 context7，補全知識缺口 |
+| PLAN        | 規劃/查缺補漏    | 查詢 context7，補足規劃依據     |
+| CREATIVE    | 設計決策         | 查詢 context7，獲取設計範例     |
+| IMPLEMENT   | 實作/同步        | 查詢 context7，積累新知識       |
+| REFLECT     | 回顧/優化        | 查詢 context7，對比最佳實踐     |
+| ARCHIVE     | 文檔化           | context7 查詢歷史知識           |
+
+## 🗺️ 流程圖
+```mermaid
+flowchart TD
+    VAN[🔍 VAN: 知識查詢] -->|信心低| context7[查 context7]
+    PLAN[📋 PLAN: 規劃查缺] -->|需補全| context7
+    CREATIVE[🎨 CREATIVE: 設計查詢] -->|需範例| context7
+    IMPLEMENT[⚒️ IMPLEMENT: 實作查詢] -->|需補充| context7
+    REFLECT[🔍 REFLECT: 回顧查詢] -->|需對比| context7
+    ARCHIVE[📦 ARCHIVE: 歷史查詢] -->|需補全| context7
+    context7 --> 合併[合併本地與 context7 結果]
+    合併 --> 回應[回傳合併答案]
+    context7 -->|查到新知| 積累[積累回本地知識庫]
+```
+
+## ✅ 標準步驟（對應各 mode）
+1. **VAN/PLAN/CREATIVE**：遇到知識缺口、信心分數低時自動查詢 context7
+2. **IMPLEMENT**：實作遇到新 API/技術時查詢 context7
+3. **REFLECT/ARCHIVE**：回顧/文檔化時查詢 context7 對比最佳實踐
+4. **合併回應**：將 context7 結果與本地知識合併，標註來源
+5. **知識積累**：查到新知時，自動積累回本地知識庫（如 Redis/Memory-Bank），提升下次命中率
+
+## 📝 範例命令/調用格式
+- `resolve-library-id`: 解析庫標識符
+- `get-library-docs`: 獲取庫文檔
+- `get-examples`: 獲取程式碼範例
+- `build`: 執行建構流程
+
+## 🌟 最佳實踐
+- 先解析庫ID確保目標正確
+- 組合使用文檔與範例提升理解
+- 建構前確認依賴項完整
+- 查詢結果自動積累回本地知識庫
+- 合併回應時標註來源，讓用戶可辨識新舊知識
+
+## 🚦 典型觸發情境
+- VAN：遇到未知 API、自動查詢 context7
+- PLAN：規劃新功能時，查詢 context7 補足依據
+- CREATIVE：設計新元件時，查詢 context7 取得範例
+- IMPLEMENT：實作過程遇到新問題時查詢 context7
+- REFLECT：回顧 bug 或優化時查詢 context7
+- ARCHIVE：文檔化時查詢 context7 歷史知識
+
+## 🔗 整合建議
+- 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 context7-flow
+- 查詢結果自動積累回本地知識庫（memory-bank/redis）
+- 推薦於每個 mode 進入時自動檢查知識缺口並觸發 context7 查詢
+
+[[calls]]
+match = """context7|library docs|get examples|resolve library"""
+tool = "context7"
+
+
+[[calls]]
+match = """context7|library docs|get examples|resolve library"""
+tool = "context7"

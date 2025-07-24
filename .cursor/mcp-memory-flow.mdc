@@ -1,0 +1,183 @@
+---
+alwaysApply: true
+globs: mcp-memory-flow.mdc
+---
+
+
+## 🧩 與 Cursor custom modes 的對應關係
+
+| Custom Mode | 主要行為         | memory-flow 參與方式                |
+|-------------|------------------|-------------------------------------|
+| VAN         | 狀態初始化/查詢  | 讀取 session/activeContext，補全上下文 |
+| PLAN        | 規劃/決策        | 寫入/更新 session，積累新規劃/決策     |
+| CREATIVE    | 設計/多方案      | 設計決策同步至 session/memory-bank    |
+| IMPLEMENT   | 進度/狀態同步    | 實作進度、bug、技術債同步至 session   |
+| REFLECT     | 回顧/優化        | 回顧教訓、優化建議積累至 session      |
+| ARCHIVE     | 歷史/清理        | 歷史狀態歸檔、過時記憶自動清理        |
+
+## 🗺️ 流程圖
+```mermaid
+flowchart TD
+    VAN[🔍 VAN: 狀態查詢] --> session[讀取 session/activeContext]
+    PLAN[📋 PLAN: 規劃決策] --> session[寫入/更新 session]
+    CREATIVE[🎨 CREATIVE: 設計決策] --> session[同步設計至 session]
+    IMPLEMENT[⚒️ IMPLEMENT: 進度同步] --> session[同步進度/bug]
+    REFLECT[🔍 REFLECT: 回顧優化] --> session[積累教訓/優化]
+    ARCHIVE[📦 ARCHIVE: 歷史清理] --> 清理[自動清理/歸檔]
+    session --> memorybank[同步至 Memory-Bank]
+    session --> 清理
+```
+
+## ✅ 標準步驟（對應各 mode）
+1. **VAN**：進入專案時自動讀取 session/activeContext，補全上下文
+2. **PLAN**：新規劃/決策寫入 session，積累至 memory-bank
+3. **CREATIVE**：設計決策同步至 session/memory-bank
+4. **IMPLEMENT**：進度、bug、技術債同步至 session
+5. **REFLECT**：回顧教訓、優化建議積累至 session
+6. **ARCHIVE**：定期自動清理過時、冗餘、低頻資訊
+
+## 📝 範例命令/調用格式
+- `read`: 讀取記憶內容
+- `write`: 寫入新記憶
+- `update`: 更新現有記憶
+- `delete`: 刪除特定記憶
+- `clear`: 清空所有記憶
+
+## 🌟 最佳實踐
+- 使用描述性鍵名組織資料
+- 定期清理過期記憶項目
+- 重要資料寫入前先確認格式
+- 每個 mode 進入/切換時自動同步 session 與 memory-bank
+- 查詢結果自動積累回本地知識庫
+
+## 🚦 典型觸發情境
+- VAN：切換專案/模式時自動補全上下文
+- PLAN：規劃新功能、決策時自動寫入 session
+- CREATIVE：設計多方案時同步決策
+- IMPLEMENT：每次進度/bug/技術債更新時同步
+- REFLECT：回顧/優化時積累教訓
+- ARCHIVE：週期性自動清理
+
+## 🔗 整合建議
+- 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 memory-flow
+- 每個 mode 進入/切換時自動同步 session 與 memory-bank
+- 定期自動清理過時記憶，維持 session 健康
+
+[[calls]]
+match = """memory|remember|recall|store data|update memory"""
+tool = "memory"
+
+## 查詢合併與來源標註規則
+
+### 合併策略
+- 若 context7 與本地知識同時命中，優先顯示 context7（官方/最新），本地知識作為補充。
+- 可並列顯示，並明確標註來源（如【官方文件】、【本地知識】）。
+- 若內容衝突，提示用戶「官方文件與本地知識不一致，請優先參考官方」。
+
+### 標註格式
+- 官方知識：`【官方文件】內容...`
+- 本地知識：`【本地知識】內容...`
+- 合併回應範例：
+  ```
+  【官方文件】Angular 20 路由守衛寫法如下...
+  【本地知識】你過去常用的寫法為...
+  ```
+
+### 用戶交互建議
+- 當合併回應時，明確提示「已同時查詢官方文件與本地知識，請優先參考官方內容」。
+- 若用戶需要僅看官方或本地知識，可提供切換選項。
+- 若內容衝突，主動提醒用戶並建議以官方為準。
+
+### 用戶交互建議
+- 當合併回應時，明確提示「已同時查詢官方文件與本地知識，請優先參考官方內容」。
+- 若用戶需要僅看官方或本地知識，可提供切換選項。
+- 若內容衝突，主動提醒用戶並建議以官方為準。
+
+## 🧩 與 Cursor custom modes 的對應關係
+
+| Custom Mode | 主要行為         | memory-flow 參與方式                |
+|-------------|------------------|-------------------------------------|
+| VAN         | 狀態初始化/查詢  | 讀取 session/activeContext，補全上下文 |
+| PLAN        | 規劃/決策        | 寫入/更新 session，積累新規劃/決策     |
+| CREATIVE    | 設計/多方案      | 設計決策同步至 session/memory-bank    |
+| IMPLEMENT   | 進度/狀態同步    | 實作進度、bug、技術債同步至 session   |
+| REFLECT     | 回顧/優化        | 回顧教訓、優化建議積累至 session      |
+| ARCHIVE     | 歷史/清理        | 歷史狀態歸檔、過時記憶自動清理        |
+
+## 🗺️ 流程圖
+```mermaid
+flowchart TD
+    VAN[🔍 VAN: 狀態查詢] --> session[讀取 session/activeContext]
+    PLAN[📋 PLAN: 規劃決策] --> session[寫入/更新 session]
+    CREATIVE[🎨 CREATIVE: 設計決策] --> session[同步設計至 session]
+    IMPLEMENT[⚒️ IMPLEMENT: 進度同步] --> session[同步進度/bug]
+    REFLECT[🔍 REFLECT: 回顧優化] --> session[積累教訓/優化]
+    ARCHIVE[📦 ARCHIVE: 歷史清理] --> 清理[自動清理/歸檔]
+    session --> memorybank[同步至 Memory-Bank]
+    session --> 清理
+```
+
+## ✅ 標準步驟（對應各 mode）
+1. **VAN**：進入專案時自動讀取 session/activeContext，補全上下文
+2. **PLAN**：新規劃/決策寫入 session，積累至 memory-bank
+3. **CREATIVE**：設計決策同步至 session/memory-bank
+4. **IMPLEMENT**：進度、bug、技術債同步至 session
+5. **REFLECT**：回顧教訓、優化建議積累至 session
+6. **ARCHIVE**：定期自動清理過時、冗餘、低頻資訊
+
+## 📝 範例命令/調用格式
+- `read`: 讀取記憶內容
+- `write`: 寫入新記憶
+- `update`: 更新現有記憶
+- `delete`: 刪除特定記憶
+- `clear`: 清空所有記憶
+
+## 🌟 最佳實踐
+- 使用描述性鍵名組織資料
+- 定期清理過期記憶項目
+- 重要資料寫入前先確認格式
+- 每個 mode 進入/切換時自動同步 session 與 memory-bank
+- 查詢結果自動積累回本地知識庫
+
+## 🚦 典型觸發情境
+- VAN：切換專案/模式時自動補全上下文
+- PLAN：規劃新功能、決策時自動寫入 session
+- CREATIVE：設計多方案時同步決策
+- IMPLEMENT：每次進度/bug/技術債更新時同步
+- REFLECT：回顧/優化時積累教訓
+- ARCHIVE：週期性自動清理
+
+## 🔗 整合建議
+- 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 memory-flow
+- 每個 mode 進入/切換時自動同步 session 與 memory-bank
+- 定期自動清理過時記憶，維持 session 健康
+
+[[calls]]
+match = """memory|remember|recall|store data|update memory"""
+tool = "memory"
+
+## 查詢合併與來源標註規則
+
+### 合併策略
+- 若 context7 與本地知識同時命中，優先顯示 context7（官方/最新），本地知識作為補充。
+- 可並列顯示，並明確標註來源（如【官方文件】、【本地知識】）。
+- 若內容衝突，提示用戶「官方文件與本地知識不一致，請優先參考官方」。
+
+### 標註格式
+- 官方知識：`【官方文件】內容...`
+- 本地知識：`【本地知識】內容...`
+- 合併回應範例：
+  ```
+  【官方文件】Angular 20 路由守衛寫法如下...
+  【本地知識】你過去常用的寫法為...
+  ```
+
+### 用戶交互建議
+- 當合併回應時，明確提示「已同時查詢官方文件與本地知識，請優先參考官方內容」。
+- 若用戶需要僅看官方或本地知識，可提供切換選項。
+- 若內容衝突，主動提醒用戶並建議以官方為準。
+
+### 用戶交互建議
+- 當合併回應時，明確提示「已同時查詢官方文件與本地知識，請優先參考官方內容」。
+- 若用戶需要僅看官方或本地知識，可提供切換選項。
+- 若內容衝突，主動提醒用戶並建議以官方為準。

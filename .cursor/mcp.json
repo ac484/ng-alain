@@ -1,0 +1,139 @@
+{
+  "mcpServers": {
+    "angular-cli": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@talzach/mcp-angular-cli"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "generate",
+        "build",
+        "serve",
+        "test",
+        "lint",
+        "e2e",
+        "update",
+        "*"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "tsx",
+        "C:/Users/ac7x/Documents/GitHub/mcp/context7-master/src/index.ts"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "resolve-library-id",
+        "get-library-docs",
+        "get-examples",
+        "build",
+        "*"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "list_allowed_directories",
+        "list_directory",
+        "directory_tree",
+        "create_directory",
+        "write_file",
+        "read_file",
+        "edit_file",
+        "delete_file",
+        "move_file",
+        "copy_file",
+        "*"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "autoApprove": [
+        "read",
+        "write",
+        "update",
+        "delete",
+        "clear",
+        "*"
+      ]
+    },
+    "mcp-memory-bank": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/ipospelov/mcp-memory-bank",
+        "mcp_memory_bank"
+      ]
+    },
+    "redis-mcp": {
+      "command": "C:\\Users\\ac7x\\pipx\\venvs\\uv\\Scripts\\uv.exe",
+      "args": [
+        "--directory",
+        "C:/Users/ac7x/Documents/GitHub/mcp/mcp-redis",
+        "run",
+        "src/main.py"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "client_list",
+        "create_vector_index_hash",
+        "dbsize",
+        "delete",
+        "expire",
+        "get",
+        "get_index_info",
+        "get_indexed_keys_number",
+        "get_indexes",
+        "get_vector_from_hash",
+        "hdel",
+        "hexists",
+        "hget",
+        "hgetall",
+        "hset",
+        "info",
+        "json_del",
+        "json_get",
+        "json_set",
+        "llen",
+        "lpop",
+        "lpush",
+        "lrange",
+        "publish",
+        "rename",
+        "rpop",
+        "rpush",
+        "sadd",
+        "scan_all_keys",
+        "scan_keys",
+        "set",
+        "set_vector_in_hash",
+        "smembers",
+        "srem",
+        "subscribe",
+        "type",
+        "unsubscribe",
+        "vector_search_hash",
+        "xadd",
+        "xdel",
+        "xrange",
+        "zadd",
+        "zrange",
+        "zrem",
+        "*"
+      ]
+    }
+  }
+}
