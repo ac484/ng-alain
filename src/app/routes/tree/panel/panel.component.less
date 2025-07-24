@@ -9,7 +9,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fff;
   border-right: 1px solid #f0f0f0;
   transition: all 0.3s;
   min-width: 280px;
@@ -64,14 +63,10 @@ nz-tree {
   padding: 4px 8px;
   line-height: 28px;
   cursor: pointer;
-  border-radius: 4px;
   transition: all 0.2s;
   &.selected {
-    background: linear-gradient(135deg,#e6f7ff 0%,#bae7ff 100%);
-    border-left: 3px solid #1890ff;
     font-weight: 500;
   }
-  &:hover { background: #f0f9ff; }
   nz-icon { margin-right: 6px; font-size: 14px; }
 }
 
@@ -117,7 +112,6 @@ nz-tree {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #fff;
   min-width: 300px;
 }
 
@@ -180,12 +174,8 @@ nz-tree {
   }
   nz-list {
     .ant-list-item {
-      border-radius: 6px;
       margin-bottom: 8px;
       padding: 12px;
-      background: #fafafa;
-      transition: all 0.2s;
-      &:hover { background: #f0f9ff; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     }
     .task-title { font-weight: 500; font-size: 14px; }
   }

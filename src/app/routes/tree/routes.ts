@@ -61,24 +61,12 @@ export default [
         loadComponent: () => import('./scan-result/scan-result.component').then(m => m.ScanResultComponent)
       },
       {
-        path: 'task-detail',
-        loadComponent: () => import('./task-detail/task-detail.component').then(m => m.TaskDetailComponent)
-      },
-      {
         path: 'document-viewer',
         loadComponent: () => import('../../layout/basic/widgets/document-viewer.component').then(m => m.DocumentViewerComponent)
       },
       {
         path: 'settings',
         loadComponent: () => import('./template/settings/settings.component').then(m => m.TreeSettingsComponent)
-      },
-      {
-        path: 'drag',
-        loadComponent: () => import('./template/drag/drag.component').then(m => m.TreeDragComponent)
-      },
-      {
-        path: 'context',
-        loadComponent: () => import('./template/context/context.component').then(m => m.TreeContextComponent)
       },
       {
         path: 'panel',

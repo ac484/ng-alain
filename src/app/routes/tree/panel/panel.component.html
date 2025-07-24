@@ -2,7 +2,7 @@
 <app-firebase-crud></app-firebase-crud>
 
 <!-- 使用 nz-splitter 取代 Flex 佈局 -->
-<nz-splitter [nzLayout]="'horizontal'" style="height:calc(100vh - 100px);min-height:600px;background:#fafafa;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;">
+<nz-splitter [nzLayout]="'horizontal'" style="height:calc(100vh - 100px);min-height:600px;overflow:hidden;">
   <!-- 左側：結構樹 -->
   <nz-splitter-panel [nzMin]="280" [nzMax]="800" [nzDefaultSize]="360">
     <div class="tree-exploration-panel" [class.collapsed]="leftPanelCollapsed">
