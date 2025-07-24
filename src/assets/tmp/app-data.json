@@ -32,6 +32,12 @@
           "link": "/hub/workspace",
           "i18n": "menu.workspace",
           "icon": "anticon-team"
+        },
+        {
+          "text": "Settings",
+          "link": "/hub/settings",
+          "i18n": "menu.hub.settings",
+          "icon": "anticon-setting"
         }
       ]
     },
