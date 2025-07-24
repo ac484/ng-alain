@@ -14,8 +14,7 @@
         "test",
         "lint",
         "e2e",
-        "update",
-        "*"
+        "update"
       ]
     },
     "context7": {
@@ -23,10 +22,7 @@
       "disabled": false,
       "autoApprove": [
         "resolve-library-id",
-        "get-library-docs",
-        "topic",
-        "tokens",
-        "*"
+        "get-library-docs"
       ]
     },
     "filesystem": {
@@ -47,8 +43,7 @@
         "edit_file",
         "delete_file",
         "move_file",
-        "copy_file",
-        "*"
+        "copy_file"
       ]
     },
     "memory": {
@@ -62,8 +57,7 @@
         "write",
         "update",
         "delete",
-        "clear",
-        "*"
+        "clear"
       ]
     },
     "mcp-memory-bank": {
@@ -127,8 +121,7 @@
         "xrange",
         "zadd",
         "zrange",
-        "zrem",
-        "*"
+        "zrem"
       ]
     }
   }
