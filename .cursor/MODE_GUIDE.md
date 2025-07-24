@@ -11,6 +11,7 @@
 | **CREATIVE** | 🎨 | `Ctrl+Shift+C` | 創意設計與架構決策 |
 | **IMPLEMENT** | ⚒️ | `Ctrl+Shift+I` | 程式碼實作與同步 |
 | **REFLECT** | 🔍 | `Ctrl+Shift+R` | 回顧與優化 |
+| **ARCHIVE** | 📦 | `Ctrl+Shift+A` | 文檔化與知識歸檔 |
 
 ## 🔄 模式切換流程
 
@@ -21,6 +22,8 @@ graph TD
     CREATIVE --> IMPLEMENT[⚒️ IMPLEMENT]
     IMPLEMENT --> REFLECT[🔍 REFLECT]
     REFLECT --> PLAN
+    REFLECT --> ARCHIVE[📦 ARCHIVE]
+    ARCHIVE --> PLAN
     
     VAN --> IMPLEMENT
     PLAN --> IMPLEMENT
@@ -104,6 +107,19 @@ graph TD
 - 學習總結時
 
 **快捷鍵**: `Ctrl+Shift+R`
+
+### 📦 ARCHIVE 模式
+**用途**: 文檔化與知識歸檔
+- 將已完成的任務、設計決策、反思與最佳實踐進行結構化文檔化
+- 同步至 Memory Bank 歷史記錄
+- 確保知識可追溯與團隊共享
+
+**何時使用**:
+- 功能/專案階段結束時
+- 需要歸檔知識與經驗時
+- 團隊交接或知識傳承時
+
+**快捷鍵**: `Ctrl+Shift+A`
 
 ## 🚀 快速操作
 
