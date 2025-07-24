@@ -4,12 +4,12 @@
 - contract/
   - [✓] contract-list.component.ts
   - [✓] contract-form.component.ts
-  - [✗] contract-payment-list.component.ts
-  - [✗] contract-payment-form.component.ts
-  - [✗] contract-payment.model.ts
-  - [✗] contract-payment.service.ts
-  - [✗] contract-workflow.model.ts
-  - [✗] contract-workflow.service.ts
+  - [✓] contract-payment-list.component.ts   # 新增：多次請款子表格
+  - [✓] contract-payment-form.component.ts   # 新增：單次請款編輯表單
+  - [✓] contract-payment.model.ts            # 新增：多次請款型別
+  - [✓] contract-payment.service.ts          # 新增：多次請款 service
+  - [✓] contract-workflow.model.ts           # 新增：請款審批流程型別
+  - [✓] contract-workflow.service.ts         # 新增：動態審批流程 service
   - [✓] contract.model.ts
   - [✓] contract.service.ts
   - [✓] contract.component.ts
@@ -17,15 +17,19 @@
   - [✓] settings.component.ts
   - [✓] settings.component.html
   - [✓] settings.component.less
-  - [✗] owner-settings.component.ts
-  - [✗] workflow-settings.component.ts
-  - [✗] workflow-settings.model.ts
-  - [✗] workflow-settings.service.ts
 - fire-crud/
   - [✓] hub-crud.service.ts
   - [✓] hub-crud.component.ts
 - basic/widget/
   - [✓] fab.component.ts
+- tree/
+  - [✓] contract.component.ts
+  - [✓] contract.component.html
+  - [✓] contract.component.less
+- workspace/
+  - [✓] workspace.component.ts
+  - [✓] workspace.component.html
+  - [✓] workspace.component.less
 
 ## memory-bank/
 - [✓] projectbrief.md
@@ -35,6 +39,7 @@
 - [✓] activeContext.md
 - [✓] progress.md
 - [✓] tasks.md
+- [✓] file-structure.md
 - features/
   - [✓] contract-payments.md
   - [✓] dynamic-workflow.md

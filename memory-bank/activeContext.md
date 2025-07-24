@@ -61,3 +61,64 @@
 - 合約相關的所有 UI/Service/設定/工具/資料流/耦合點，已在 Memory Bank 條列到每一層級。
 
 > 本摘要為後續 Memory Bank 文件、型別設計、功能擴充的基礎，請隨時同步更新。 
+
+### 多次請款與動態審批骨架現況（2024-06-22）
+- contract-payment-list.component.ts：多次請款子表格骨架已建立
+- contract-payment-form.component.ts：單次請款編輯表單骨架已建立
+- contract-payment.model.ts：多次請款型別骨架已建立
+- contract-payment.service.ts：多次請款 service 骨架已建立
+- contract-workflow.model.ts：請款審批流程型別骨架已建立
+- contract-workflow.service.ts：動態審批流程 service 骨架已建立
+- 下一步：資料流整合、UI prototype 實作 
+
+### 多次請款與動態審批骨架檔案設計說明（2024-06-22）
+
+#### contract-payment-list.component.ts
+- 設計動機：合約清單展開多次請款子表格，支援行內編輯、動態載入、狀態渲染。
+- 職責：UI 展示與互動，所有資料操作透過 ContractPaymentService。
+- 資料流：@Input contractId，ngOnInit 時呼叫 paymentService.list(contractId) 載入資料，addRow/stopEdit/deleteRow 皆呼叫 service。
+- 型別依賴：ContractPayment。
+- 整合點：需在 contract-list.component.ts 展開子表格時動態載入。
+- 現況：骨架已建立，尚未串接主合約清單、尚未實作資料驗證與狀態流轉。
+- TODO：串接主合約清單、實作資料驗證、狀態流轉、UI prototype。
+
+#### contract-payment-form.component.ts
+- 設計動機：單次請款編輯表單，支援欄位驗證、儲存、取消。
+- 職責：UI 表單，所有資料操作透過 ContractPaymentService。
+- 資料流：@Input payment，@Output save/cancel。
+- 型別依賴：ContractPayment。
+- 整合點：供 contract-payment-list.component.ts 彈窗/行內編輯時使用。
+- 現況：骨架已建立，尚未串接資料流、驗證、UI prototype。
+- TODO：串接 paymentService、完善驗證、UI prototype。
+
+#### contract-payment.model.ts
+- 設計動機：定義多次請款資料結構，支援狀態、流程、附件、備註等。
+- 職責：型別定義，供 service 與 UI 使用。
+- 資料流：與 contract-payment.service.ts、contract-payment-list.component.ts 串接。
+- 現況：骨架已建立，型別可擴充。
+- TODO：根據實際需求擴充欄位。
+
+#### contract-payment.service.ts
+- 設計動機：封裝多次請款的 CRUD 與業務邏輯，未來可擴充狀態流轉、驗證等。
+- 職責：所有請款資料的存取、驗證、狀態流轉。
+- 資料流：底層依賴 HubCrudService，所有操作皆透過此 service。
+- 型別依賴：ContractPayment。
+- 整合點：供 contract-payment-list、contract-payment-form 等元件呼叫。
+- 現況：骨架已建立，狀態流轉/驗證等業務邏輯待補。
+- TODO：實作狀態流轉、資料驗證、串接 UI。
+
+#### contract-workflow.model.ts
+- 設計動機：定義動態審批流程的資料結構，支援多模板、條件分支。
+- 職責：型別定義，供 service 與 UI 使用。
+- 資料流：與 contract-payment.service.ts、contract-workflow.service.ts 串接。
+- 現況：骨架已建立，尚未串接實際流程設計器/設定頁。
+- TODO：根據流程設計需求擴充欄位。
+
+#### contract-workflow.service.ts
+- 設計動機：封裝動態審批流程模板 CRUD、狀態機邏輯、流程運行時狀態管理。
+- 職責：所有流程模板的存取、狀態機運作。
+- 資料流：底層依賴 HubCrudService，所有操作皆透過此 service。
+- 型別依賴：WorkflowDefinition。
+- 整合點：供流程設計器、contract-payment.service.ts 等呼叫。
+- 現況：骨架已建立，狀態機邏輯待補。
+- TODO：實作狀態機、串接流程設計器、資料驗證。 
