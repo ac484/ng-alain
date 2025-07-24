@@ -88,11 +88,6 @@
               "i18n": "menu.tree.scan-result"
             },
             {
-              "text": "Task Detail",
-              "link": "/tree/task-detail",
-              "i18n": "menu.tree.task-detail"
-            },
-            {
               "text": "TreePanel",
               "link": "/tree/panel",
               "i18n": "menu.tree.panel"
