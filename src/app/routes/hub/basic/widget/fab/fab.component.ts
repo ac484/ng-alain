@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { NzFloatButtonModule } from 'ng-zorro-antd/float-button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -8,31 +8,48 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   standalone: true,
   imports: [NzFloatButtonModule, NzIconModule, DragDropModule],
   template: `
-    <div class="fab-drag-anchor" cdkDrag [cdkDragFreeDragPosition]="{ x: dragX, y: dragY }" (cdkDragEnded)="onDragEnd($event)">
+    <div
+      class="fab-drag-anchor"
+      cdkDrag
+      [cdkDragFreeDragPosition]="{ x: dragX, y: dragY }"
+      (cdkDragEnded)="onDragEnd($event)"
+      (cdkDragMoved)="onDragMove($event)"
+    >
       <nz-float-button-group
         [nzIcon]="currentIcon"
         nzType="primary"
         nzTrigger="click"
+        [nzPlacement]="smartPlacement"
         (nzOnOpenChange)="openChange($event)"
-        [nzPlacement]="placement"
       >
-        <nz-float-button></nz-float-button>
-        <nz-float-button [nzIcon]="inner"></nz-float-button>
+        <nz-float-button [nzIcon]="commentIcon" (click)="onAction('comment')"></nz-float-button>
+        <nz-float-button [nzIcon]="shareIcon" (click)="onAction('share')"></nz-float-button>
+        <nz-float-button [nzIcon]="settingIcon" (click)="onAction('setting')"></nz-float-button>
       </nz-float-button-group>
-      <ng-template #inner>
-        <nz-icon nzType="comment" nzTheme="outline"></nz-icon>
-      </ng-template>
-      <ng-template #up>
+
+      <!-- 方向圖標 -->
+      <ng-template #upIcon>
         <nz-icon nzType="up" nzTheme="outline" />
       </ng-template>
-      <ng-template #down>
+      <ng-template #downIcon>
         <nz-icon nzType="down" nzTheme="outline" />
       </ng-template>
-      <ng-template #left>
+      <ng-template #leftIcon>
         <nz-icon nzType="left" nzTheme="outline" />
       </ng-template>
-      <ng-template #right>
+      <ng-template #rightIcon>
         <nz-icon nzType="right" nzTheme="outline" />
+      </ng-template>
+
+      <!-- 功能圖標 -->
+      <ng-template #commentIcon>
+        <nz-icon nzType="comment" nzTheme="outline" />
+      </ng-template>
+      <ng-template #shareIcon>
+        <nz-icon nzType="share-alt" nzTheme="outline" />
+      </ng-template>
+      <ng-template #settingIcon>
+        <nz-icon nzType="setting" nzTheme="outline" />
       </ng-template>
     </div>
   `,
@@ -46,6 +63,11 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         cursor: grab;
         user-select: none;
       }
+
+      .fab-drag-anchor:active {
+        cursor: grabbing;
+      }
+
       nz-float-button-group {
         position: absolute;
       }
@@ -55,57 +77,73 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 export class FabComponent {
   dragX = 0;
   dragY = 0;
-  placement: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  smartPlacement: 'top' | 'bottom' | 'left' | 'right' = 'top';
 
-  // 根據拖曳位置自動切換方向與icon
-  get currentIcon() {
-    switch (this.placement) {
-      case 'top':
-        return this.up;
-      case 'bottom':
-        return this.down;
-      case 'left':
-        return this.left;
-      case 'right':
-        return this.right;
-      default:
-        return this.up;
-    }
+  // 當前位置（用於計算智能方向）
+  private currentX = 0;
+  private currentY = 0;
+
+  @ViewChild('upIcon', { static: true }) upIcon!: TemplateRef<any>;
+  @ViewChild('downIcon', { static: true }) downIcon!: TemplateRef<any>;
+  @ViewChild('leftIcon', { static: true }) leftIcon!: TemplateRef<any>;
+  @ViewChild('rightIcon', { static: true }) rightIcon!: TemplateRef<any>;
+
+  get currentIcon(): TemplateRef<any> {
+    const iconMap = {
+      top: this.upIcon,
+      bottom: this.downIcon,
+      left: this.leftIcon,
+      right: this.rightIcon
+    };
+    return iconMap[this.smartPlacement];
   }
 
-  // template refs for icons
-  up: any;
-  down: any;
-  left: any;
-  right: any;
-
-  openChange(status: boolean): void {
-    // 可根據 status 控制彈出狀態
-    // console.log('openChange', status);
+  onDragMove(event: any): void {
+    // 實時更新位置和智能方向
+    const rect = event.source.element.nativeElement.getBoundingClientRect();
+    this.currentX = rect.left;
+    this.currentY = rect.top;
+    this.smartPlacement = this.calculateSmartPlacement(this.currentX, this.currentY);
   }
 
   onDragEnd(event: any): void {
     this.dragX = event.source.getFreeDragPosition().x;
     this.dragY = event.source.getFreeDragPosition().y;
-    this.placement = this.autoPlacement(this.dragX, this.dragY);
+    this.smartPlacement = this.calculateSmartPlacement(this.currentX, this.currentY);
   }
 
-  // 智能選擇彈出方向：靠近哪個邊就從對側彈出
-  autoPlacement(x: number, y: number): 'top' | 'bottom' | 'left' | 'right' {
+  private calculateSmartPlacement(x: number, y: number): 'top' | 'bottom' | 'left' | 'right' {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const btnW = 56; // FAB 寬度
-    const btnH = 56; // FAB 高度
-    const centerX = x + btnW / 2;
-    const centerY = y + btnH / 2;
-    const dTop = centerY;
-    const dBottom = vh - centerY;
-    const dLeft = centerX;
-    const dRight = vw - centerX;
-    const min = Math.min(dTop, dBottom, dLeft, dRight);
-    if (min === dTop) return 'bottom';
-    if (min === dBottom) return 'top';
-    if (min === dLeft) return 'right';
-    return 'left';
+    const fabSize = 56;
+
+    // 按鈕中心點
+    const centerX = x + fabSize / 2;
+    const centerY = y + fabSize / 2;
+
+    // 螢幕中心點
+    const screenCenterX = vw / 2;
+    const screenCenterY = vh / 2;
+
+    // 計算相對於螢幕中心的位置
+    const deltaX = centerX - screenCenterX;
+    const deltaY = centerY - screenCenterY;
+
+    // 判斷主要方向（絕對值較大的軸）
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // 水平方向為主
+      return deltaX > 0 ? 'left' : 'right';
+    } else {
+      // 垂直方向為主
+      return deltaY > 0 ? 'top' : 'bottom';
+    }
+  }
+
+  openChange(status: boolean): void {
+    console.log('浮動按鈕組狀態:', status ? '展開' : '收合');
+  }
+
+  onAction(type: string): void {
+    console.log(`執行 ${type} 動作`);
   }
 }
