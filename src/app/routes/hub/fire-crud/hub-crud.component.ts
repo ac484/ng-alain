@@ -5,7 +5,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { HubCrudService } from './hub-crud.service';
-import { Contract } from '../models/hub.model';
+import { Contract } from '../contract/contract.model';
 import { FabComponent } from '../basic/widget/fab.component';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSelectModule } from 'ng-zorro-antd/select';

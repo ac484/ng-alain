@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { HubFireCrudComponent } from '../fire-crud/hub-crud.component';
+import { ContractListComponent } from './contract-list.component';
 
 @Component({
   selector: 'hub-contract',
   standalone: true,
-  imports: [HubFireCrudComponent],
-  template: `<hub-fire-crud></hub-fire-crud>`
+  imports: [ContractListComponent],
+  template: `<contract-list></contract-list>`
 })
 export class HubContractComponent {}
