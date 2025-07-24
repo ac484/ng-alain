@@ -35,10 +35,9 @@ import { HubCrudService } from '../fire-crud/hub-crud.service';
           <tr class="editable-row">
             <td>{{ c.contractSerial }}</td>
             <td>
-              <div class="editable-cell" [hidden]="editId === c.key" (click)="startEdit(c.key)">
+              <div class="client-cell">
                 {{ c.client }}
               </div>
-              <input [hidden]="editId !== c.key" type="text" nz-input [(ngModel)]="c.client" (blur)="stopEdit(c)" />
             </td>
             <td>
               <div class="editable-cell" [hidden]="editId === c.key" (click)="startEdit(c.key)">
@@ -83,6 +82,18 @@ import { HubCrudService } from '../fire-crud/hub-crud.service';
         border: 1px solid #d9d9d9;
         border-radius: 4px;
         padding: 4px 11px;
+      }
+      .client-cell {
+        position: relative;
+        padding: 5px 12px;
+        background: transparent;
+        cursor: default;
+        border: none !important;
+      }
+      .editable-row:hover .client-cell {
+        border: none !important;
+        background: transparent;
+        cursor: default;
       }
     `
   ]
