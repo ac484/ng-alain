@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+
 import { SystemLayoutComponent } from './system-layout.component';
 
 export const routes: Routes = [

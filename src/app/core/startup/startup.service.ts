@@ -61,12 +61,11 @@ import { ACLService } from '@delon/acl';
 import { DA_SERVICE_TOKEN, ITokenService } from '@delon/auth';
 import { ALAIN_I18N_TOKEN, MenuService, SettingsService, TitleService } from '@delon/theme';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
-import { Observable, zip, catchError, map, of, mergeMap } from 'rxjs';
+import { Observable, zip, catchError, map, of, mergeMap, firstValueFrom } from 'rxjs';
 
 import { FirebaseACLInitService } from '../firebase/firebase-acl-init.service';
-import { I18NService } from '../i18n/i18n.service';
 import { FirebaseACLService } from '../firebase/firebase-acl.service';
-import { firstValueFrom } from 'rxjs';
+import { I18NService } from '../i18n/i18n.service';
 
 /**
  * 應用程式啟動提供者

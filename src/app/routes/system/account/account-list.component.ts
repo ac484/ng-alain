@@ -1,20 +1,14 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { PageHeaderModule } from '@delon/abc/page-header';
 import { STModule } from '@delon/abc/st';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 
 @Component({
   selector: 'system-account-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    PageHeaderModule,
-    STModule,
-    NzCardModule,
-    NzButtonModule
-  ],
+  imports: [CommonModule, PageHeaderModule, STModule, NzCardModule, NzButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <page-header title="帳號管理"></page-header>

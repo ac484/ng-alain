@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FirebaseUserService } from '@core/firebase/firebase-user.service';
-import { BehaviorSubject, Observable, from } from 'rxjs';
 import { User } from '@core/firebase/models/base.model';
+import { BehaviorSubject, Observable, from } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class SystemAccountService extends FirebaseUserService {

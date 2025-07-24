@@ -5,8 +5,8 @@
  * 展示 ng-alain ACL 權限控制系統與 Firebase 認證的整合
  */
 
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { AsyncPipe, JsonPipe, DatePipe, NgIf, NgFor } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Auth } from '@angular/fire/auth';
 import { ACLService } from '@delon/acl';
 import { MenuService } from '@delon/theme';
