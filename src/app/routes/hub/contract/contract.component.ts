@@ -7,63 +7,92 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { FormsModule } from '@angular/forms';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 
-export interface TreeNodeInterface {
-  key: string;
-  name: string;
-  age?: number;
-  level?: number;
-  expand?: boolean;
-  address?: string;
-  children?: TreeNodeInterface[];
-  parent?: TreeNodeInterface;
+export interface ContractAmount {
+  original: number;
+  changed?: number;
+  current: number;
+}
+
+export interface Contract {
+  key: string; // 唯一識別
+  client: string; // 業主
+  contractName: string; // 合約名稱
+  contractCode?: string; // 合約案號識別碼
+  feeCode?: string; // 合約費用識別碼
+  amount: ContractAmount; // 合約金額
+  // ...其他欄位
+  // 若需支援樹狀結構，可加 children?: Contract[]
+  children?: Contract[];
+  parent?: Contract;
 }
 
 @Component({
-  selector: 'nz-demo-table-expand-children',
+  selector: 'hub-contract',
   imports: [NzTableModule, NzDropDownModule, NzIconModule, NzInputModule, FormsModule, CdkDropList, CdkDrag],
   template: `
-    <nz-table #expandTable [nzData]="filteredData" nzTableLayout="fixed">
+    <nz-table #contractTable [nzData]="filteredData" nzTableLayout="fixed">
       <thead>
         <tr>
-          <th nzCustomFilter>
-            Name
-            <nz-filter-trigger [(nzVisible)]="nameFilterVisible" [nzActive]="nameSearchValue.length > 0" [nzDropdownMenu]="nameMenu">
-              <nz-icon nzType="search" />
-            </nz-filter-trigger>
-          </th>
-          <th nzCustomFilter>
-            Age
-            <nz-filter-trigger [(nzVisible)]="ageFilterVisible" [nzActive]="ageSearchValue.length > 0" [nzDropdownMenu]="ageMenu">
-              <nz-icon nzType="search" />
-            </nz-filter-trigger>
-          </th>
-          <th nzCustomFilter>
-            Address
-            <nz-filter-trigger
-              [(nzVisible)]="addressFilterVisible"
-              [nzActive]="addressSearchValue.length > 0"
-              [nzDropdownMenu]="addressMenu"
-            >
-              <nz-icon nzType="search" />
-            </nz-filter-trigger>
+          <th>序號</th>
+          <th>業主</th>
+          <th>合約名稱</th>
+          <th>合約案號識別碼</th>
+          <th>合約費用識別碼</th>
+          <th>
+            合約金額
+            <div style="font-size: 12px;"> <span>原始</span> / <span>變更</span> / <span>現行</span> </div>
           </th>
         </tr>
       </thead>
       <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-        @for (data of expandTable.data; track data) {
+        @for (data, idx of contractTable.data; track data) {
           @for (item of mapOfExpandedData[data.key]; track item) {
             @if ((item.parent && item.parent.expand) || !item.parent) {
               <tr cdkDrag>
-                <td
-                  [nzIndentSize]="item.level! * 20"
-                  [nzShowExpand]="!!item.children"
-                  [(nzExpand)]="item.expand"
-                  (nzExpandChange)="collapse(mapOfExpandedData[data.key], item, $event)"
-                >
-                  {{ item.name }}
+                <td>{{ idx + 1 }}</td>
+                <td>
+                  <div *ngIf="editKey !== item.key; else editClient" (click)="startEdit(item.key, 'client')">
+                    {{ item.client }}
+                  </div>
+                  <ng-template #editClient>
+                    <input nz-input [(ngModel)]="item.client" (blur)="stopEdit()" />
+                  </ng-template>
                 </td>
-                <td>{{ item.age }}</td>
-                <td>{{ item.address }}</td>
+                <td>
+                  <div *ngIf="editKey !== item.key; else editName" (click)="startEdit(item.key, 'contractName')">
+                    {{ item.contractName }}
+                  </div>
+                  <ng-template #editName>
+                    <input nz-input [(ngModel)]="item.contractName" (blur)="stopEdit()" />
+                  </ng-template>
+                </td>
+                <td>
+                  <div *ngIf="editKey !== item.key; else editCode" (click)="startEdit(item.key, 'contractCode')">
+                    {{ item.contractCode || '-' }}
+                  </div>
+                  <ng-template #editCode>
+                    <input nz-input [(ngModel)]="item.contractCode" (blur)="stopEdit()" />
+                  </ng-template>
+                </td>
+                <td>
+                  <div *ngIf="editKey !== item.key; else editFee" (click)="startEdit(item.key, 'feeCode')">
+                    {{ item.feeCode || '-' }}
+                  </div>
+                  <ng-template #editFee>
+                    <input nz-input [(ngModel)]="item.feeCode" (blur)="stopEdit()" />
+                  </ng-template>
+                </td>
+                <td>
+                  <ng-container *ngIf="editKey !== item.key; else editAmount">
+                    <span>{{ item.amount.original | number: '1.0-0' }}</span> / <span>{{ item.amount.changed || '-' }}</span> /
+                    <span>{{ item.amount.current | number: '1.0-0' }}</span>
+                  </ng-container>
+                  <ng-template #editAmount>
+                    <input nz-input type="number" style="width: 60px;" [(ngModel)]="item.amount.original" (blur)="stopEdit()" /> /
+                    <input nz-input type="number" style="width: 60px;" [(ngModel)]="item.amount.changed" (blur)="stopEdit()" /> /
+                    <input nz-input type="number" style="width: 60px;" [(ngModel)]="item.amount.current" (blur)="stopEdit()" />
+                  </ng-template>
+                </td>
               </tr>
             }
           }
@@ -126,71 +155,39 @@ export interface TreeNodeInterface {
   ]
 })
 export class HubContractComponent implements OnInit {
-  listOfMapData: TreeNodeInterface[] = [
+  editKey: string | null = null;
+  editField: string | null = null;
+
+  // 新資料結構範例
+  listOfMapData: Contract[] = [
     {
-      key: `1`,
-      name: 'John Brown sr.',
-      age: 60,
-      address: 'New York No. 1 Lake Park',
+      key: '1',
+      client: '台灣電力公司',
+      contractName: '台電南部電廠維護合約',
+      contractCode: 'A-001',
+      feeCode: 'F-001',
+      amount: { original: 1000000, changed: 1200000, current: 1200000 },
       children: [
         {
-          key: `1-1`,
-          name: 'John Brown',
-          age: 42,
-          address: 'New York No. 2 Lake Park'
-        },
-        {
-          key: `1-2`,
-          name: 'John Brown jr.',
-          age: 30,
-          address: 'New York No. 3 Lake Park',
-          children: [
-            {
-              key: `1-2-1`,
-              name: 'Jimmy Brown',
-              age: 16,
-              address: 'New York No. 3 Lake Park'
-            }
-          ]
-        },
-        {
-          key: `1-3`,
-          name: 'Jim Green sr.',
-          age: 72,
-          address: 'London No. 1 Lake Park',
-          children: [
-            {
-              key: `1-3-1`,
-              name: 'Jim Green',
-              age: 42,
-              address: 'London No. 2 Lake Park',
-              children: [
-                {
-                  key: `1-3-1-1`,
-                  name: 'Jim Green jr.',
-                  age: 25,
-                  address: 'London No. 3 Lake Park'
-                },
-                {
-                  key: `1-3-1-2`,
-                  name: 'Jimmy Green sr.',
-                  age: 18,
-                  address: 'London No. 4 Lake Park'
-                }
-              ]
-            }
-          ]
+          key: '1-1',
+          client: '台灣電力公司',
+          contractName: '台電南部電廠子合約',
+          contractCode: 'A-001-1',
+          feeCode: 'F-001-1',
+          amount: { original: 200000, changed: 250000, current: 250000 }
         }
       ]
     },
     {
-      key: `2`,
-      name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park'
+      key: '2',
+      client: '台灣自來水公司',
+      contractName: '自來水管線維護合約',
+      contractCode: 'B-001',
+      feeCode: 'F-002',
+      amount: { original: 800000, current: 800000 }
     }
   ];
-  mapOfExpandedData: { [key: string]: TreeNodeInterface[] } = {};
+  mapOfExpandedData: { [key: string]: Contract[] } = {};
 
   // 各欄位 filter 狀態
   nameSearchValue = '';
@@ -201,21 +198,21 @@ export class HubContractComponent implements OnInit {
   addressFilterVisible = false;
 
   // 多欄位同時篩選
-  get filteredData(): TreeNodeInterface[] {
+  get filteredData(): Contract[] {
     return this.listOfMapData.filter(item => this.treeNodeMatchAll(item));
   }
 
-  treeNodeMatchAll(node: TreeNodeInterface): boolean {
+  treeNodeMatchAll(node: Contract): boolean {
     // name
-    const nameMatch = !this.nameSearchValue || this.treeNodeMatch(node, 'name', this.nameSearchValue);
+    const nameMatch = !this.nameSearchValue || this.treeNodeMatch(node, 'client', this.nameSearchValue);
     // age
-    const ageMatch = !this.ageSearchValue || this.treeNodeMatch(node, 'age', this.ageSearchValue);
+    const ageMatch = !this.ageSearchValue || this.treeNodeMatch(node, 'contractName', this.ageSearchValue);
     // address
-    const addressMatch = !this.addressSearchValue || this.treeNodeMatch(node, 'address', this.addressSearchValue);
+    const addressMatch = !this.addressSearchValue || this.treeNodeMatch(node, 'contractCode', this.addressSearchValue);
     return nameMatch && ageMatch && addressMatch;
   }
 
-  treeNodeMatch(node: TreeNodeInterface, field: 'name' | 'age' | 'address', search: string): boolean {
+  treeNodeMatch(node: Contract, field: 'client' | 'contractName' | 'contractCode', search: string): boolean {
     const value = node[field] ? String(node[field]) : '';
     if (value.includes(search)) return true;
     if (node.children) {
@@ -247,7 +244,7 @@ export class HubContractComponent implements OnInit {
     this.searchAddress();
   }
 
-  collapse(array: TreeNodeInterface[], data: TreeNodeInterface, $event: boolean): void {
+  collapse(array: Contract[], data: Contract, $event: boolean): void {
     if (!$event) {
       if (data.children) {
         data.children.forEach(d => {
@@ -261,9 +258,9 @@ export class HubContractComponent implements OnInit {
     }
   }
 
-  convertTreeToList(root: TreeNodeInterface): TreeNodeInterface[] {
-    const stack: TreeNodeInterface[] = [];
-    const array: TreeNodeInterface[] = [];
+  convertTreeToList(root: Contract): Contract[] {
+    const stack: Contract[] = [];
+    const array: Contract[] = [];
     const hashMap = {};
     stack.push({ ...root, level: 0, expand: false });
 
@@ -280,7 +277,7 @@ export class HubContractComponent implements OnInit {
     return array;
   }
 
-  visitNode(node: TreeNodeInterface, hashMap: { [key: string]: boolean }, array: TreeNodeInterface[]): void {
+  visitNode(node: Contract, hashMap: { [key: string]: boolean }, array: Contract[]): void {
     if (!hashMap[node.key]) {
       hashMap[node.key] = true;
       array.push(node);
@@ -288,8 +285,17 @@ export class HubContractComponent implements OnInit {
   }
 
   // 新增拖曳排序方法
-  drop(event: CdkDragDrop<TreeNodeInterface[]>) {
+  drop(event: CdkDragDrop<Contract[]>) {
     moveItemInArray(this.filteredData, event.previousIndex, event.currentIndex);
+  }
+
+  startEdit(key: string, field: string): void {
+    this.editKey = key;
+    this.editField = field;
+  }
+  stopEdit(): void {
+    this.editKey = null;
+    this.editField = null;
   }
 
   ngOnInit(): void {
