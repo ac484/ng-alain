@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { Component, TemplateRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { NzFloatButtonModule } from 'ng-zorro-antd/float-button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -22,9 +22,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         [nzPlacement]="smartPlacement"
         (nzOnOpenChange)="openChange($event)"
       >
-        <nz-float-button [nzIcon]="commentIcon" (click)="onAction('comment')"></nz-float-button>
-        <nz-float-button [nzIcon]="shareIcon" (click)="onAction('share')"></nz-float-button>
-        <nz-float-button [nzIcon]="settingIcon" (click)="onAction('setting')"></nz-float-button>
+        <nz-float-button [nzIcon]="commentIcon" (click)="onAction.emit('add')"></nz-float-button>
+        <!-- 你可以保留其他功能按鈕 -->
       </nz-float-button-group>
 
       <!-- 方向圖標 -->
@@ -43,13 +42,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
       <!-- 功能圖標 -->
       <ng-template #commentIcon>
-        <nz-icon nzType="comment" nzTheme="outline" />
-      </ng-template>
-      <ng-template #shareIcon>
-        <nz-icon nzType="share-alt" nzTheme="outline" />
-      </ng-template>
-      <ng-template #settingIcon>
-        <nz-icon nzType="setting" nzTheme="outline" />
+        <nz-icon nzType="plus" nzTheme="outline" />
       </ng-template>
     </div>
   `,
@@ -63,11 +56,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         cursor: grab;
         user-select: none;
       }
-
       .fab-drag-anchor:active {
         cursor: grabbing;
       }
-
       nz-float-button-group {
         position: absolute;
       }
@@ -79,7 +70,6 @@ export class FabComponent {
   dragY = 0;
   smartPlacement: 'top' | 'bottom' | 'left' | 'right' = 'top';
 
-  // 當前位置（用於計算智能方向）
   private currentX = 0;
   private currentY = 0;
 
@@ -87,6 +77,9 @@ export class FabComponent {
   @ViewChild('downIcon', { static: true }) downIcon!: TemplateRef<any>;
   @ViewChild('leftIcon', { static: true }) leftIcon!: TemplateRef<any>;
   @ViewChild('rightIcon', { static: true }) rightIcon!: TemplateRef<any>;
+  @ViewChild('commentIcon', { static: true }) commentIcon!: TemplateRef<any>;
+
+  @Output() onAction = new EventEmitter<string>();
 
   get currentIcon(): TemplateRef<any> {
     const iconMap = {
@@ -99,7 +92,6 @@ export class FabComponent {
   }
 
   onDragMove(event: any): void {
-    // 實時更新位置和智能方向
     const rect = event.source.element.nativeElement.getBoundingClientRect();
     this.currentX = rect.left;
     this.currentY = rect.top;
@@ -116,34 +108,18 @@ export class FabComponent {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const fabSize = 56;
-
-    // 按鈕中心點
     const centerX = x + fabSize / 2;
     const centerY = y + fabSize / 2;
-
-    // 螢幕中心點
     const screenCenterX = vw / 2;
     const screenCenterY = vh / 2;
-
-    // 計算相對於螢幕中心的位置
     const deltaX = centerX - screenCenterX;
     const deltaY = centerY - screenCenterY;
-
-    // 判斷主要方向（絕對值較大的軸）
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // 水平方向為主
       return deltaX > 0 ? 'left' : 'right';
     } else {
-      // 垂直方向為主
       return deltaY > 0 ? 'top' : 'bottom';
     }
   }
 
-  openChange(status: boolean): void {
-    console.log('浮動按鈕組狀態:', status ? '展開' : '收合');
-  }
-
-  onAction(type: string): void {
-    console.log(`執行 ${type} 動作`);
-  }
+  openChange(status: boolean): void {}
 }

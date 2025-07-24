@@ -5,16 +5,19 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { DecimalPipe, NgStyle } from '@angular/common';
-import { HubCrudService } from '../services/hub-crud.service';
+import { HubCrudService } from '../fire-crud/hub-crud.service';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { FabComponent } from '../basic/widget/fab/fab.component';
+import { CommonModule } from '@angular/common';
+import { Contract } from '../models/hub.model'; // 假設 Contract 型別已在 hub.model.ts 定義
 
 @Component({
   selector: 'hub-contract',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    CommonModule,
     FabComponent,
     NzTableModule,
     NzInputModule,
@@ -23,11 +26,10 @@ import { FabComponent } from '../basic/widget/fab/fab.component';
     NzFormModule,
     ReactiveFormsModule,
     DecimalPipe,
-    DragDropModule,
-    NgStyle
+    DragDropModule
   ],
   template: `
-    <app-fab></app-fab>
+    <app-fab (onAction)="handleFabAction($event)"></app-fab>
     <div class="fab-form" *ngIf="showForm">
       <form [formGroup]="form" (ngSubmit)="submit()" nz-form>
         <div nz-form-item>
@@ -127,14 +129,14 @@ import { FabComponent } from '../basic/widget/fab/fab.component';
   ]
 })
 export class HubContractComponent {
-  listOfData: any[] = [];
+  listOfData: Contract[] = [];
   isSubmitting = false;
   form: FormGroup;
   showForm = false;
 
   constructor(
     private fb: FormBuilder,
-    private hubCrud: HubCrudService<any>
+    private hubCrud: HubCrudService
   ) {
     this.form = this.fb.group({
       contractSerial: ['', [Validators.required]],
@@ -144,10 +146,16 @@ export class HubContractComponent {
       feeCode: [''],
       amount: [0, [Validators.required, Validators.min(1)]]
     });
-    // 即時監聽 contracts
-    this.hubCrud.listen('contracts').subscribe(data => {
+    // 即時監聽 hub_contract 集合
+    this.hubCrud.useCollection<Contract>('hub_contract').subscribe((data: Contract[]) => {
       this.listOfData = data;
     });
+  }
+
+  handleFabAction(type: string) {
+    if (type === 'add') {
+      this.toggleForm();
+    }
   }
 
   toggleForm() {
@@ -161,7 +169,7 @@ export class HubContractComponent {
     if (this.form.invalid) return;
     this.isSubmitting = true;
     try {
-      await this.hubCrud.add('contracts', this.form.value);
+      await this.hubCrud.add('hub_contract', this.form.value);
       this.showForm = false;
       this.form.reset();
     } finally {
