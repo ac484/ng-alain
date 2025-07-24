@@ -59,7 +59,7 @@ flowchart TD
 
 ## 🔗 整合建議
 - 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 context7-flow
-- 查詢結果自動積累回本地知識庫（memory-bank/redis）
+- 查詢結果自動積累回本地知識庫（custom_modes/redis）
 - 推薦於每個 mode 進入時自動檢查知識缺口並觸發 context7 查詢
 
 [[calls]]
@@ -126,7 +126,7 @@ flowchart TD
 
 ## 🔗 整合建議
 - 在 custom_modes/van_instructions.md、plan_instructions.md 等文件的「Memory Bank 檢查」步驟自動觸發 context7-flow
-- 查詢結果自動積累回本地知識庫（memory-bank/redis）
+- 查詢結果自動積累回本地知識庫（custom_modes/redis）
 - 推薦於每個 mode 進入時自動檢查知識缺口並觸發 context7 查詢
 
 [[calls]]

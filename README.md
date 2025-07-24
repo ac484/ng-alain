@@ -93,7 +93,7 @@ Alternatively, you can download the ZIP file from GitHub and extract it to your 
 This provides you with all the necessary files, including:
 - Rule files in `.cursor/rules/isolation_rules/`
 - Mode instruction files in `custom_modes/` directory
-- Template Memory Bank files in `memory-bank/`
+- Template Memory Bank files in `custom_modes/`
 
 ### Step 2: Setting Up Custom Modes in Cursor
 

@@ -47,7 +47,7 @@ ng-alain/
 │   ├── assets/                  # 靜態資源
 │   └── environments/            # 環境配置
 ├── functions/                   # Firebase Functions
-├── memory-bank/                 # Memory Bank 文檔
+├── custom_modes/                 # Memory Bank 文檔
 └── tasks.md                     # 任務追蹤
 ```
 
