@@ -17,19 +17,19 @@
       "children": [
         {
           "text": "Contract",
-          "link": "/contract",
+          "link": "/hub/contract",
           "i18n": "menu.contract",
           "icon": "anticon-file-text"
         },
         {
           "text": "Tree",
-          "link": "/tree",
+          "link": "/hub/tree",
           "i18n": "menu.tree",
           "icon": "anticon-fork"
         },
         {
           "text": "Workspace",
-          "link": "/workspace",
+          "link": "/hub/workspace",
           "i18n": "menu.workspace",
           "icon": "anticon-team"
         }
