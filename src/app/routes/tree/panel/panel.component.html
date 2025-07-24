@@ -78,7 +78,7 @@
   <nz-splitter-panel>
     <nz-splitter [nzLayout]="'vertical'" style="height:100%;min-height:400px;">
       <!-- 上方詳情 -->
-      <nz-splitter-panel [nzMin]="200" [nzDefaultSize]="60">
+      <nz-splitter-panel [nzMin]="200" [nzDefaultSize]="'50%'">
         <div class="node-details-section">
           <div class="node-details" *ngIf="selectedNodeForDetail$ | async as selectedNode; else noNodeSelected">
             <div class="details-header">
