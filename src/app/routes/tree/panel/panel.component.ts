@@ -57,13 +57,13 @@ export class TreePanelComponent implements OnInit, OnDestroy, AfterViewInit {
   private searchSubject = new BehaviorSubject<string>('');
 
   // Splitter 配置屬性
-  readonly leftPanelSize = 70;
-  readonly minLeftPanelSize = 200;
-  readonly maxLeftPanelSize = 600;
-  readonly upperPanelSize = 60;
-  readonly minUpperPanelSize = 200;
-  readonly resizerStyle = { background: 'rgba(0, 0, 0, 0.06)' };
-  readonly verticalResizerStyle = { background: 'rgba(0, 0, 0, 0.04)' };
+  // readonly leftPanelSize = 70;
+  // readonly minLeftPanelSize = 200;
+  // readonly maxLeftPanelSize = 600;
+  // readonly upperPanelSize = 60;
+  // readonly minUpperPanelSize = 200;
+  // readonly resizerStyle = { background: 'rgba(0, 0, 0, 0.06)' };
+  // readonly verticalResizerStyle = { background: 'rgba(0, 0, 0, 0.04)' };
 
   leftPanelCollapsed = false;
 

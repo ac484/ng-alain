@@ -1,29 +1,20 @@
 /* ============================================
    Tree Panel Minimalist Styles
-   Modern Flex Layout + Responsive
+   Modern Splitter Layout + Responsive
 ============================================ */
 
-.tree-panel-container {
-  display: flex;
-  height: calc(100vh - 100px);
-  min-height: 600px;
-  background: #fafafa;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  overflow: hidden;
-}
+// 移除 .tree-panel-container Flex 樣式，改為針對 splitter slot 微調
 
 .tree-exploration-panel {
-  flex: 0 0 60%;
-  min-width: 280px;
-  max-width: 800px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: #fff;
   border-right: 1px solid #f0f0f0;
   transition: all 0.3s;
+  min-width: 280px;
+  max-width: 800px;
   &.collapsed {
-    flex: 0 0 60px;
     min-width: 60px;
     overflow: hidden;
   }
@@ -123,7 +114,7 @@ nz-tree {
 .horizontal-resizer { height: 4px; cursor: ns-resize; margin: 8px 0; &::before { top: 50%; left: 50%; transform: translate(-50%,-50%); height: 2px; width: 40px; } }
 
 .details-analysis-panel {
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -131,7 +122,7 @@ nz-tree {
 }
 
 .node-details-section {
-  flex: 0 0 60%;
+  height: 100%;
   padding: 20px;
   border-bottom: 1px solid #f0f0f0;
   overflow-y: auto;
@@ -175,7 +166,7 @@ nz-tree {
   }
 }
 
-.task-list-section { flex: 1; padding: 20px; overflow-y: auto; }
+.task-list-section { height: 100%; padding: 20px; overflow-y: auto; }
 .task-list {
   .task-header {
     display: flex;
@@ -203,14 +194,12 @@ nz-tree {
 .empty-state { padding: 40px 20px; text-align: center; .ant-empty-description { color: #8c8c8c; font-size: 14px; } }
 
 @media (max-width: 1200px) {
-  .tree-exploration-panel { flex: 0 0 60%; min-width: 280px; }
+  .tree-exploration-panel { min-width: 280px; }
 }
 @media (max-width: 768px) {
-  .tree-panel-container { flex-direction: column; height: auto; min-height: 80vh; }
-  .tree-exploration-panel { flex: 0 0 400px; border-right: none; border-bottom: 1px solid #f0f0f0; }
-  .vertical-resizer { display: none; }
-  .details-analysis-panel { flex: 1; min-height: 400px; }
-  .node-details-section { flex: 0 0 auto; min-height: 200px; }
+  .tree-exploration-panel { min-width: 200px; border-right: none; border-bottom: 1px solid #f0f0f0; }
+  .details-analysis-panel { min-height: 400px; }
+  .node-details-section { min-height: 200px; }
   .task-list-section { min-height: 200px; }
 }
 
