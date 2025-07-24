@@ -1,14 +1,77 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { DecimalPipe } from '@angular/common';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { DecimalPipe, NgStyle } from '@angular/common';
+import { HubCrudService } from '../services/hub-crud.service';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { FabComponent } from '../basic/widget/fab/fab.component';
 
 @Component({
   selector: 'hub-contract',
   standalone: true,
-  imports: [NzTableModule, NzInputModule, FormsModule, DecimalPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FabComponent,
+    NzTableModule,
+    NzInputModule,
+    NzButtonModule,
+    NzModalModule,
+    NzFormModule,
+    ReactiveFormsModule,
+    DecimalPipe,
+    DragDropModule,
+    NgStyle
+  ],
   template: `
+    <app-fab></app-fab>
+    <div class="fab-form" *ngIf="showForm">
+      <form [formGroup]="form" (ngSubmit)="submit()" nz-form>
+        <div nz-form-item>
+          <div nz-form-label><label>序號</label></div>
+          <div nz-form-control>
+            <input nz-input formControlName="contractSerial" />
+          </div>
+        </div>
+        <div nz-form-item>
+          <div nz-form-label><label>業主</label></div>
+          <div nz-form-control>
+            <input nz-input formControlName="client" />
+          </div>
+        </div>
+        <div nz-form-item>
+          <div nz-form-label><label>合約名稱</label></div>
+          <div nz-form-control>
+            <input nz-input formControlName="contractName" />
+          </div>
+        </div>
+        <div nz-form-item>
+          <div nz-form-label><label>合約案號識別碼</label></div>
+          <div nz-form-control>
+            <input nz-input formControlName="contractCode" />
+          </div>
+        </div>
+        <div nz-form-item>
+          <div nz-form-label><label>合約費用識別碼</label></div>
+          <div nz-form-control>
+            <input nz-input formControlName="feeCode" />
+          </div>
+        </div>
+        <div nz-form-item>
+          <div nz-form-label><label>合約金額</label></div>
+          <div nz-form-control>
+            <input nz-input type="number" formControlName="amount" />
+          </div>
+        </div>
+        <div style="text-align:right; margin-top: 8px;">
+          <button nz-button nzType="primary" [nzLoading]="isSubmitting" [disabled]="form.invalid" htmlType="submit">新增合約</button>
+          <button nz-button style="margin-left: 8px;" (click)="toggleForm()" type="button">取消</button>
+        </div>
+      </form>
+    </div>
     <nz-table #nzTable [nzData]="listOfData" nzTableLayout="fixed">
       <thead>
         <tr>
@@ -21,78 +84,88 @@ import { DecimalPipe } from '@angular/common';
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let data of nzTable.data">
+        <tr *ngFor="let data of listOfData">
           <td>{{ data.contractSerial }}</td>
-          <td>
-            <div *ngIf="editId !== data.contractSerial" (click)="startEdit(data.contractSerial)">
-              {{ data.client }}
-            </div>
-            <input *ngIf="editId === data.contractSerial" nz-input [(ngModel)]="data.client" (blur)="stopEdit()" />
-          </td>
-          <td>
-            <div *ngIf="editId !== data.contractSerial" (click)="startEdit(data.contractSerial)">
-              {{ data.contractName }}
-            </div>
-            <input *ngIf="editId === data.contractSerial" nz-input [(ngModel)]="data.contractName" (blur)="stopEdit()" />
-          </td>
-          <td>
-            <div *ngIf="editId !== data.contractSerial" (click)="startEdit(data.contractSerial)">
-              {{ data.contractCode }}
-            </div>
-            <input *ngIf="editId === data.contractSerial" nz-input [(ngModel)]="data.contractCode" (blur)="stopEdit()" />
-          </td>
-          <td>
-            <div *ngIf="editId !== data.contractSerial" (click)="startEdit(data.contractSerial)">
-              {{ data.feeCode }}
-            </div>
-            <input *ngIf="editId === data.contractSerial" nz-input [(ngModel)]="data.feeCode" (blur)="stopEdit()" />
-          </td>
-          <td>
-            <div *ngIf="editId !== data.contractSerial" (click)="startEdit(data.contractSerial)">
-              {{ data.amount | number: '1.0-0' }}
-            </div>
-            <input *ngIf="editId === data.contractSerial" nz-input type="number" [(ngModel)]="data.amount" (blur)="stopEdit()" />
-          </td>
+          <td>{{ data.client }}</td>
+          <td>{{ data.contractName }}</td>
+          <td>{{ data.contractCode }}</td>
+          <td>{{ data.feeCode }}</td>
+          <td>{{ data.amount | number: '1.0-0' }}</td>
         </tr>
       </tbody>
     </nz-table>
-  `
+  `,
+  styles: [
+    `
+      .fab-form {
+        position: fixed;
+        width: 260px;
+        background: #fff;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+        border-radius: 8px;
+        padding: 12px 12px 8px 12px;
+        z-index: 1100;
+      }
+      .fab-form .nz-form-item {
+        margin-bottom: 8px;
+      }
+      .fab-form input[nz-input] {
+        font-size: 13px;
+        padding: 2px 8px;
+        height: 28px;
+      }
+      .fab-form label {
+        font-size: 12px;
+        margin-bottom: 2px;
+      }
+      .fab-form button[nz-button] {
+        height: 28px;
+        font-size: 13px;
+        padding: 0 10px;
+      }
+    `
+  ]
 })
 export class HubContractComponent {
-  editId: string | null = null;
+  listOfData: any[] = [];
+  isSubmitting = false;
+  form: FormGroup;
+  showForm = false;
 
-  listOfData = [
-    {
-      contractSerial: 'C00001',
-      client: '台灣電力公司',
-      contractName: '台電南部電廠維護合約',
-      contractCode: '10001',
-      feeCode: '20001',
-      amount: 1000000
-    },
-    {
-      contractSerial: 'C00002',
-      client: '台灣自來水公司',
-      contractName: '自來水管線維護合約',
-      contractCode: '10002',
-      feeCode: '20002',
-      amount: 800000
-    },
-    {
-      contractSerial: 'C00003',
-      client: '中華電信',
-      contractName: '光纖建置合約',
-      contractCode: '10003',
-      feeCode: '20003',
-      amount: 1500000
-    }
-  ];
-
-  startEdit(id: string): void {
-    this.editId = id;
+  constructor(
+    private fb: FormBuilder,
+    private hubCrud: HubCrudService<any>
+  ) {
+    this.form = this.fb.group({
+      contractSerial: ['', [Validators.required]],
+      client: ['', [Validators.required]],
+      contractName: ['', [Validators.required]],
+      contractCode: [''],
+      feeCode: [''],
+      amount: [0, [Validators.required, Validators.min(1)]]
+    });
+    // 即時監聽 contracts
+    this.hubCrud.listen('contracts').subscribe(data => {
+      this.listOfData = data;
+    });
   }
 
-  stopEdit(): void {
-    this.editId = null;
+  toggleForm() {
+    this.showForm = !this.showForm;
+    if (this.showForm) {
+      this.form.reset();
+    }
+  }
+
+  async submit() {
+    if (this.form.invalid) return;
+    this.isSubmitting = true;
+    try {
+      await this.hubCrud.add('contracts', this.form.value);
+      this.showForm = false;
+      this.form.reset();
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 }
