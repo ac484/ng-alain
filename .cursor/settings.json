@@ -1,0 +1,155 @@
+{
+  "cursor.customModes": {
+    "VAN": {
+      "name": "VAN QA",
+      "description": "技術驗證與上下文分析模式",
+      "instructions": "執行完整的技術驗證，包括環境檢查、建置測試、依賴驗證，並分析專案上下文狀態。",
+      "icon": "🔍",
+      "color": "#4da6ff",
+      "shortcuts": ["Ctrl+Shift+V", "Cmd+Shift+V"],
+      "autoApply": false,
+      "requiresConfirmation": true
+    },
+    "PLAN": {
+      "name": "PLAN",
+      "description": "規劃與策略制定模式",
+      "instructions": "與使用者共同定義計劃，收集必要資訊，制定詳細的實作策略，但不進行任何程式碼更動。",
+      "icon": "📋",
+      "color": "#ffa64d",
+      "shortcuts": ["Ctrl+Shift+P", "Cmd+Shift+P"],
+      "autoApply": false,
+      "requiresConfirmation": true
+    },
+    "CREATIVE": {
+      "name": "CREATIVE",
+      "description": "創意設計與架構決策模式",
+      "instructions": "進行系統架構設計、技術選型決策、創意解決方案制定，專注於設計階段的決策制定。",
+      "icon": "🎨",
+      "color": "#d94dbb",
+      "shortcuts": ["Ctrl+Shift+C", "Cmd+Shift+C"],
+      "autoApply": false,
+      "requiresConfirmation": true
+    },
+    "IMPLEMENT": {
+      "name": "IMPLEMENT",
+      "description": "程式碼實作與同步模式",
+      "instructions": "根據已批准的計劃進行程式碼實作，同步更新規劃文件，確保規劃與專案保持吻合。",
+      "icon": "⚒️",
+      "color": "#4dbb5f",
+      "shortcuts": ["Ctrl+Shift+I", "Cmd+Shift+I"],
+      "autoApply": false,
+      "requiresConfirmation": true
+    },
+    "REFLECT": {
+      "name": "REFLECT",
+      "description": "回顧與優化模式",
+      "instructions": "回顧已完成的工作，分析問題與改進點，制定優化策略，積累經驗教訓。",
+      "icon": "🔍",
+      "color": "#4dbbbb",
+      "shortcuts": ["Ctrl+Shift+R", "Cmd+Shift+R"],
+      "autoApply": false,
+      "requiresConfirmation": true
+    },
+    "ARCHIVE": {
+      "name": "ARCHIVE",
+      "description": "文檔化與知識歸檔模式",
+      "instructions": "將已完成的任務、設計決策、反思與最佳實踐進行結構化文檔化，並同步至 Memory Bank 歷史記錄，確保知識可追溯與團隊共享。",
+      "icon": "📦",
+      "color": "#b3e6cc",
+      "shortcuts": ["Ctrl+Shift+A", "Cmd+Shift+A"],
+      "autoApply": false,
+      "requiresConfirmation": true
+    }
+  },
+  "cursor.modeTransitions": {
+    "defaultMode": "PLAN",
+    "allowedTransitions": {
+      "VAN": ["PLAN", "CREATIVE", "IMPLEMENT"],
+      "PLAN": ["CREATIVE", "IMPLEMENT", "VAN"],
+      "CREATIVE": ["PLAN", "IMPLEMENT", "REFLECT"],
+      "IMPLEMENT": ["REFLECT", "VAN", "PLAN"],
+      "REFLECT": ["PLAN", "CREATIVE", "IMPLEMENT"]
+    },
+    "transitionRules": {
+      "requireApproval": true,
+      "logTransitions": true,
+      "autoSaveState": true
+    }
+  },
+  "cursor.memoryBank": {
+    "enabled": true,
+    "autoSync": true,
+    "requiredFiles": [
+      "projectbrief.md",
+      "activeContext.md",
+      "progress.md",
+      "systemPatterns.md",
+      "techContext.md",
+      "productContext.md"
+    ],
+    "autoBackup": true,
+    "backupInterval": "daily"
+  },
+  "cursor.redis": {
+    "enabled": true,
+    "autoCache": true,
+    "cacheStrategy": "high-quality-only",
+    "cleanupInterval": "weekly",
+    "vectorSearch": true
+  },
+  "cursor.context7": {
+    "enabled": true,
+    "autoQuery": true,
+    "mergeStrategy": "official-first",
+    "sourceAnnotation": true
+  },
+  "cursor.workflow": {
+    "complexityDetection": true,
+    "creativePhaseEnforcement": true,
+    "qualityMetrics": true,
+    "autoDocumentation": true
+  },
+  "cursor.notifications": {
+    "modeChanges": true,
+    "memoryBankUpdates": true,
+    "qualityWarnings": true,
+    "completionAlerts": true
+  },
+  "cursor.keybindings": {
+    "modeSwitch": {
+      "VAN": "ctrl+shift+v",
+      "PLAN": "ctrl+shift+p",
+      "CREATIVE": "ctrl+shift+c",
+      "IMPLEMENT": "ctrl+shift+i",
+      "REFLECT": "ctrl+shift+r"
+    },
+    "quickActions": {
+      "updateMemoryBank": "ctrl+shift+m",
+      "vanQA": "ctrl+shift+q",
+      "saveContext": "ctrl+shift+s"
+    }
+  },
+  "cursor.integrations": {
+    "git": {
+      "autoCommit": false,
+      "commitOnModeChange": false,
+      "branchNaming": "mode/feature-description"
+    },
+    "vscode": {
+      "syncSettings": true,
+      "shareKeybindings": true
+    }
+  },
+  "cursor.quality": {
+    "lintOnSave": true,
+    "testOnBuild": true,
+    "autoFormat": true,
+    "complexityThreshold": 80
+  },
+  "cursor.documentation": {
+    "autoGenerate": true,
+    "templatePath": ".cursor/templates",
+    "outputFormat": "markdown",
+    "includeDiagrams": true
+  }
+}
