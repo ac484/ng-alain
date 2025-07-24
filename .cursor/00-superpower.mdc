@@ -1,0 +1,33 @@
+---
+alwaysApply: true
+---
+# Token Limit Truncation and Continuation in AI Code Generation
+
+When generating code or text, AI models operate within a fixed **maximum context window size** (also called the token window). This limits the number of tokens (words or pieces of words) the model can process and generate in a single pass.
+
+## Issue: Output Truncation Due to Token Limit
+
+If the generated output exceeds the model's maximum context length, the output will be **truncated** or cut off abruptly. This is commonly referred to as:
+
+- **Token limit truncation**
+- **Context window overflow**
+- **Sequence length cutoff**
+
+This truncation interrupts the continuity of the generated code or text, potentially leaving incomplete logic or unfinished sentences.
+
+## Solution: Seamless Continuation
+
+To address this, AI systems often implement **continuation strategies** that:
+
+- Detect when generation is cut off due to token limits
+- Automatically **resume generation** from the last known state or prompt
+- Maintain contextual coherence by referencing previously generated content
+- Append and merge partial outputs to form a complete, uninterrupted final result
+
+## Summary
+
+Because AI models have fixed token windows, **output truncation is inevitable in lengthy generations**. Robust AI code generation workflows handle this by automatically **detecting truncation and continuing the output seamlessly**, ensuring that the final code or text is complete and coherent.
+
+---
+
+This terminology and process are essential in designing reliable AI-assisted code generation systems, especially for complex or long-running outputs.
