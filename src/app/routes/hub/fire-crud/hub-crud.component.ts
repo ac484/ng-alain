@@ -142,6 +142,7 @@ export class HubFireCrudComponent implements OnInit {
   editId: string | null = null;
   editField: keyof Contract | null = null;
   editValue: any = '';
+  // 移除合約專屬欄位
   clients: string[] = [];
 
   constructor(
@@ -153,28 +154,17 @@ export class HubFireCrudComponent implements OnInit {
     this.crud.useCollection<Contract>('hub_contract').subscribe(data => {
       this.contracts = [...data]; // immutable
     });
-    // 取得業主清單
-    this.loadClients();
-  }
-
-  async loadClients() {
-    const settings = await this.crud.getClientsSettings();
-    this.clients = settings?.list || [];
+    // 移除 loadClients 方法
   }
 
   async addRow() {
-    // 並行取得預設業主與下一個合約序號
-    const [defaultClient, contractSerial] = await Promise.all([this.crud.getDefaultClient(), this.crud.getNextContractSerial()]);
-    const newContract: Contract = {
-      contractSerial,
-      client: defaultClient,
-      contractName: '',
-      contractCode: '',
-      feeCode: '',
-      amount: 0
+    // 僅保留通用 CRUD 新增邏輯，移除合約序號與業主相關邏輯
+    const newItem: any = {
+      // 根據通用 CRUD 結構自行定義欄位
     };
-    const id = await this.crud.add<Contract>('hub_contract', newContract);
-    // 取得新資料後自動進入編輯
+    const id = await this.crud.add<any>('your_collection', newItem);
+    // 更新資料集
+    this.contracts = [...this.contracts, { ...newItem, key: id }];
     setTimeout(() => {
       this.startEdit(id, 'contractName');
     }, 200);
@@ -208,12 +198,7 @@ export class HubFireCrudComponent implements OnInit {
 
   async deleteRow(id: string | undefined) {
     if (!id) return;
-    const contract = this.contracts.find(d => d.key === id);
     this.contracts = this.contracts.filter(d => d.key !== id);
-    await this.crud.delete<Contract>('hub_contract', id);
-    // 回收 contractSerial
-    if (contract?.contractSerial) {
-      await this.crud.recycleContractSerial(contract.contractSerial);
-    }
+    await this.crud.delete<any>('your_collection', id);
   }
 }
