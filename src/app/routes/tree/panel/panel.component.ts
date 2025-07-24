@@ -26,7 +26,7 @@ import { SpaceNode } from '../models/models';
   selector: 'app-tree-panel',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, // 確保已引入 CommonModule
     FormsModule,
     NzTreeModule,
     NzDropDownModule,

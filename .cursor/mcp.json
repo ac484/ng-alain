@@ -25,7 +25,8 @@
         "resolve-library-id",
         "get-library-docs",
         "topic",
-        "tokens"
+        "tokens",
+        "*"
       ]
     },
     "filesystem": {
