@@ -1,0 +1,1 @@
+import"./chunk-57BLH6QZ.js";var t=[{path:"contract",loadComponent:()=>import("./chunk-DWUMKNMU.js").then(o=>o.HubContractComponent)},{path:"tree/contract",loadComponent:()=>import("./chunk-ETKH66JP.js").then(o=>o.HubTreeContractComponent)},{path:"workspace",loadComponent:()=>import("./chunk-57TKBGIO.js").then(o=>o.HubWorkspaceComponent)}];export{t as default};
