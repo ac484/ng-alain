@@ -1,1 +1,0 @@
-import"./chunk-57BLH6QZ.js";var o=[{path:"",loadComponent:()=>import("./chunk-7IQZ2NQM.js").then(t=>t.DeptListComponent),data:{title:"\u90E8\u9580\u5217\u8868"}}];export{o as routes};
