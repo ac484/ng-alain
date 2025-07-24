@@ -37,22 +37,6 @@ export default [
         loadComponent: () => import('./list/list.component').then(m => m.TreeListComponent)
       },
       {
-        path: 'create',
-        loadComponent: () => import('./template/create/create.component').then(m => m.TreeCreateComponent)
-      },
-      {
-        path: 'search',
-        loadComponent: () => import('./template/search/search.component').then(m => m.TreeSearchComponent)
-      },
-      {
-        path: 'import-export',
-        loadComponent: () => import('./template/import-export/import-export.component').then(m => m.TreeImportExportComponent)
-      },
-      {
-        path: 'pdf-import',
-        loadComponent: () => import('./template/pdf-import/pdf-import.component').then(m => m.TreePdfImportComponent)
-      },
-      {
         path: 'pdf-scan',
         loadComponent: () => import('./pdf-scan/pdf-scan.component').then(m => m.PdfScanComponent)
       },
@@ -63,10 +47,6 @@ export default [
       {
         path: 'document-viewer',
         loadComponent: () => import('../../layout/basic/widgets/document-viewer.component').then(m => m.DocumentViewerComponent)
-      },
-      {
-        path: 'settings',
-        loadComponent: () => import('./template/settings/settings.component').then(m => m.TreeSettingsComponent)
       },
       {
         path: 'panel',
