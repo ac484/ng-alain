@@ -182,7 +182,7 @@ export class PdfScanComponent implements OnInit {
     const pageIndices = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i - 1);
 
     const copiedPages = await newPdfDoc.copyPages(this.pdfDocument, pageIndices);
-    copiedPages.forEach(page => newPdfDoc.addPage(page));
+    copiedPages.forEach((page: any) => newPdfDoc.addPage(page));
 
     return await newPdfDoc.save();
   }
