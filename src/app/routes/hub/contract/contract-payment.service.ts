@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { collection, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, serverTimestamp, Timestamp } from '@angular/fire/firestore';
+import { collection, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, getDoc, serverTimestamp, Timestamp } from '@angular/fire/firestore';
 import { HubCrudService } from '../fire-crud/hub-crud.service';
-import { ContractPayment, ContractPaymentStep, PaymentStatus, StepStatus } from './contract-payment.model';
+import { ContractPayment, ContractPaymentStep, PaymentStatus, StepStatus, WorkflowDefinition } from './contract-payment.model';
 import { ContractWorkflowService } from './contract-workflow.service';
 
 @Injectable({ providedIn: 'root' })
@@ -73,12 +73,16 @@ export class ContractPaymentService {
 
   // Initialize workflow steps from template
   async initializeWorkflow(workflowTemplateId: string): Promise<ContractPaymentStep[]> {
-    const templates = await this.workflowService.listTemplates().toPromise();
-    const workflowTemplate = templates?.find(t => t.key === workflowTemplateId);
+    // Get workflow template directly from Firestore
+    const col = collection(this.hubCrud.firestoreInstance, 'hub_workflow_definitions');
+    const templateRef = doc(col, workflowTemplateId);
+    const templateSnap = await getDocs(query(col, where('__name__', '==', workflowTemplateId)));
 
-    if (!workflowTemplate) {
+    if (templateSnap.empty) {
       throw new Error(`Workflow template not found: ${workflowTemplateId}`);
     }
+
+    const workflowTemplate = { key: templateSnap.docs[0].id, ...templateSnap.docs[0].data() } as WorkflowDefinition;
 
     return workflowTemplate.steps.map((step, index) => ({
       name: step.name,
@@ -91,12 +95,15 @@ export class ContractPaymentService {
 
   // Advance workflow to next step
   async advanceWorkflow(paymentId: string, currentStepIndex: number, approved: boolean, comment: string = ''): Promise<void> {
-    // Get current payment
-    const paymentDoc = await this.hubCrud.useDoc<ContractPayment>(this.collectionName, paymentId).toPromise();
+    // Get current payment directly from Firestore
+    const paymentRef = doc(this.hubCrud.firestoreInstance, this.collectionName, paymentId);
+    const paymentSnap = await getDoc(paymentRef);
 
-    if (!paymentDoc) {
+    if (!paymentSnap.exists()) {
       throw new Error(`Payment not found: ${paymentId}`);
     }
+
+    const paymentDoc = { key: paymentSnap.id, ...paymentSnap.data() } as ContractPayment;
 
     const updatedSteps = [...paymentDoc.steps];
 

@@ -24,6 +24,7 @@
 
 
 
+
 - [x] 3. Implement minimal ContractPaymentService
 
 
@@ -32,10 +33,13 @@
   - Use @angular/fire consistently for all database operations
   - Implement core CRUD: list(), add(), update(), delete()
   - Add minimal workflow integration: initializeWorkflow(), advanceWorkflow()
+
   - Keep business logic simple and focused
   - _Requirements: 1.1, 1.2, 2.1, 2.3, 2.4, 3.3, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 4. Create minimal ContractPaymentFormComponent with OnPush
+- [x] 4. Create minimal ContractPaymentFormComponent with OnPush
+
+
   - Build standalone component with ChangeDetectionStrategy.OnPush
   - Use signals for reactive state management
   - Implement minimal reactive form with essential validation
@@ -57,7 +61,11 @@
   - Maintain existing contract functionality unchanged
   - _Requirements: 1.1, 1.2, 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 7. Create minimal WorkflowSettingsComponent with OnPush
+- [x] 7. Create minimal WorkflowSettingsComponent with OnPush
+
+
+
+
   - Build standalone component with ChangeDetectionStrategy.OnPush
   - Use signals for reactive state management
   - Implement minimal template CRUD following existing patterns
