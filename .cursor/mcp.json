@@ -126,6 +126,62 @@
           "zrange",
           "zrem"
         ]
+      },
+      "redis-mcp-ac": {
+        "command": "C:\\Users\\ac7x\\scoop\\apps\\python\\current\\Scripts\\uv.exe",
+        "args": [
+          "--directory",
+          "C:/Users/ac7x/Documents/GitHub/mcp/mcp-redis",
+          "run",
+          "src/main.py"
+        ],
+        "disabled": false,
+        "autoApprove": [
+          "client_list",
+          "create_vector_index_hash",
+          "dbsize",
+          "delete",
+          "expire",
+          "get",
+          "get_index_info",
+          "get_indexed_keys_number",
+          "get_indexes",
+          "get_vector_from_hash",
+          "hdel",
+          "hexists",
+          "hget",
+          "hgetall",
+          "hset",
+          "info",
+          "json_del",
+          "json_get",
+          "json_set",
+          "llen",
+          "lpop",
+          "lpush",
+          "lrange",
+          "publish",
+          "rename",
+          "rpop",
+          "rpush",
+          "sadd",
+          "scan_all_keys",
+          "scan_keys",
+          "set",
+          "set_vector_in_hash",
+          "smembers",
+          "srem",
+          "subscribe",
+          "type",
+          "unsubscribe",
+          "vector_search_hash",
+          "xadd",
+          "xdel",
+          "xrange",
+          "zadd",
+          "zrange",
+          "zrem"
+        ]
       }
     }
   }
