@@ -20,6 +20,11 @@ import { Observable } from 'rxjs';
 export class HubCrudService {
   private firestore = inject(Firestore);
 
+  // 暴露 firestore 實例供其他服務使用
+  get firestoreInstance(): Firestore {
+    return this.firestore;
+  }
+
   // 語法糖：取得集合（自動型別）
   useCollection<T extends { key?: string }>(collectionName: string): Observable<T[]> {
     const col = collection(this.firestore, collectionName) as CollectionReference<T>;
