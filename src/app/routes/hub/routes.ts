@@ -7,7 +7,7 @@ export default [
   },
   {
     path: 'tree/contract',
-    loadComponent: () => import('./tree/contract.component').then(m => m.HubTreeContractComponent)
+    loadComponent: () => import('./tree/tree.component').then(m => m.HubTreeContractComponent)
   },
   {
     path: 'workspace',
