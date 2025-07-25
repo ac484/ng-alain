@@ -91,7 +91,10 @@
 
 
 
-- [ ] 9. Implement minimal workflow state transitions
+- [x] 9. Implement minimal workflow state transitions
+
+
+
   - Create simple workflow progression logic
   - Use @angular/fire runTransaction for atomic updates
   - Keep state machine logic minimal and essential

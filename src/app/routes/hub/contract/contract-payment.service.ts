@@ -31,7 +31,30 @@ export class ContractPaymentService {
     // Get workflow template for client
     const workflowTemplate = await this.workflowService.getTemplateForClient(clientId);
     if (!workflowTemplate) {
-      throw new Error(`No workflow template found for client: ${clientId}`);
+      // Create a default workflow template if none exists
+      console.warn(`No workflow template found for client: ${clientId}, creating default template`);
+      const defaultTemplateId = await this.createDefaultWorkflowTemplate(clientId);
+      const defaultTemplate = await this.workflowService.getTemplateForClient(clientId);
+      if (!defaultTemplate) {
+        throw new Error(`Failed to create default workflow template for client: ${clientId}`);
+      }
+      const steps = await this.initializeWorkflow(defaultTemplate.key!);
+
+      const paymentData: Omit<ContractPayment, 'key'> = {
+        contractId,
+        amount,
+        status: 'draft' as PaymentStatus,
+        workflowId: defaultTemplate.key!,
+        steps,
+        attachments: [],
+        remark,
+        createdAt: serverTimestamp() as Timestamp,
+        updatedAt: serverTimestamp() as Timestamp
+      };
+
+      const col = collection(this.hubCrud.firestoreInstance, this.collectionName);
+      const docRef = await addDoc(col, paymentData);
+      return docRef.id;
     }
 
     // Initialize workflow steps
@@ -71,86 +94,167 @@ export class ContractPaymentService {
     await deleteDoc(ref);
   }
 
+  // Submit payment to start workflow
+  async submitPayment(paymentId: string): Promise<void> {
+    const paymentRef = doc(this.hubCrud.firestoreInstance, this.collectionName, paymentId);
+
+    // Use runTransaction for atomic updates
+    const { runTransaction } = await import('@angular/fire/firestore');
+
+    await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
+      const paymentSnap = await transaction.get(paymentRef);
+
+      if (!paymentSnap.exists()) {
+        throw new Error(`Payment not found: ${paymentId}`);
+      }
+
+      const paymentDoc = { key: paymentSnap.id, ...paymentSnap.data() } as ContractPayment;
+
+      // Validate payment can be submitted
+      if (paymentDoc.status !== 'draft') {
+        throw new Error(`Payment cannot be submitted. Current status: ${paymentDoc.status}`);
+      }
+
+      // Update payment status and activate first workflow step
+      const updatedSteps = [...paymentDoc.steps];
+      if (updatedSteps.length > 0) {
+        updatedSteps[0] = {
+          ...updatedSteps[0],
+          status: 'pending' as StepStatus,
+          updatedAt: serverTimestamp() as Timestamp
+        };
+      }
+
+      transaction.update(paymentRef, {
+        status: 'submitted' as PaymentStatus,
+        steps: updatedSteps,
+        updatedAt: serverTimestamp() as Timestamp
+      });
+    });
+  }
+
   // Initialize workflow steps from template
   async initializeWorkflow(workflowTemplateId: string): Promise<ContractPaymentStep[]> {
     // Get workflow template directly from Firestore
     const col = collection(this.hubCrud.firestoreInstance, 'hub_workflow_definitions');
     const templateRef = doc(col, workflowTemplateId);
-    const templateSnap = await getDocs(query(col, where('__name__', '==', workflowTemplateId)));
+    const templateSnap = await getDoc(templateRef);
 
-    if (templateSnap.empty) {
+    if (!templateSnap.exists()) {
       throw new Error(`Workflow template not found: ${workflowTemplateId}`);
     }
 
-    const workflowTemplate = { key: templateSnap.docs[0].id, ...templateSnap.docs[0].data() } as WorkflowDefinition;
+    const workflowTemplate = { key: templateSnap.id, ...templateSnap.data() } as WorkflowDefinition;
 
     return workflowTemplate.steps.map((step, index) => ({
       name: step.name,
-      status: (index === 0 ? 'pending' : 'waiting') as StepStatus,
+      status: 'waiting' as StepStatus, // All steps start as waiting, will be activated when submitted
       approver: step.approver,
       comment: '',
       updatedAt: serverTimestamp() as Timestamp
     }));
   }
 
-  // Advance workflow to next step
+  // Advance workflow to next step with atomic transaction
   async advanceWorkflow(paymentId: string, currentStepIndex: number, approved: boolean, comment: string = ''): Promise<void> {
-    // Get current payment directly from Firestore
     const paymentRef = doc(this.hubCrud.firestoreInstance, this.collectionName, paymentId);
-    const paymentSnap = await getDoc(paymentRef);
 
-    if (!paymentSnap.exists()) {
-      throw new Error(`Payment not found: ${paymentId}`);
-    }
+    // Use runTransaction for atomic updates
+    const { runTransaction } = await import('@angular/fire/firestore');
 
-    const paymentDoc = { key: paymentSnap.id, ...paymentSnap.data() } as ContractPayment;
+    await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
+      const paymentSnap = await transaction.get(paymentRef);
 
-    const updatedSteps = [...paymentDoc.steps];
+      if (!paymentSnap.exists()) {
+        throw new Error(`Payment not found: ${paymentId}`);
+      }
 
-    if (approved) {
-      // Mark current step as done
-      updatedSteps[currentStepIndex] = {
-        ...updatedSteps[currentStepIndex],
-        status: 'done' as StepStatus,
-        comment,
-        updatedAt: serverTimestamp() as Timestamp
-      };
+      const paymentDoc = { key: paymentSnap.id, ...paymentSnap.data() } as ContractPayment;
+      const updatedSteps = [...paymentDoc.steps];
 
-      // Check if there's a next step
-      if (currentStepIndex + 1 < updatedSteps.length) {
-        // Activate next step
-        updatedSteps[currentStepIndex + 1] = {
-          ...updatedSteps[currentStepIndex + 1],
-          status: 'pending' as StepStatus,
+      // Validate current step index
+      if (currentStepIndex < 0 || currentStepIndex >= updatedSteps.length) {
+        throw new Error(`Invalid step index: ${currentStepIndex}`);
+      }
+
+      // Validate current step status
+      if (updatedSteps[currentStepIndex].status !== 'pending') {
+        throw new Error(`Step ${currentStepIndex} is not in pending status`);
+      }
+
+      if (approved) {
+        // Mark current step as done
+        updatedSteps[currentStepIndex] = {
+          ...updatedSteps[currentStepIndex],
+          status: 'done' as StepStatus,
+          comment,
           updatedAt: serverTimestamp() as Timestamp
         };
 
-        // Update payment status to reviewing
-        await this.update(paymentId, {
-          steps: updatedSteps,
-          status: 'reviewing' as PaymentStatus
-        });
+        // Check if there's a next step
+        if (currentStepIndex + 1 < updatedSteps.length) {
+          // Activate next step
+          updatedSteps[currentStepIndex + 1] = {
+            ...updatedSteps[currentStepIndex + 1],
+            status: 'pending' as StepStatus,
+            updatedAt: serverTimestamp() as Timestamp
+          };
+
+          // Update payment status to reviewing
+          transaction.update(paymentRef, {
+            steps: updatedSteps,
+            status: 'reviewing' as PaymentStatus,
+            updatedAt: serverTimestamp() as Timestamp
+          });
+        } else {
+          // All steps completed - approve payment
+          transaction.update(paymentRef, {
+            steps: updatedSteps,
+            status: 'approved' as PaymentStatus,
+            updatedAt: serverTimestamp() as Timestamp
+          });
+        }
       } else {
-        // All steps completed - approve payment
-        await this.update(paymentId, {
+        // Mark current step as rejected
+        updatedSteps[currentStepIndex] = {
+          ...updatedSteps[currentStepIndex],
+          status: 'rejected' as StepStatus,
+          comment,
+          updatedAt: serverTimestamp() as Timestamp
+        };
+
+        // Reject entire payment
+        transaction.update(paymentRef, {
           steps: updatedSteps,
-          status: 'approved' as PaymentStatus
+          status: 'rejected' as PaymentStatus,
+          updatedAt: serverTimestamp() as Timestamp
         });
       }
-    } else {
-      // Mark current step as rejected
-      updatedSteps[currentStepIndex] = {
-        ...updatedSteps[currentStepIndex],
-        status: 'rejected' as StepStatus,
-        comment,
-        updatedAt: serverTimestamp() as Timestamp
-      };
+    });
+  }
 
-      // Reject entire payment
-      await this.update(paymentId, {
-        steps: updatedSteps,
-        status: 'rejected' as PaymentStatus
-      });
-    }
+  // Create a default workflow template for a client
+  private async createDefaultWorkflowTemplate(clientId: string): Promise<string> {
+    const defaultTemplate: Omit<WorkflowDefinition, 'key'> = {
+      name: `${clientId} 預設審批流程`,
+      clientId: clientId,
+      isActive: true,
+      steps: [
+        {
+          name: '主管審核',
+          approver: 'supervisor',
+          order: 1
+        },
+        {
+          name: '財務審核',
+          approver: 'finance',
+          order: 2
+        }
+      ],
+      createdAt: serverTimestamp() as Timestamp,
+      updatedAt: serverTimestamp() as Timestamp
+    };
+
+    return await this.workflowService.createTemplate(defaultTemplate);
   }
 }

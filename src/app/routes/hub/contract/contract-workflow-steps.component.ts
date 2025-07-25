@@ -240,15 +240,18 @@ export class ContractWorkflowStepsComponent {
             const approved = this.isApproving();
             const comment = this.approvalComment();
 
-            // Use runTransaction for atomic workflow updates
-            await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
-                await this.paymentService.advanceWorkflow(
-                    this.payment.key!,
-                    currentIndex,
-                    approved,
-                    comment
-                );
-            });
+            // Validate inputs
+            if (currentIndex < 0 || currentIndex >= this.payment.steps.length) {
+                throw new Error('Invalid workflow step');
+            }
+
+            // Call the service method which handles the transaction internally
+            await this.paymentService.advanceWorkflow(
+                this.payment.key!,
+                currentIndex,
+                approved,
+                comment
+            );
 
             const action = approved ? '核准' : '拒絕';
             this.message.success(`${action}成功`);
@@ -258,7 +261,8 @@ export class ContractWorkflowStepsComponent {
 
         } catch (error) {
             console.error('Workflow approval error:', error);
-            this.message.error('操作失敗，請重試');
+            const errorMessage = error instanceof Error ? error.message : '操作失敗，請重試';
+            this.message.error(errorMessage);
         } finally {
             this.isProcessing.set(false);
         }

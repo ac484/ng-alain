@@ -14,13 +14,15 @@ import { ContractPaymentService } from './contract-payment.service';
 import { FabComponent } from '../basic/widget/fab.component';
 import { HubCrudService } from '../fire-crud/hub-crud.service';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 import { ContractWorkflowStepsComponent } from './contract-workflow-steps.component';
+import { ContractPaymentFormComponent, PaymentFormData } from './contract-payment-form.component';
 
 @Component({
   selector: 'contract-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, NzDropDownModule, NzTagModule, NzIconModule, FabComponent, ContractWorkflowStepsComponent],
+  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, NzDropDownModule, NzModalModule, NzTagModule, NzIconModule, FabComponent, ContractWorkflowStepsComponent, ContractPaymentFormComponent],
   template: `
     <app-fab (onAction)="addRow()"></app-fab>
     <br />
@@ -162,6 +164,16 @@ import { ContractWorkflowStepsComponent } from './contract-workflow-steps.compon
                                 編輯
                               </button>
                               <button 
+                                *ngIf="payment.status === 'draft'"
+                                nz-button 
+                                nzType="primary" 
+                                nzSize="small"
+                                (click)="submitPayment(payment.key!)"
+                                [nzLoading]="paymentSubmitting().has(payment.key!)"
+                                style="margin-left: 4px;">
+                                提交審批
+                              </button>
+                              <button 
                                 nz-button 
                                 nzType="link" 
                                 nzSize="small"
@@ -211,6 +223,24 @@ import { ContractWorkflowStepsComponent } from './contract-workflow-steps.compon
         <li nz-menu-item *ngFor="let cl of clients" (click)="changeClient(currentDropdownRow, cl)">{{ cl }}</li>
       </ul>
     </nz-dropdown-menu>
+
+    <!-- Payment Form Modal -->
+    <nz-modal
+      [nzVisible]="showPaymentModal()"
+      [nzTitle]="editingPayment() ? '編輯付款請求' : '新增付款請求'"
+      [nzFooter]="null"
+      [nzWidth]="600"
+      (nzOnCancel)="onPaymentModalCancel()">
+      
+      <div *nzModalContent>
+        <app-contract-payment-form
+          [payment]="editingPayment()"
+          [contractId]="currentContract()?.key || ''"
+          (formSubmit)="onPaymentFormSubmit($event)"
+          (formCancel)="onPaymentModalCancel()">
+        </app-contract-payment-form>
+      </div>
+    </nz-modal>
   `,
   styles: [
     `
@@ -277,7 +307,13 @@ export class ContractListComponent implements OnInit {
   expandSet = signal(new Set<string>());
   contractPayments = signal(new Map<string, ContractPayment[]>());
   paymentLoading = signal(new Set<string>());
+  paymentSubmitting = signal(new Set<string>());
   workflowStepsExpanded = signal(new Set<string>());
+
+  // Payment form modal signals
+  showPaymentModal = signal(false);
+  currentContract = signal<Contract | null>(null);
+  editingPayment = signal<ContractPayment | null>(null);
 
   constructor(
     private contractService: ContractService,
@@ -381,44 +417,95 @@ export class ContractListComponent implements OnInit {
     return this.contractPayments().get(contractId) || [];
   }
 
-  async addPayment(contract: Contract): Promise<void> {
+  addPayment(contract: Contract): void {
     if (!contract.key) {
       console.error('Contract key is missing');
       return;
     }
 
-    // Set loading state
-    const currentLoading = this.paymentLoading();
-    currentLoading.add(contract.key);
-    this.paymentLoading.set(new Set(currentLoading));
-
-    try {
-      console.log('Adding payment for contract:', contract.key, 'client:', contract.client);
-
-      // Create a simple payment with default values
-      await this.paymentService.add(contract.key, 100, '新增付款請求', contract.client);
-
-      console.log('Payment added successfully, reloading payments...');
-
-      // Reload payments for this contract
-      await this.loadContractPayments(contract.key);
-
-      console.log('Payments reloaded successfully');
-
-    } catch (error) {
-      console.error('Failed to add payment:', error);
-      // You might want to show a user-friendly error message here
-    } finally {
-      // Remove loading state
-      const updatedLoading = this.paymentLoading();
-      updatedLoading.delete(contract.key);
-      this.paymentLoading.set(new Set(updatedLoading));
-    }
+    // Set current contract and show modal
+    this.currentContract.set(contract);
+    this.editingPayment.set(null); // Clear editing payment for new payment
+    this.showPaymentModal.set(true);
   }
 
   editPayment(payment: ContractPayment): void {
-    // For now, just log - in a full implementation, this would open an edit form
-    console.log('Edit payment:', payment);
+    // Set editing payment and show modal
+    this.editingPayment.set(payment);
+    this.currentContract.set(this.contracts.find(c => c.key === payment.contractId) || null);
+    this.showPaymentModal.set(true);
+  }
+
+  async onPaymentFormSubmit(formData: PaymentFormData): Promise<void> {
+    try {
+      if (this.editingPayment()) {
+        // Update existing payment
+        await this.paymentService.update(this.editingPayment()!.key!, {
+          amount: formData.amount,
+          remark: formData.remark,
+          attachments: formData.attachments
+        });
+        console.log('付款請求更新成功');
+      } else {
+        // Create new payment
+        const currentContract = this.currentContract();
+        if (!currentContract?.key) {
+          throw new Error('合約資訊缺失');
+        }
+
+        await this.paymentService.add(
+          currentContract.key,
+          formData.amount,
+          formData.remark,
+          currentContract.client
+        );
+        console.log('付款請求創建成功');
+      }
+
+      this.onPaymentModalCancel();
+
+      // Reload payments for current contract
+      const contractId = this.currentContract()?.key;
+      if (contractId) {
+        await this.loadContractPayments(contractId);
+      }
+    } catch (error) {
+      console.error('操作失敗：', error);
+      // You might want to show a user-friendly error message here
+    }
+  }
+
+  onPaymentModalCancel(): void {
+    this.showPaymentModal.set(false);
+    this.currentContract.set(null);
+    this.editingPayment.set(null);
+  }
+
+  async submitPayment(paymentId: string): Promise<void> {
+    // Set submitting state
+    const currentSubmitting = this.paymentSubmitting();
+    currentSubmitting.add(paymentId);
+    this.paymentSubmitting.set(new Set(currentSubmitting));
+
+    try {
+      await this.paymentService.submitPayment(paymentId);
+
+      // Refresh all expanded contract payments to show updated status
+      const expandedContracts = Array.from(this.expandSet());
+      for (const contractId of expandedContracts) {
+        await this.loadContractPayments(contractId);
+      }
+
+      console.log('Payment submitted successfully');
+    } catch (error) {
+      console.error('Failed to submit payment:', error);
+      // You might want to show a user-friendly error message here
+    } finally {
+      // Remove submitting state
+      const updatedSubmitting = this.paymentSubmitting();
+      updatedSubmitting.delete(paymentId);
+      this.paymentSubmitting.set(new Set(updatedSubmitting));
+    }
   }
 
   async deletePayment(paymentId: string): Promise<void> {
