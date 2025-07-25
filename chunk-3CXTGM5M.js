@@ -1,2 +1,0 @@
-import{Fb as n,Nc as c,jc as o,kc as a}from"./chunk-MUKALFIJ.js";import"./chunk-57BLH6QZ.js";var e=class e{};e.\u0275fac=function(t){return new(t||e)},e.\u0275cmp=n({type:e,selectors:[["app-hub-tree-contract"]],decls:2,vars:0,consts:[[2,"padding","32px","text-align","center","color","#aaa","font-size","20px"]],template:function(t,s){t&1&&(o(0,"div",0),c(1,` \u5408\u7D04\u6A39\u72C0\u4E2D\u5FC3\u4F54\u4F4D
-`),a())},encapsulation:2});var i=e;export{i as HubTreeContractComponent};
