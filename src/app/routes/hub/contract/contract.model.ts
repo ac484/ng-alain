@@ -8,5 +8,4 @@ export interface Contract {
   contractCode?: string;
   feeCode?: string;
   amount: number;
-  payments?: ContractPayment[];
 }
