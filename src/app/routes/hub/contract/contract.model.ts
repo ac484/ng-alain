@@ -1,3 +1,5 @@
+import { ContractPayment } from './contract-payment.model';
+
 export interface Contract {
   key?: string;
   contractSerial: string;
@@ -6,4 +8,5 @@ export interface Contract {
   contractCode?: string;
   feeCode?: string;
   amount: number;
+  payments?: ContractPayment[];
 }
