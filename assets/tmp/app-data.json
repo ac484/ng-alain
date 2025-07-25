@@ -10,181 +10,144 @@
   },
   "menu": [
     {
-      "text": "Hub",
-      "i18n": "menu.hub",
+      "text": "主导航",
+      "i18n": "menu.main",
       "group": true,
       "hideInBreadcrumb": true,
       "children": [
         {
-          "text": "Contract",
-          "link": "/hub/contract",
-          "i18n": "menu.contract",
-          "icon": "anticon-file-text"
+          "text": "仪表盘",
+          "i18n": "menu.dashboard",
+          "icon": "anticon-dashboard",
+          "children": [
+            {
+              "text": "仪表盘V1",
+              "link": "/dashboard/v1",
+              "i18n": "menu.dashboard.v1"
+            },
+            {
+              "text": "分析页",
+              "link": "/dashboard/analysis",
+              "i18n": "menu.dashboard.analysis"
+            },
+            {
+              "text": "监控页",
+              "link": "/dashboard/monitor",
+              "i18n": "menu.dashboard.monitor"
+            },
+            {
+              "text": "工作台",
+              "link": "/dashboard/workplace",
+              "i18n": "menu.dashboard.workplace"
+            }
+          ]
         },
         {
-          "text": "Tree",
-          "link": "/hub/tree",
-          "i18n": "menu.tree",
-          "icon": "anticon-fork"
+          "text": "快捷菜单",
+          "i18n": "menu.shortcut",
+          "icon": "anticon-rocket",
+          "shortcutRoot": true,
+          "children": []
         },
         {
-          "text": "Workspace",
-          "link": "/hub/workspace",
-          "i18n": "menu.workspace",
-          "icon": "anticon-team"
-        },
-        {
-          "text": "Settings",
-          "link": "/hub/settings",
-          "i18n": "menu.hub.settings",
-          "icon": "anticon-setting"
+          "text": "小部件",
+          "i18n": "menu.widgets",
+          "link": "/widgets",
+          "icon": "anticon-appstore",
+          "badge": 2
         }
       ]
     },
     {
-      "text": "Business",
-      "i18n": "menu.business",
+      "text": "NG-ALAIN",
+      "i18n": "menu.alain",
       "group": true,
       "hideInBreadcrumb": true,
       "children": [
         {
-          "text": "Contract",
-          "i18n": "menu.contract",
-          "icon": "anticon-file-text",
+          "text": "样式",
+          "i18n": "menu.style",
+          "icon": "anticon-info",
           "children": [
             {
-              "text": "Contract List",
-              "link": "/contract/list",
-              "i18n": "menu.contract.list"
+              "text": "Typography",
+              "link": "/style/typography",
+              "i18n": "menu.style.typography",
+              "shortcut": true
             },
             {
-              "text": "Create Contract",
-              "link": "/contract/create",
-              "i18n": "menu.contract.create"
+              "text": "Grid Masonry",
+              "link": "/style/gridmasonry",
+              "i18n": "menu.style.gridmasonry"
             },
             {
-              "text": "Contract Panel",
-              "link": "/contract/panel",
-              "i18n": "menu.contract.panel"
-            },
-            {
-              "text": "Contract Detail",
-              "link": "/contract/detail",
-              "i18n": "menu.contract.detail"
-            },
-            {
-              "text": "Edit Contract",
-              "link": "/contract/edit",
-              "i18n": "menu.contract.edit"
-            },
-            {
-              "text": "Contract Review",
-              "link": "/contract/review",
-              "i18n": "menu.contract.review"
-            },
-            {
-              "text": "Contract Payment",
-              "link": "/contract/payment/1",
-              "i18n": "menu.contract.payment"
-            },
-            {
-              "text": "Contract Change",
-              "link": "/contract/change/1",
-              "i18n": "menu.contract.change"
-            },
-            {
-              "text": "Contract Attachment",
-              "link": "/contract/attachment/1",
-              "i18n": "menu.contract.attachment"
+              "text": "Colors",
+              "link": "/style/colors",
+              "i18n": "menu.style.colors"
             }
           ]
         },
         {
-          "text": "Tree",
-          "i18n": "menu.tree",
-          "icon": "anticon-fork",
+          "text": "Delon",
+          "i18n": "menu.delon",
+          "icon": "anticon-bulb",
           "children": [
             {
-              "text": "Firebase Crud",
-              "link": "/tree/firebase-crud",
-              "i18n": "menu.tree.firebase-crud"
+              "text": "Dynamic Form",
+              "link": "/delon/form",
+              "i18n": "menu.delon.form"
             },
             {
-              "text": "Tree List",
-              "link": "/tree/list",
-              "i18n": "menu.tree.list"
+              "text": "Simple Table",
+              "link": "/delon/st",
+              "i18n": "menu.delon.table"
             },
             {
-              "text": "PDF Scan",
-              "link": "/tree/pdf-scan",
-              "i18n": "menu.tree.pdf-scan"
+              "text": "Util",
+              "link": "/delon/util",
+              "i18n": "menu.delon.util",
+              "acl": "role-a"
             },
             {
-              "text": "Scan Result",
-              "link": "/tree/scan-result",
-              "i18n": "menu.tree.scan-result"
+              "text": "Print",
+              "link": "/delon/print",
+              "i18n": "menu.delon.print",
+              "acl": "role-b"
             },
             {
-              "text": "TreePanel",
-              "link": "/tree/panel",
-              "i18n": "menu.tree.panel"
-            }
-          ]
-        },
-        {
-          "text": "Workspace",
-          "i18n": "menu.workspace",
-          "icon": "anticon-team",
-          "children": [
-            {
-              "text": "Workspace List",
-              "link": "/workspace/list",
-              "i18n": "menu.workspace.list"
+              "text": "QR",
+              "link": "/delon/qr",
+              "i18n": "menu.delon.qr"
             },
             {
-              "text": "Create Workspace",
-              "link": "/workspace/create",
-              "i18n": "menu.workspace.create"
+              "text": "ACL",
+              "link": "/delon/acl",
+              "i18n": "menu.delon.acl"
             },
             {
-              "text": "Workspace Settings",
-              "link": "/workspace/settings",
-              "i18n": "menu.workspace.settings"
+              "text": "Route Guard",
+              "link": "/delon/guard",
+              "i18n": "menu.delon.guard"
             },
             {
-              "text": "Calendar",
-              "link": "/workspace/calendar",
-              "i18n": "menu.workspace.calendar"
+              "text": "Cache",
+              "link": "/delon/cache",
+              "i18n": "menu.delon.cache"
             },
             {
-              "text": "Task Management",
-              "link": "/workspace/task",
-              "i18n": "menu.workspace.task"
+              "text": "Down File",
+              "link": "/delon/downfile",
+              "i18n": "menu.delon.downfile"
             },
             {
-              "text": "Memos",
-              "link": "/workspace/memos",
-              "i18n": "menu.workspace.memos"
+              "text": "Xlsx",
+              "link": "/delon/xlsx",
+              "i18n": "menu.delon.xlsx"
             },
             {
-              "text": "Inspection",
-              "link": "/workspace/inspection",
-              "i18n": "menu.workspace.inspection"
-            },
-            {
-              "text": "Daily Log",
-              "link": "/workspace/daily-log",
-              "i18n": "menu.workspace.daily-log"
-            },
-            {
-              "text": "Overview",
-              "link": "/workspace/overview",
-              "i18n": "menu.workspace.overview"
-            },
-            {
-              "text": "Timeline",
-              "link": "/workspace/timeline",
-              "i18n": "menu.workspace.timeline"
+              "text": "Zip",
+              "link": "/delon/zip",
+              "i18n": "menu.delon.zip"
             }
           ]
         }
@@ -298,23 +261,6 @@
           ]
         },
         {
-          "text": "Account",
-          "i18n": "menu.account",
-          "icon": "anticon-user",
-          "children": [
-            {
-              "text": "center",
-              "link": "/pro/account/center",
-              "i18n": "menu.account.center"
-            },
-            {
-              "text": "settings",
-              "link": "/pro/account/settings",
-              "i18n": "menu.account.settings"
-            }
-          ]
-        },
-        {
           "text": "Exception",
           "i18n": "menu.exception",
           "link": "/",
@@ -339,168 +285,21 @@
               "reuse": false
             }
           ]
-        }
-      ]
-    },
-    {
-      "text": "Main Navigation",
-      "i18n": "menu.main",
-      "group": true,
-      "hideInBreadcrumb": true,
-      "children": [
-        {
-          "text": "Dashboard",
-          "i18n": "menu.dashboard",
-          "icon": "anticon-dashboard",
-          "children": [
-            {
-              "text": "Dashboard V1",
-              "link": "/dashboard/v1",
-              "i18n": "menu.dashboard.v1"
-            },
-            {
-              "text": "Analysis",
-              "link": "/dashboard/analysis",
-              "i18n": "menu.dashboard.analysis"
-            },
-            {
-              "text": "Monitor",
-              "link": "/dashboard/monitor",
-              "i18n": "menu.dashboard.monitor"
-            },
-            {
-              "text": "Workplace",
-              "link": "/dashboard/workplace",
-              "i18n": "menu.dashboard.workplace"
-            }
-          ]
         },
         {
-          "text": "Shortcut Menu",
-          "i18n": "menu.shortcut",
-          "icon": "anticon-rocket",
-          "shortcutRoot": true,
-          "children": []
-        },
-        {
-          "text": "Widgets",
-          "i18n": "menu.widgets",
-          "link": "/widgets",
-          "icon": "anticon-appstore",
-          "badge": 2
-        }
-      ]
-    },
-    {
-      "text": "NG-ALAIN",
-      "i18n": "menu.alain",
-      "group": true,
-      "hideInBreadcrumb": true,
-      "children": [
-        {
-          "text": "Delon",
-          "i18n": "menu.delon",
-          "icon": "anticon-bulb",
+          "text": "Account",
+          "i18n": "menu.account",
+          "icon": "anticon-user",
           "children": [
             {
-              "text": "Dynamic Form",
-              "link": "/delon/form",
-              "i18n": "menu.delon.form"
+              "text": "center",
+              "link": "/pro/account/center",
+              "i18n": "menu.account.center"
             },
             {
-              "text": "Simple Table",
-              "link": "/delon/st",
-              "i18n": "menu.delon.table"
-            },
-            {
-              "text": "Util",
-              "link": "/delon/util",
-              "i18n": "menu.delon.util",
-              "acl": "role-a"
-            },
-            {
-              "text": "Print",
-              "link": "/delon/print",
-              "i18n": "menu.delon.print",
-              "acl": "role-b"
-            },
-            {
-              "text": "QR",
-              "link": "/delon/qr",
-              "i18n": "menu.delon.qr"
-            },
-            {
-              "text": "ACL",
-              "link": "/delon/acl",
-              "i18n": "menu.delon.acl"
-            },
-            {
-              "text": "ACL Admin",
-              "link": "/delon/acl-admin",
-              "i18n": "menu.delon.acl-admin"
-            },
-            {
-              "text": "ACL Users",
-              "link": "/delon/acl-users",
-              "i18n": "menu.delon.acl-users"
-            },
-            {
-              "text": "ACL Roles",
-              "link": "/delon/acl-roles",
-              "i18n": "menu.delon.acl-roles"
-            },
-            {
-              "text": "ACL Permissions",
-              "link": "/delon/acl-permissions",
-              "i18n": "menu.delon.acl-permissions"
-            },
-            {
-              "text": "Route Guard",
-              "link": "/delon/guard",
-              "i18n": "menu.delon.guard"
-            },
-            {
-              "text": "Cache",
-              "link": "/delon/cache",
-              "i18n": "menu.delon.cache"
-            },
-            {
-              "text": "Down File",
-              "link": "/delon/downfile",
-              "i18n": "menu.delon.downfile"
-            },
-            {
-              "text": "Xlsx",
-              "link": "/delon/xlsx",
-              "i18n": "menu.delon.xlsx"
-            },
-            {
-              "text": "Zip",
-              "link": "/delon/zip",
-              "i18n": "menu.delon.zip"
-            }
-          ]
-        },
-        {
-          "text": "Style",
-          "i18n": "menu.style",
-          "icon": "anticon-info",
-          "children": [
-            {
-              "text": "Typography",
-              "link": "/style/typography",
-              "i18n": "menu.style.typography",
-              "shortcut": true
-            },
-            {
-              "text": "Grid Masonry",
-              "link": "/style/gridmasonry",
-              "i18n": "menu.style.gridmasonry"
-            },
-            {
-              "text": "Colors",
-              "link": "/style/colors",
-              "i18n": "menu.style.colors"
+              "text": "settings",
+              "link": "/pro/account/settings",
+              "i18n": "menu.account.settings"
             }
           ]
         }
@@ -518,7 +317,10 @@
           "icon": "anticon-cloud",
           "children": [
             {
-
+              "text": "Relation",
+              "link": "/data-v/relation",
+              "i18n": "menu.report.relation",
+              "reuse": false
             }
           ]
         },
