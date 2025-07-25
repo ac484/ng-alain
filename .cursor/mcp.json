@@ -30,7 +30,10 @@
         "args": [
           "-y",
           "@modelcontextprotocol/server-filesystem",
-          "./"
+          "./src",
+          "./custom_modes",
+          "./memory-bank",
+          "./functions"
         ],
         "disabled": false,
         "autoApprove": [
