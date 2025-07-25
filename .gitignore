@@ -127,3 +127,5 @@ Thumbs.db
 # /yarn.lock
 
 /delon-builds
+
+.angular
