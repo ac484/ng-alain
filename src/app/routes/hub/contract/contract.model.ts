@@ -8,4 +8,5 @@ export interface Contract {
   contractCode?: string;
   feeCode?: string;
   amount: number;
+  payments: ContractPayment[]; // 新增，預設可為空陣列
 }

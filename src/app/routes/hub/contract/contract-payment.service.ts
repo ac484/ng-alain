@@ -4,6 +4,8 @@ import { collection, doc, addDoc, updateDoc, deleteDoc, query, where, getDocs, g
 import { HubCrudService } from '../fire-crud/hub-crud.service';
 import { ContractPayment, ContractPaymentStep, PaymentStatus, StepStatus, WorkflowDefinition } from './contract-payment.model';
 import { ContractWorkflowService } from './contract-workflow.service';
+import { Contract } from '../contract/contract.model';
+import { runTransaction } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class ContractPaymentService {
@@ -14,126 +16,165 @@ export class ContractPaymentService {
     private workflowService: ContractWorkflowService
   ) { }
 
-  // List all payments for a specific contract
+  // List all payments for a specific contract - 從合約陣列讀取
   async listByContract(contractId: string): Promise<ContractPayment[]> {
-    const col = collection(this.hubCrud.firestoreInstance, this.collectionName);
-    const q = query(col, where('contractId', '==', contractId));
-    const snapshot = await getDocs(q);
+    const contractRef = doc(this.hubCrud.firestoreInstance, 'hub_contract', contractId);
+    const contractSnap = await getDoc(contractRef);
 
-    return snapshot.docs.map(doc => ({
-      key: doc.id,
-      ...doc.data()
-    } as ContractPayment));
+    if (!contractSnap.exists()) {
+      return [];
+    }
+
+    const contract = contractSnap.data() as Contract;
+    return contract.payments || [];
   }
 
-  // Add new payment with workflow initialization
+  // Add new payment with workflow initialization - 寫入合約陣列
   async add(contractId: string, amount: number, remark: string = '', clientId: string): Promise<string> {
     // Get workflow template for client
     const workflowTemplate = await this.workflowService.getTemplateForClient(clientId);
-    if (!workflowTemplate) {
-      // Create a default workflow template if none exists
-      console.warn(`No workflow template found for client: ${clientId}, creating default template`);
-      const defaultTemplateId = await this.createDefaultWorkflowTemplate(clientId);
-      const defaultTemplate = await this.workflowService.getTemplateForClient(clientId);
-      if (!defaultTemplate) {
-        throw new Error(`Failed to create default workflow template for client: ${clientId}`);
-      }
-      const steps = await this.initializeWorkflow(defaultTemplate.key!);
+    const steps = workflowTemplate
+      ? await this.initializeWorkflow(workflowTemplate.key!)
+      : await this.initializeWorkflow((await this.createDefaultWorkflowTemplate(clientId)));
 
-      const paymentData: Omit<ContractPayment, 'key'> = {
-        contractId,
-        amount,
-        status: 'draft' as PaymentStatus,
-        workflowId: defaultTemplate.key!,
-        steps,
-        attachments: [],
-        remark,
-        createdAt: serverTimestamp() as Timestamp,
-        updatedAt: serverTimestamp() as Timestamp
-      };
-
-      const col = collection(this.hubCrud.firestoreInstance, this.collectionName);
-      const docRef = await addDoc(col, paymentData);
-      return docRef.id;
-    }
-
-    // Initialize workflow steps
-    const steps = await this.initializeWorkflow(workflowTemplate.key!);
-
+    // 產生新付款物件，使用 new Date() 而非 serverTimestamp()
     const paymentData: Omit<ContractPayment, 'key'> = {
       contractId,
       amount,
       status: 'draft' as PaymentStatus,
-      workflowId: workflowTemplate.key!,
+      workflowId: workflowTemplate ? workflowTemplate.key! : '',
       steps,
       attachments: [],
       remark,
-      createdAt: serverTimestamp() as Timestamp,
-      updatedAt: serverTimestamp() as Timestamp
+      createdAt: new Date() as any, // 使用 new Date() 而非 serverTimestamp()
+      updatedAt: new Date() as any
     };
 
-    const col = collection(this.hubCrud.firestoreInstance, this.collectionName);
-    const docRef = await addDoc(col, paymentData);
-    return docRef.id;
-  }
-
-  // Update payment
-  async update(id: string, data: Partial<ContractPayment>): Promise<void> {
-    const updateData = {
-      ...data,
-      updatedAt: serverTimestamp() as Timestamp
-    };
-
-    const ref = doc(this.hubCrud.firestoreInstance, this.collectionName, id);
-    await updateDoc(ref, updateData);
-  }
-
-  // Delete payment
-  async delete(id: string): Promise<void> {
-    const ref = doc(this.hubCrud.firestoreInstance, this.collectionName, id);
-    await deleteDoc(ref);
-  }
-
-  // Submit payment to start workflow
-  async submitPayment(paymentId: string): Promise<void> {
-    const paymentRef = doc(this.hubCrud.firestoreInstance, this.collectionName, paymentId);
-
-    // Use runTransaction for atomic updates
-    const { runTransaction } = await import('@angular/fire/firestore');
-
+    // 直接更新合約文件的 payments 陣列
+    const contractRef = doc(this.hubCrud.firestoreInstance, 'hub_contract', contractId);
     await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
-      const paymentSnap = await transaction.get(paymentRef);
-
-      if (!paymentSnap.exists()) {
-        throw new Error(`Payment not found: ${paymentId}`);
-      }
-
-      const paymentDoc = { key: paymentSnap.id, ...paymentSnap.data() } as ContractPayment;
-
-      // Validate payment can be submitted
-      if (paymentDoc.status !== 'draft') {
-        throw new Error(`Payment cannot be submitted. Current status: ${paymentDoc.status}`);
-      }
-
-      // Update payment status and activate first workflow step
-      const updatedSteps = [...paymentDoc.steps];
-      if (updatedSteps.length > 0) {
-        updatedSteps[0] = {
-          ...updatedSteps[0],
-          status: 'pending' as StepStatus,
-          updatedAt: serverTimestamp() as Timestamp
-        };
-      }
-
-      transaction.update(paymentRef, {
-        status: 'submitted' as PaymentStatus,
-        steps: updatedSteps,
-        updatedAt: serverTimestamp() as Timestamp
-      });
+      const contractSnap = await transaction.get(contractRef);
+      if (!contractSnap.exists()) throw new Error('Contract not found');
+      const contract = contractSnap.data() as Contract;
+      const updatedPayments = [...(contract.payments || []), paymentData];
+      transaction.update(contractRef, { payments: updatedPayments });
     });
+    return 'local-array-id'; // 可根據需求產生唯一 id
   }
 
-  // Initialize workflow steps from template
+  // Update payment - 更新合約陣列中的付款
+  async update(paymentId: string, data: Partial<ContractPayment>): Promise<void> {
+    // 需要先找到包含此付款的合約
+    const contractsCol = collection(this.hubCrud.firestoreInstance, 'hub_contract');
+    const contractsSnapshot = await getDocs(contractsCol);
+
+    for (const contractDoc of contractsSnapshot.docs) {
+      const contract = contractDoc.data() as Contract;
+      const paymentIndex = contract.payments?.findIndex(p => p.key === paymentId);
+
+      if (paymentIndex !== undefined && paymentIndex >= 0) {
+        const contractRef = doc(this.hubCrud.firestoreInstance, 'hub_contract', contractDoc.id);
+        await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
+          const contractSnap = await transaction.get(contractRef);
+          if (!contractSnap.exists()) throw new Error('Contract not found');
+
+          const currentContract = contractSnap.data() as Contract;
+          const updatedPayments = [...currentContract.payments];
+          updatedPayments[paymentIndex] = {
+            ...updatedPayments[paymentIndex],
+            ...data,
+            updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+          };
+
+          transaction.update(contractRef, { payments: updatedPayments });
+        });
+        return;
+      }
+    }
+
+    throw new Error(`Payment not found: ${paymentId}`);
+  }
+
+  // Delete payment - 從合約陣列中刪除付款
+  async delete(paymentId: string): Promise<void> {
+    // 需要先找到包含此付款的合約
+    const contractsCol = collection(this.hubCrud.firestoreInstance, 'hub_contract');
+    const contractsSnapshot = await getDocs(contractsCol);
+
+    for (const contractDoc of contractsSnapshot.docs) {
+      const contract = contractDoc.data() as Contract;
+      const paymentIndex = contract.payments?.findIndex(p => p.key === paymentId);
+
+      if (paymentIndex !== undefined && paymentIndex >= 0) {
+        const contractRef = doc(this.hubCrud.firestoreInstance, 'hub_contract', contractDoc.id);
+        await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
+          const contractSnap = await transaction.get(contractRef);
+          if (!contractSnap.exists()) throw new Error('Contract not found');
+
+          const currentContract = contractSnap.data() as Contract;
+          const updatedPayments = currentContract.payments.filter((_, index) => index !== paymentIndex);
+
+          transaction.update(contractRef, { payments: updatedPayments });
+        });
+        return;
+      }
+    }
+
+    throw new Error(`Payment not found: ${paymentId}`);
+  }
+
+  // Submit payment to start workflow - 更新合約陣列中的付款狀態
+  async submitPayment(paymentId: string): Promise<void> {
+    // 需要先找到包含此付款的合約
+    const contractsCol = collection(this.hubCrud.firestoreInstance, 'hub_contract');
+    const contractsSnapshot = await getDocs(contractsCol);
+
+    for (const contractDoc of contractsSnapshot.docs) {
+      const contract = contractDoc.data() as Contract;
+      const paymentIndex = contract.payments?.findIndex(p => p.key === paymentId);
+
+      if (paymentIndex !== undefined && paymentIndex >= 0) {
+        const contractRef = doc(this.hubCrud.firestoreInstance, 'hub_contract', contractDoc.id);
+        await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
+          const contractSnap = await transaction.get(contractRef);
+          if (!contractSnap.exists()) throw new Error('Contract not found');
+
+          const currentContract = contractSnap.data() as Contract;
+          const payment = currentContract.payments[paymentIndex];
+
+          // Validate payment can be submitted
+          if (payment.status !== 'draft') {
+            throw new Error(`Payment cannot be submitted. Current status: ${payment.status}`);
+          }
+
+          // Update payment status and activate first workflow step
+          const updatedSteps = [...payment.steps];
+          if (updatedSteps.length > 0) {
+            updatedSteps[0] = {
+              ...updatedSteps[0],
+              status: 'pending' as StepStatus,
+              updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+            };
+          }
+
+          const updatedPayments = [...currentContract.payments];
+          updatedPayments[paymentIndex] = {
+            ...payment,
+            status: 'submitted' as PaymentStatus,
+            steps: updatedSteps,
+            updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+          };
+
+          transaction.update(contractRef, { payments: updatedPayments });
+        });
+        return;
+      }
+    }
+
+    throw new Error(`Payment not found: ${paymentId}`);
+  }
+
+  // Initialize workflow steps from template - 使用 new Date() 替代 serverTimestamp()
   async initializeWorkflow(workflowTemplateId: string): Promise<ContractPaymentStep[]> {
     // Get workflow template directly from Firestore
     const col = collection(this.hubCrud.firestoreInstance, 'hub_workflow_definitions');
@@ -151,86 +192,106 @@ export class ContractPaymentService {
       status: 'waiting' as StepStatus, // All steps start as waiting, will be activated when submitted
       approver: step.approver,
       comment: '',
-      updatedAt: serverTimestamp() as Timestamp
+      updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
     }));
   }
 
-  // Advance workflow to next step with atomic transaction
+  // Advance workflow to next step with atomic transaction - 更新合約陣列中的工作流程
   async advanceWorkflow(paymentId: string, currentStepIndex: number, approved: boolean, comment: string = ''): Promise<void> {
-    const paymentRef = doc(this.hubCrud.firestoreInstance, this.collectionName, paymentId);
+    // 需要先找到包含此付款的合約
+    const contractsCol = collection(this.hubCrud.firestoreInstance, 'hub_contract');
+    const contractsSnapshot = await getDocs(contractsCol);
 
-    // Use runTransaction for atomic updates
-    const { runTransaction } = await import('@angular/fire/firestore');
+    for (const contractDoc of contractsSnapshot.docs) {
+      const contract = contractDoc.data() as Contract;
+      const paymentIndex = contract.payments?.findIndex(p => p.key === paymentId);
 
-    await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
-      const paymentSnap = await transaction.get(paymentRef);
+      if (paymentIndex !== undefined && paymentIndex >= 0) {
+        const contractRef = doc(this.hubCrud.firestoreInstance, 'hub_contract', contractDoc.id);
+        await runTransaction(this.hubCrud.firestoreInstance, async (transaction) => {
+          const contractSnap = await transaction.get(contractRef);
+          if (!contractSnap.exists()) throw new Error('Contract not found');
 
-      if (!paymentSnap.exists()) {
-        throw new Error(`Payment not found: ${paymentId}`);
-      }
+          const currentContract = contractSnap.data() as Contract;
+          const payment = currentContract.payments[paymentIndex];
+          const updatedSteps = [...payment.steps];
 
-      const paymentDoc = { key: paymentSnap.id, ...paymentSnap.data() } as ContractPayment;
-      const updatedSteps = [...paymentDoc.steps];
+          // Validate current step index
+          if (currentStepIndex < 0 || currentStepIndex >= updatedSteps.length) {
+            throw new Error(`Invalid step index: ${currentStepIndex}`);
+          }
 
-      // Validate current step index
-      if (currentStepIndex < 0 || currentStepIndex >= updatedSteps.length) {
-        throw new Error(`Invalid step index: ${currentStepIndex}`);
-      }
+          // Validate current step status
+          if (updatedSteps[currentStepIndex].status !== 'pending') {
+            throw new Error(`Step ${currentStepIndex} is not in pending status`);
+          }
 
-      // Validate current step status
-      if (updatedSteps[currentStepIndex].status !== 'pending') {
-        throw new Error(`Step ${currentStepIndex} is not in pending status`);
-      }
+          if (approved) {
+            // Mark current step as done
+            updatedSteps[currentStepIndex] = {
+              ...updatedSteps[currentStepIndex],
+              status: 'done' as StepStatus,
+              comment,
+              updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+            };
 
-      if (approved) {
-        // Mark current step as done
-        updatedSteps[currentStepIndex] = {
-          ...updatedSteps[currentStepIndex],
-          status: 'done' as StepStatus,
-          comment,
-          updatedAt: serverTimestamp() as Timestamp
-        };
+            // Check if there's a next step
+            if (currentStepIndex + 1 < updatedSteps.length) {
+              // Activate next step
+              updatedSteps[currentStepIndex + 1] = {
+                ...updatedSteps[currentStepIndex + 1],
+                status: 'pending' as StepStatus,
+                updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+              };
 
-        // Check if there's a next step
-        if (currentStepIndex + 1 < updatedSteps.length) {
-          // Activate next step
-          updatedSteps[currentStepIndex + 1] = {
-            ...updatedSteps[currentStepIndex + 1],
-            status: 'pending' as StepStatus,
-            updatedAt: serverTimestamp() as Timestamp
-          };
+              // Update payment status to reviewing
+              const updatedPayments = [...currentContract.payments];
+              updatedPayments[paymentIndex] = {
+                ...payment,
+                steps: updatedSteps,
+                status: 'reviewing' as PaymentStatus,
+                updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+              };
 
-          // Update payment status to reviewing
-          transaction.update(paymentRef, {
-            steps: updatedSteps,
-            status: 'reviewing' as PaymentStatus,
-            updatedAt: serverTimestamp() as Timestamp
-          });
-        } else {
-          // All steps completed - approve payment
-          transaction.update(paymentRef, {
-            steps: updatedSteps,
-            status: 'approved' as PaymentStatus,
-            updatedAt: serverTimestamp() as Timestamp
-          });
-        }
-      } else {
-        // Mark current step as rejected
-        updatedSteps[currentStepIndex] = {
-          ...updatedSteps[currentStepIndex],
-          status: 'rejected' as StepStatus,
-          comment,
-          updatedAt: serverTimestamp() as Timestamp
-        };
+              transaction.update(contractRef, { payments: updatedPayments });
+            } else {
+              // All steps completed - approve payment
+              const updatedPayments = [...currentContract.payments];
+              updatedPayments[paymentIndex] = {
+                ...payment,
+                steps: updatedSteps,
+                status: 'approved' as PaymentStatus,
+                updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+              };
 
-        // Reject entire payment
-        transaction.update(paymentRef, {
-          steps: updatedSteps,
-          status: 'rejected' as PaymentStatus,
-          updatedAt: serverTimestamp() as Timestamp
+              transaction.update(contractRef, { payments: updatedPayments });
+            }
+          } else {
+            // Mark current step as rejected
+            updatedSteps[currentStepIndex] = {
+              ...updatedSteps[currentStepIndex],
+              status: 'rejected' as StepStatus,
+              comment,
+              updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+            };
+
+            // Reject entire payment
+            const updatedPayments = [...currentContract.payments];
+            updatedPayments[paymentIndex] = {
+              ...payment,
+              steps: updatedSteps,
+              status: 'rejected' as PaymentStatus,
+              updatedAt: new Date() as any // 使用 new Date() 而非 serverTimestamp()
+            };
+
+            transaction.update(contractRef, { payments: updatedPayments });
+          }
         });
+        return;
       }
-    });
+    }
+
+    throw new Error(`Payment not found: ${paymentId}`);
   }
 
   // Create a default workflow template for a client
@@ -251,7 +312,7 @@ export class ContractPaymentService {
           order: 2
         }
       ],
-      createdAt: serverTimestamp() as Timestamp,
+      createdAt: serverTimestamp() as Timestamp, // 這裡可以保留 serverTimestamp()，因為不是陣列操作
       updatedAt: serverTimestamp() as Timestamp
     };
 

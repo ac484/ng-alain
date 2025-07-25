@@ -343,7 +343,8 @@ export class ContractListComponent implements OnInit {
       contractName: '',
       contractCode: '',
       feeCode: '',
-      amount: 0
+      amount: 0,
+      payments: [] // 預設空陣列，符合 Contract 介面
     };
     const id = await this.contractService.add(newContract);
     this.contracts = [...this.contracts, { ...newContract, key: id }];
