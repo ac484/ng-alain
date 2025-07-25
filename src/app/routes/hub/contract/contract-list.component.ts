@@ -225,33 +225,28 @@ import { ContractWorkflowStepsComponent } from './contract-workflow-steps.compon
         padding: 4px 11px;
       }
       .payment-expand-row {
-        background-color: #fafafa;
         padding: 0 !important;
       }
       .payment-sub-table {
         padding: 16px;
-        background-color: #fafafa;
       }
       .payment-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
       }
       .payment-header h4 {
         margin: 0;
-        color: #595959;
         font-size: 14px;
       }
       .payment-loading {
         text-align: center;
-        padding: 20px;
-        color: #8c8c8c;
+        padding: 24px;
       }
       .payment-empty {
         text-align: center;
-        padding: 20px;
-        color: #8c8c8c;
+        padding: 24px;
       }
       .payment-empty p {
         margin-bottom: 12px;
@@ -259,19 +254,14 @@ import { ContractWorkflowStepsComponent } from './contract-workflow-steps.compon
       .workflow-steps {
         max-width: 200px;
       }
-      .payment-sub-table .ant-table-small .ant-table-tbody > tr > td {
-        padding: 6px 8px;
-      }
       .attachment-info {
         margin-top: 4px;
         font-size: 12px;
-        color: #8c8c8c;
       }
       .attachment-info span {
         margin-right: 4px;
       }
       .workflow-steps-row {
-        background-color: #f5f5f5;
         padding: 0 !important;
       }
     `
@@ -392,15 +382,37 @@ export class ContractListComponent implements OnInit {
   }
 
   async addPayment(contract: Contract): Promise<void> {
-    if (!contract.key) return;
+    if (!contract.key) {
+      console.error('Contract key is missing');
+      return;
+    }
+
+    // Set loading state
+    const currentLoading = this.paymentLoading();
+    currentLoading.add(contract.key);
+    this.paymentLoading.set(new Set(currentLoading));
 
     try {
+      console.log('Adding payment for contract:', contract.key, 'client:', contract.client);
+
       // Create a simple payment with default values
-      await this.paymentService.add(contract.key, 0, '', contract.client);
+      await this.paymentService.add(contract.key, 100, '新增付款請求', contract.client);
+
+      console.log('Payment added successfully, reloading payments...');
+
       // Reload payments for this contract
       await this.loadContractPayments(contract.key);
+
+      console.log('Payments reloaded successfully');
+
     } catch (error) {
       console.error('Failed to add payment:', error);
+      // You might want to show a user-friendly error message here
+    } finally {
+      // Remove loading state
+      const updatedLoading = this.paymentLoading();
+      updatedLoading.delete(contract.key);
+      this.paymentLoading.set(new Set(updatedLoading));
     }
   }
 
