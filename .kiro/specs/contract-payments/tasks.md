@@ -1,6 +1,11 @@
 # Implementation Plan
 
-- [ ] 1. Create minimal core data models
+- [x] 1. Create minimal core data models
+
+
+
+
+
   - Define essential TypeScript interfaces: ContractPayment, ContractPaymentStep, WorkflowDefinition
   - Create minimal PaymentStatus and StepStatus type unions
   - Keep interfaces lean with only required fields
