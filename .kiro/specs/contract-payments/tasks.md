@@ -46,7 +46,10 @@
   - Keep template and logic minimal, following existing form patterns
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 6.1, 6.2, 6.3_
 
-- [ ] 5. Build minimal ContractPaymentListComponent with OnPush
+- [x] 5. Build minimal ContractPaymentListComponent with OnPush
+
+
+
   - Create standalone component with ChangeDetectionStrategy.OnPush
   - Use signals for all reactive state (payments, loading, editingId)
   - Follow existing contract-list inline editing pattern
@@ -54,7 +57,10 @@
   - Implement efficient OnPush-compatible change detection
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5, 4.1_
 
-- [ ] 6. Integrate payment sub-table with minimal changes to ContractListComponent
+- [x] 6. Integrate payment sub-table with minimal changes to ContractListComponent
+
+
+
   - Add minimal expandable row functionality to existing template
   - Use OnPush strategy for optimal performance
   - Keep integration lightweight and non-intrusive
