@@ -11,14 +11,23 @@
   - Keep interfaces lean with only required fields
   - _Requirements: 1.3, 2.2, 3.2, 4.1_
 
-- [ ] 2. Implement minimal ContractWorkflowService
+- [x] 2. Implement minimal ContractWorkflowService
+
+
+
+
   - Create service extending existing HubCrudService pattern
   - Use @angular/fire for all Firestore operations (collection, doc, addDoc, updateDoc, deleteDoc)
   - Implement essential methods: listTemplates(), getTemplateForClient(), createTemplate()
   - Keep workflow logic minimal and focused
   - _Requirements: 3.1, 3.2, 4.2, 5.1, 5.2, 5.3, 5.5_
 
-- [ ] 3. Implement minimal ContractPaymentService
+
+
+- [x] 3. Implement minimal ContractPaymentService
+
+
+
   - Create service following existing ContractService pattern
   - Use @angular/fire consistently for all database operations
   - Implement core CRUD: list(), add(), update(), delete()
