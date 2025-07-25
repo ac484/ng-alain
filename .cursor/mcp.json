@@ -18,8 +18,8 @@
         ]
       },
       "context7": {
-        "url": "https://context7.com/mcp",
-        "disabled": false,
+        "command": "npx",
+        "args": ["-y", "@upstash/context7-mcp@latest"],
         "autoApprove": [
           "resolve-library-id",
           "get-library-docs"
