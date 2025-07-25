@@ -1,2 +1,0 @@
-import{Fb as o,Nc as s,jc as n,kc as a}from"./chunk-ONJQPJYD.js";import"./chunk-HN2SGUN4.js";var e=class e{};e.\u0275fac=function(t){return new(t||e)},e.\u0275cmp=o({type:e,selectors:[["app-hub-workspace"]],decls:2,vars:0,consts:[[2,"padding","32px","text-align","center","color","#aaa","font-size","20px"]],template:function(t,i){t&1&&(n(0,"div",0),s(1,` \u5DE5\u4F5C\u5340\u4E2D\u5FC3\u4F54\u4F4D
-`),a())},encapsulation:2});var p=e;export{p as HubWorkspaceComponent};
