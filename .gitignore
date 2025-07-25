@@ -9,13 +9,25 @@ desktop.ini
 *.swo
 *.swp
 *~
+.history/*
 
 # Node.js
 node_modules/
 npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 package-lock.json
 # yarn.lock
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
 
 # Python
 .coverage
@@ -56,9 +68,6 @@ hs_err_pid*
 # Logs
 *.log
 logs/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Runtime data
 *.pid
@@ -77,6 +86,8 @@ CLAUDE.md
 /bazel-out
 /dist
 /out-tsc
+
+# Temporary files
 /tmp
 
 # IDEs and editors
@@ -93,17 +104,6 @@ CLAUDE.md
 !.vscode/launch.json
 !.vscode/settings.json
 !.vscode/tasks.json
-.history/*
-
-# Yarn
-# yarn.lock
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-.pnp.*
 
 # Firebase
 .firebase
@@ -111,21 +111,19 @@ CLAUDE.md
 .env
 .runtimeconfig.json
 
-# Miscellaneous
+# Angular
 /.angular/cache
+.angular
+
+# Miscellaneous
 /connect.lock
 /libpeerconnection.log
 testem.log
 /typings
 
-# System files
-.DS_Store
-Thumbs.db
-
-# lock
+# Lock files
 /pnpm-lock.yaml
 # /yarn.lock
 
+# Build artifacts
 /delon-builds
-
-.angular
