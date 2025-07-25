@@ -14,12 +14,13 @@ import { ContractPaymentService } from './contract-payment.service';
 import { FabComponent } from '../basic/widget/fab.component';
 import { HubCrudService } from '../fire-crud/hub-crud.service';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { ContractWorkflowStepsComponent } from './contract-workflow-steps.component';
 
 @Component({
   selector: 'contract-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, NzDropDownModule, NzTagModule, NzIconModule, FabComponent],
+  imports: [CommonModule, FormsModule, NzTableModule, NzButtonModule, NzInputModule, NzPopconfirmModule, NzDropDownModule, NzTagModule, NzIconModule, FabComponent, ContractWorkflowStepsComponent],
   template: `
     <app-fab (onAction)="addRow()"></app-fab>
     <br />
@@ -160,6 +161,15 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
                                 [disabled]="payment.status === 'approved' || payment.status === 'rejected'">
                                 編輯
                               </button>
+                              <button 
+                                nz-button 
+                                nzType="link" 
+                                nzSize="small"
+                                (click)="toggleWorkflowSteps(payment.key!)"
+                                style="margin-left: 4px;">
+                                <span nz-icon [nzType]="workflowStepsExpanded().has(payment.key!) ? 'up' : 'down'"></span>
+                                流程
+                              </button>
                               <nz-popconfirm
                                 nzTitle="確定要刪除此付款請求嗎？"
                                 (nzOnConfirm)="deletePayment(payment.key!)">
@@ -175,6 +185,16 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
                               </nz-popconfirm>
                             </td>
                           </tr>
+                          @if (workflowStepsExpanded().has(payment.key!)) {
+                            <tr>
+                              <td colspan="5" class="workflow-steps-row">
+                                <app-contract-workflow-steps
+                                  [payment]="payment"
+                                  (workflowUpdated)="onWorkflowUpdated(c.key!)">
+                                </app-contract-workflow-steps>
+                              </td>
+                            </tr>
+                          }
                         }
                       </tbody>
                     </nz-table>
@@ -250,6 +270,10 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
       .attachment-info span {
         margin-right: 4px;
       }
+      .workflow-steps-row {
+        background-color: #f5f5f5;
+        padding: 0 !important;
+      }
     `
   ]
 })
@@ -263,6 +287,7 @@ export class ContractListComponent implements OnInit {
   expandSet = signal(new Set<string>());
   contractPayments = signal(new Map<string, ContractPayment[]>());
   paymentLoading = signal(new Set<string>());
+  workflowStepsExpanded = signal(new Set<string>());
 
   constructor(
     private contractService: ContractService,
@@ -455,5 +480,21 @@ export class ContractListComponent implements OnInit {
       console.error('Date formatting error:', error);
       return '';
     }
+  }
+
+  // Workflow steps management methods
+  toggleWorkflowSteps(paymentId: string): void {
+    const currentExpanded = this.workflowStepsExpanded();
+    if (currentExpanded.has(paymentId)) {
+      currentExpanded.delete(paymentId);
+    } else {
+      currentExpanded.add(paymentId);
+    }
+    this.workflowStepsExpanded.set(new Set(currentExpanded));
+  }
+
+  async onWorkflowUpdated(contractId: string): Promise<void> {
+    // Reload payments for this contract to reflect workflow changes
+    await this.loadContractPayments(contractId);
   }
 }
