@@ -142,7 +142,15 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
                                 }
                               </div>
                             </td>
-                            <td>{{ formatPaymentDate(payment.createdAt) }}</td>
+                            <td>
+                              <div>{{ formatPaymentDate(payment.createdAt) }}</div>
+                              @if (payment.attachments && payment.attachments.length > 0) {
+                                <div class="attachment-info">
+                                  <span nz-icon nzType="paper-clip"></span>
+                                  {{ payment.attachments.length }} 個附件
+                                </div>
+                              }
+                            </td>
                             <td>
                               <button 
                                 nz-button 
@@ -233,6 +241,14 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
       }
       .payment-sub-table .ant-table-small .ant-table-tbody > tr > td {
         padding: 6px 8px;
+      }
+      .attachment-info {
+        margin-top: 4px;
+        font-size: 12px;
+        color: #8c8c8c;
+      }
+      .attachment-info span {
+        margin-right: 4px;
       }
     `
   ]

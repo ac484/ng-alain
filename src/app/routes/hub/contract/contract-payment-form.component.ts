@@ -1,13 +1,15 @@
-import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzUploadModule } from 'ng-zorro-antd/upload';
+import { NzUploadModule, NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { ContractPayment } from './contract-payment.model';
+import { ContractAttachmentService } from './contract-attachment.service';
 
 export interface PaymentFormData {
   amount: number;
@@ -26,7 +28,8 @@ export interface PaymentFormData {
     NzInputModule,
     NzInputNumberModule,
     NzButtonModule,
-    NzUploadModule
+    NzUploadModule,
+    NzIconModule
   ],
   template: `
     <form nz-form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
@@ -62,11 +65,21 @@ export interface PaymentFormData {
             nzMultiple
             [nzFileList]="fileList()"
             [nzBeforeUpload]="beforeUpload"
-            (nzChange)="handleFileChange($event)">
-            <button nz-button>
+            [nzCustomRequest]="customUpload"
+            (nzChange)="handleFileChange($event)"
+            [nzShowUploadList]="{
+              showPreviewIcon: true,
+              showRemoveIcon: true,
+              showDownloadIcon: true
+            }">
+            <button nz-button [nzLoading]="uploading()">
+              <span nz-icon nzType="upload"></span>
               <span>上傳附件</span>
             </button>
           </nz-upload>
+          <div style="margin-top: 8px; color: #8c8c8c; font-size: 12px;">
+            支援圖片、PDF、Word、Excel文件，單個文件不超過10MB，最多5個文件
+          </div>
         </nz-form-control>
       </nz-form-item>
 
@@ -101,9 +114,11 @@ export class ContractPaymentFormComponent implements OnInit {
   // Signals for reactive state management
   isSubmitting = signal(false);
   editMode = computed(() => !!this.payment);
-  fileList = signal<any[]>([]);
+  fileList = signal<NzUploadFile[]>([]);
+  uploading = signal(false);
 
   paymentForm: FormGroup;
+  private attachmentService = inject(ContractAttachmentService);
 
   constructor(
     private fb: FormBuilder,
@@ -135,37 +150,50 @@ export class ContractPaymentFormComponent implements OnInit {
       });
 
       // Convert attachment URLs to file list format
-      const attachmentFiles = this.payment.attachments.map((url, index) => ({
+      const attachmentFiles: NzUploadFile[] = this.payment.attachments.map((url, index) => ({
         uid: `${index}`,
-        name: `attachment-${index + 1}`,
-        status: 'done',
-        url: url
+        name: this.attachmentService.getFileNameFromUrl(url),
+        status: 'done' as const,
+        url: url,
+        size: 0,
+        type: ''
       }));
       this.fileList.set(attachmentFiles);
     }
   }
 
-  beforeUpload = (file: any): boolean => {
-    // Validate file type and size
-    const isValidType = file.type.includes('image/') ||
-      file.type === 'application/pdf' ||
-      file.type.includes('document');
-
-    if (!isValidType) {
-      this.message.error('只能上傳圖片、PDF或文檔文件！');
+  beforeUpload = (file: NzUploadFile): boolean => {
+    // Check file count limit
+    if (this.fileList().length >= 5) {
+      this.message.error('最多只能上傳5個文件！');
       return false;
     }
 
-    const isLt10M = file.size / 1024 / 1024 < 10;
-    if (!isLt10M) {
-      this.message.error('文件大小不能超過 10MB！');
-      return false;
-    }
-
-    return false; // Prevent automatic upload, handle manually
+    // Use attachment service validation
+    return this.attachmentService.validateFile(file as any);
   };
 
-  handleFileChange(info: any): void {
+  customUpload = (item: any): any => {
+    this.uploading.set(true);
+
+    // Upload file using attachment service
+    this.attachmentService.uploadFile(item.file, this.contractId || 'temp')
+      .then((downloadURL) => {
+        // Update file status to done
+        item.onSuccess(downloadURL, item.file);
+        this.message.success(`${item.file.name} 上傳成功`);
+      })
+      .catch((error) => {
+        // Update file status to error
+        item.onError(error, item.file);
+        this.message.error(`${item.file.name} 上傳失敗`);
+      })
+      .finally(() => {
+        this.uploading.set(false);
+      });
+  };
+
+  handleFileChange(info: NzUploadChangeParam): void {
     let fileList = [...info.fileList];
 
     // Limit to 5 files
@@ -173,10 +201,18 @@ export class ContractPaymentFormComponent implements OnInit {
 
     this.fileList.set(fileList);
 
-    // Update form control with file URLs (in real implementation, upload to storage first)
+    // Update form control with file URLs from successful uploads
     const attachmentUrls = fileList
       .filter(file => file.status === 'done')
-      .map(file => file.url || file.response?.url || '');
+      .map(file => {
+        // Get URL from response (customUpload returns downloadURL)
+        if (file.response) {
+          return file.response;
+        }
+        // For existing files, use the url property
+        return file.url || '';
+      })
+      .filter(url => url); // Remove empty URLs
 
     this.paymentForm.patchValue({ attachments: attachmentUrls });
   }

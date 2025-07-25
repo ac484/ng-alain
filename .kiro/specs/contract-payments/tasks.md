@@ -79,12 +79,15 @@
   - Use @angular/fire consistently for all operations
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 8. Add minimal file attachment support
+- [x] 8. Add minimal file attachment support
+
+
   - Implement basic file upload using @angular/fire Storage
   - Add essential file validation (type, size)
   - Create simple attachment display and download
   - Keep file management minimal and focused
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+
 
 - [ ] 9. Implement minimal workflow state transitions
   - Create simple workflow progression logic
