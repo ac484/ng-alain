@@ -126,7 +126,19 @@ import {
   SaveOutline,
   CopyOutline,
   FolderOpenOutline,
-  ClusterOutline
+  ClusterOutline,
+  // Tree 組件需要的圖標
+  ApartmentOutline,
+  HistoryOutline,
+  // 共用組件需要的圖標
+  CheckSquareOutline,
+  UpOutline,
+  DownOutline,
+  LeftOutline,
+  RightOutline,
+  // Twotone 圖標
+  FilePdfTwoTone,
+  FileTextTwoTone
 } from '@ant-design/icons-angular/icons';
 
 export const ICONS = [
@@ -243,5 +255,17 @@ export const ICONS = [
   SaveOutline,
   CopyOutline,
   FolderOpenOutline,
-  ClusterOutline
+  ClusterOutline,
+  // Tree 組件需要的圖標
+  ApartmentOutline,
+  HistoryOutline,
+  // 共用組件需要的圖標
+  CheckSquareOutline,
+  UpOutline,
+  DownOutline,
+  LeftOutline,
+  RightOutline,
+  // Twotone 圖標
+  FilePdfTwoTone,
+  FileTextTwoTone
 ];
