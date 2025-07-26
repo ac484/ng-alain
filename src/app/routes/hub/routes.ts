@@ -2,19 +2,25 @@ import { Routes } from '@angular/router';
 
 export default [
   {
-    path: 'contract',
-    loadComponent: () => import('./contract/contract.component').then(m => m.HubContractComponent)
-  },
-  {
-    path: 'tree',
-    loadComponent: () => import('./tree/tree.component').then(m => m.HubTreeContractComponent)
-  },
-  {
-    path: 'workspace',
-    loadComponent: () => import('./workspace/workspace.component').then(m => m.HubWorkspaceComponent)
+    path: 'contracts',
+    loadChildren: () => import('./features/contracts/routes').then(m => m.contractRoutes)
   },
   {
     path: 'settings',
-    loadComponent: () => import('./settings/settings.component').then(m => m.HubSettingsComponent)
+    loadChildren: () => import('./features/settings/routes').then(m => m.settingsRoutes)
+  },
+  {
+    path: 'workspace',
+    loadChildren: () => import('./features/workspace/routes').then(m => m.workspaceRoutes)
+  },
+  // Legacy redirects
+  {
+    path: 'contract',
+    redirectTo: 'contracts'
+  },
+  {
+    path: '',
+    redirectTo: 'contracts',
+    pathMatch: 'full'
   }
 ] as Routes;

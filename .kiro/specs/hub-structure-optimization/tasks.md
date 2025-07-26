@@ -3,19 +3,26 @@
 - [x] 1. Set up core infrastructure and directory structure
 
 
+
   - Create the new directory structure according to the design
   - Implement base models and interfaces for type safety
   - Set up barrel exports for clean imports
   - _Requirements: 1.1, 1.3, 1.4, 5.1, 5.2, 5.3_
 
+
+
 - [ ] 1.1 Create new directory structure
   - Create `core/`, `shared/`, and `features/` directories under hub
   - Set up subdirectories for services, models, and components
   - Create placeholder index.ts files for barrel exports
+
+
   - _Requirements: 1.1, 1.2, 5.1, 5.2_
 
 - [ ] 1.2 Implement base models and interfaces
   - Create BaseModel interface with common properties (key, createdAt, updatedAt)
+
+
   - Create AuditableModel interface extending BaseModel
   - Implement type-safe interfaces for generic CRUD operations
   - _Requirements: 6.1, 6.2, 3.1_
@@ -25,6 +32,8 @@
   - Implement consistent export patterns across all modules
   - Test import paths to ensure proper module resolution
   - _Requirements: 1.3, 4.2, 5.3_
+
+
 
 - [ ] 2. Enhance and migrate core services
   - Refactor HubCrudService to be more generic and type-safe
@@ -37,6 +46,8 @@
   - Implement proper TypeScript constraints for type safety
   - Add comprehensive error handling and logging
   - Write unit tests for enhanced service functionality
+
+
   - _Requirements: 6.1, 6.2, 6.3_
 
 - [ ] 2.2 Implement repository pattern
@@ -50,8 +61,12 @@
   - Implement ErrorHandlingService with notification integration
   - Create error boundary component for graceful error display
   - Add proper error logging and user feedback mechanisms
+
+
   - Write unit tests for error handling scenarios
   - _Requirements: 6.2, 6.3_
+
+
 
 - [ ] 3. Create shared components infrastructure
   - Extract and refactor FAB component to be truly generic
@@ -68,10 +83,14 @@
 
 - [ ] 3.2 Create additional shared UI components
   - Implement error boundary component for graceful error handling
+
+
   - Create loading spinner component with consistent styling
   - Add confirmation dialog component for delete operations
   - Write unit tests for all shared components
   - _Requirements: 2.1, 2.2, 3.1_
+
+
 
 - [ ] 4. Migrate contract feature to new structure
   - Move all contract-related files to features/contracts directory
@@ -79,9 +98,13 @@
   - Implement proper feature routing with lazy loading
   - _Requirements: 1.1, 1.2, 3.1, 3.2, 4.1, 4.3_
 
+
+
 - [ ] 4.1 Create contract feature directory structure
   - Set up components/, services/, models/ directories under features/contracts
   - Create subdirectories for contract-list, contract-form, contract-payments
+
+
   - Set up proper barrel exports for the contract feature
   - _Requirements: 1.1, 1.2, 5.3_
 
@@ -112,17 +135,23 @@
   - Implement proper sub-feature organization and routing
   - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 5.1 Set up payment sub-feature structure
+- [x] 5.1 Set up payment sub-feature structure
+
+
   - Create contract-payments directory under features/contracts/components
   - Move payment-list and payment-form components to new location
   - Update payment service and model organization
   - Implement proper routing for payment sub-features
   - _Requirements: 7.1, 7.2_
 
+
+
 - [ ] 5.2 Set up workflow sub-feature structure
   - Create contract-workflow directory under features/contracts/components
   - Move workflow-steps and related components to new location
   - Update workflow service and model organization
+
+
   - Prepare structure for future workflow designer component
   - _Requirements: 7.2, 7.3, 7.4_
 
@@ -132,17 +161,23 @@
   - Implement feature routing and lazy loading
   - _Requirements: 1.1, 1.2, 3.1, 4.1_
 
-- [ ] 6.1 Create settings feature structure
+- [x] 6.1 Create settings feature structure
+
+
   - Set up features/settings directory with proper subdirectories
   - Move settings.component.ts and related files to new location
   - Create settings service following repository pattern
   - Set up proper barrel exports for settings feature
   - _Requirements: 1.1, 1.2, 2.1, 2.2_
 
+
+
 - [ ] 6.2 Convert settings components to standalone
   - Update SettingsComponent to standalone with OnPush strategy
   - Implement proper form handling with reactive forms
   - Add Angular v20 signals for state management
+
+
   - Write comprehensive unit tests for settings components
   - _Requirements: 3.1, 3.2, 3.3_
 
@@ -160,12 +195,17 @@
 
 - [ ] 7.1 Create workspace feature structure
   - Set up features/workspace directory with proper organization
+
+
   - Move workspace.component.ts to new location
   - Create workspace service and model structure
   - Set up barrel exports for workspace feature
   - _Requirements: 1.1, 1.2, 2.1_
 
-- [ ] 7.2 Convert workspace components to standalone
+- [x] 7.2 Convert workspace components to standalone
+
+
+
   - Update WorkspaceComponent to standalone architecture
   - Implement proper component interfaces and typing
   - Add OnPush change detection strategy
@@ -215,6 +255,9 @@
   - Test all contract feature components (list, form, payments)
   - Test settings and workspace components
   - Test shared components (FAB, error boundary)
+
+
+
   - Mock dependencies properly and test component behavior
   - _Requirements: 6.3_
 
