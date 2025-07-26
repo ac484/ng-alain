@@ -10,18 +10,18 @@ import { ContractService } from '../../services';
 import { Contract } from '../../models';
 
 @Component({
-    selector: 'hub-contract-form',
-    standalone: true,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        NzFormModule,
-        NzInputModule,
-        NzButtonModule,
-        NzInputNumberModule
-    ],
-    template: `
+  selector: 'hub-contract-form',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NzFormModule,
+    NzInputModule,
+    NzButtonModule,
+    NzInputNumberModule
+  ],
+  template: `
     <form nz-form [formGroup]="form" (ngSubmit)="onSubmit()">
       <nz-form-item>
         <nz-form-label nzRequired>合約名稱</nz-form-label>
@@ -64,67 +64,70 @@ import { Contract } from '../../models';
   `
 })
 export class ContractFormComponent implements OnInit {
-    form: FormGroup;
-    loading = false;
-    isEdit = false;
-    contractId?: string;
+  form: FormGroup;
+  loading = false;
+  isEdit = false;
+  contractId?: string;
 
-    constructor(
-        private fb: FormBuilder,
-        private contractService: ContractService,
-        private router: Router,
-        private route: ActivatedRoute
-    ) {
-        this.form = this.fb.group({
-            contractName: ['', [Validators.required]],
-            client: ['', [Validators.required]],
-            amount: [0, [Validators.required, Validators.min(0)]]
-        });
+  constructor(
+    private fb: FormBuilder,
+    private contractService: ContractService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.form = this.fb.group({
+      contractName: ['', [Validators.required]],
+      client: ['', [Validators.required]],
+      amount: [0, [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  ngOnInit() {
+    this.contractId = this.route.snapshot.paramMap.get('id') || undefined;
+    this.isEdit = !!this.contractId;
+
+    if (this.isEdit && this.contractId) {
+      this.loadContract();
     }
+  }
 
-    ngOnInit() {
-        this.contractId = this.route.snapshot.paramMap.get('id') || undefined;
-        this.isEdit = !!this.contractId;
+  private loadContract() {
+    // Implementation would load contract data
+    // For now, keeping it simple
+  }
+
+  async onSubmit() {
+    if (this.form.valid) {
+      this.loading = true;
+      try {
+        const formValue = this.form.value;
 
         if (this.isEdit && this.contractId) {
-            this.loadContract();
+          await this.contractService.update(this.contractId, formValue);
+        } else {
+          const contractSerial = await this.contractService.getNextContractSerial();
+          await this.contractService.add({
+            ...formValue,
+            contractSerial
+          });
         }
-    }
 
-    private loadContract() {
-        // Implementation would load contract data
-        // For now, keeping it simple
-    }
-
-    async onSubmit() {
-        if (this.form.valid) {
-            this.loading = true;
-            try {
-                const formValue = this.form.value;
-
-                if (this.isEdit && this.contractId) {
-                    await this.contractService.update(this.contractId, formValue);
-                } else {
-                    const contractSerial = await this.contractService.getNextContractSerial();
-                    await this.contractService.add({
-                        ...formValue,
-                        contractSerial
-                    });
-                }
-
-                this.router.navigate(['/hub/contracts']);
-            } catch (error) {
-                console.error('Save failed:', error);
-            } finally {
-                this.loading = false;
-            }
-        }
-    }
-
-    onCancel() {
         this.router.navigate(['/hub/contracts']);
+      } catch (error) {
+        console.error('Save failed:', error);
+      } finally {
+        this.loading = false;
+      }
     }
+  }
 
-    currencyFormatter = (value: number): string => `$ ${value}`;
-    currencyParser = (value: string): string => value.replace(/\$ /g, '');
+  onCancel() {
+    this.router.navigate(['/hub/contracts']);
+  }
+
+  currencyFormatter = (value: number): string => `$ ${value}`;
+  currencyParser = (value: string): number => {
+    const parsed = value.replace(/\$ /g, '');
+    return parseFloat(parsed) || 0;
+  };
 }
