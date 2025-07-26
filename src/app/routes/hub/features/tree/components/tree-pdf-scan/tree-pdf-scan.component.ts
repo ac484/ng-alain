@@ -9,9 +9,9 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { PdfUploadComponent, PdfUploadResult } from '../../../shared/components/pdf-upload';
-import { PdfPageRangeComponent, PageRange } from '../../../shared/components/pdf-page-range';
-import { PdfTextExtractorComponent, TextExtractionRequest, TextExtractionResult } from '../../../shared/components/pdf-text-extractor';
+import { PdfUploadComponent, PdfUploadResult } from '../../../../shared/components/pdf-upload';
+import { PdfPageRangeComponent, PageRange } from '../../../../shared/components/pdf-page-range';
+import { PdfTextExtractorComponent, TextExtractionRequest, TextExtractionResult } from '../../../../shared/components/pdf-text-extractor';
 
 interface PdfScanResponse {
   status: 'DONE' | 'ERROR';
@@ -282,19 +282,22 @@ export class TreePdfScanComponent implements OnInit {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 
-    this.message.success('文字文件已下載');
+    console.log('文字文件已下載');
   }
 
   reset(): void {
-    this.fileList = [];
-    this.currentFile = null;
-    this.pdfDocument = null;
-    this.isProcessing = false;
+    // 重置所有狀態
+    this.pdfUploadResult = null;
+    this.extractionRequest = null;
     this.extractedText = '';
-    this.errorMessage = '';
-    this.processingTip = '正在上傳文件...';
-    this.totalPages = 0;
-    this.startPage = 1;
-    this.endPage = 1;
+    this.isExtracting = false;
+
+    // 重置子組件
+    if (this.pdfUpload) {
+      this.pdfUpload.reset();
+    }
+    if (this.textExtractor) {
+      this.textExtractor.reset();
+    }
   }
 }
