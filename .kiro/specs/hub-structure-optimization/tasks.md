@@ -121,12 +121,19 @@
   - Ensure FAB button functionality for new contract creation
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 9.1, 9.2, 9.3, 9.4, 10.1, 10.2, 10.3, 10.4, 3.1, 3.2, 3.3_
 
-- [ ] 4.3 Migrate contract services and models
-  - Move contract.service.ts to features/contracts/services
-  - Move contract.model.ts to features/contracts/models
-  - Update service to use repository pattern and proper error handling
-  - Add comprehensive unit tests for migrated services
-  - _Requirements: 6.1, 6.2, 6.3_
+- [ ] 4.3 Migrate and preserve all contract services and models with complete functionality
+  - Move contract.service.ts to features/contracts/services while preserving all methods
+  - Preserve getNextContractSerial() method with transaction-based serial number generation
+  - Preserve recycleContractSerial() method for serial number recycling
+  - Preserve getClientsSettings() and setClientsSettings() methods for dynamic client management
+  - Preserve getDefaultClient() method for default client functionality
+  - Move contract.model.ts, contract-payment.model.ts, contract-workflow.model.ts to features/contracts/models
+  - Preserve ContractPaymentService with all payment CRUD operations and workflow integration
+  - Preserve ContractWorkflowService with template management and workflow processing
+  - Preserve ContractAttachmentService for file upload functionality
+  - Update services to use repository pattern while maintaining all existing functionality
+  - Add comprehensive unit tests for all migrated services
+  - _Requirements: 6.1, 6.2, 6.3, 9.1, 9.2, 9.3, 9.4, 10.1, 10.2, 10.3, 10.4_
 
 - [ ] 4.4 Implement contract feature routing
   - Create routes.ts file for contract feature with lazy loading

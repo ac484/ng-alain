@@ -17,20 +17,9 @@
       "children": [
         {
           "text": "Contracts",
+          "link": "/hub/contracts",
           "i18n": "menu.hub.contracts",
-          "icon": "anticon-file-text",
-          "children": [
-            {
-              "text": "Contract List",
-              "link": "/hub/contracts",
-              "i18n": "menu.hub.contracts.list"
-            },
-            {
-              "text": "New Contract",
-              "link": "/hub/contracts/new",
-              "i18n": "menu.hub.contracts.new"
-            }
-          ]
+          "icon": "anticon-file-text"
         },
         {
           "text": "Settings",
