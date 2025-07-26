@@ -108,12 +108,18 @@
   - Set up proper barrel exports for the contract feature
   - _Requirements: 1.1, 1.2, 5.3_
 
-- [ ] 4.2 Convert contract components to standalone
-  - Update ContractComponent to standalone with proper imports
-  - Convert ContractListComponent to standalone with OnPush strategy
-  - Convert ContractFormComponent to standalone with reactive forms
-  - Add proper TypeScript typing and Angular v20 signals where appropriate
-  - _Requirements: 3.1, 3.2, 3.3_
+- [ ] 4.2 Implement complete contract management with all existing functionality in single page
+  - Preserve all existing inline editing capabilities (contract name, code, fee code, amount)
+  - Maintain client dropdown selection with dynamic client list
+  - Keep auto-generated contract serial number system (C00001 format)
+  - Implement expandable table rows to show payment details and workflow progress inline
+  - Preserve complete payment request CRUD operations with status management
+  - Maintain file upload functionality with validation (10MB limit, 5 files max, multiple formats)
+  - Keep interactive workflow approval system with comment capability
+  - Preserve all existing state management (expand states, loading states, submission states)
+  - Convert to standalone component with OnPush strategy and Angular v20 signals
+  - Ensure FAB button functionality for new contract creation
+  - _Requirements: 8.1, 8.2, 8.3, 8.4, 9.1, 9.2, 9.3, 9.4, 10.1, 10.2, 10.3, 10.4, 3.1, 3.2, 3.3_
 
 - [ ] 4.3 Migrate contract services and models
   - Move contract.service.ts to features/contracts/services
@@ -155,37 +161,37 @@
   - Prepare structure for future workflow designer component
   - _Requirements: 7.2, 7.3, 7.4_
 
-- [ ] 6. Migrate settings feature
-  - Move settings components to features/settings directory
-  - Convert to standalone components with proper architecture
-  - Implement feature routing and lazy loading
-  - _Requirements: 1.1, 1.2, 3.1, 4.1_
+- [ ] 6. Preserve and enhance settings feature with flexible owner and workflow management
+  - Maintain existing flexible owner management functionality
+  - Preserve dynamic workflow template configuration
+  - Convert to new structure while keeping all business logic
+  - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [x] 6.1 Create settings feature structure
+- [x] 6.1 Create settings feature structure with preserved functionality
 
 
   - Set up features/settings directory with proper subdirectories
   - Move settings.component.ts and related files to new location
-  - Create settings service following repository pattern
+  - Preserve all existing owner management and workflow template features
   - Set up proper barrel exports for settings feature
-  - _Requirements: 1.1, 1.2, 2.1, 2.2_
+  - _Requirements: 7.1, 7.2, 1.1, 1.2_
 
 
 
-- [ ] 6.2 Convert settings components to standalone
+- [ ] 6.2 Convert settings components to standalone while preserving functionality
   - Update SettingsComponent to standalone with OnPush strategy
-  - Implement proper form handling with reactive forms
-  - Add Angular v20 signals for state management
-
-
+  - Maintain all existing reactive forms for owner and workflow management
+  - Preserve Angular signals for dynamic owner and workflow state management
+  - Ensure all existing business logic for flexible configuration is maintained
   - Write comprehensive unit tests for settings components
-  - _Requirements: 3.1, 3.2, 3.3_
+  - _Requirements: 7.1, 7.2, 7.3, 7.4, 3.1, 3.2, 3.3_
 
-- [ ] 6.3 Implement settings feature routing
+- [ ] 6.3 Implement settings feature routing with preserved functionality
   - Create routes.ts for settings feature with lazy loading
   - Update main hub routes to include settings lazy loading
   - Test settings feature routing and component loading
-  - _Requirements: 4.1, 4.2, 4.3_
+  - Verify all owner management and workflow template features work correctly
+  - _Requirements: 4.1, 4.2, 4.3, 7.1, 7.2_
 
 - [ ] 7. Migrate workspace feature
   - Move workspace components to features/workspace directory

@@ -74,11 +74,44 @@ The current hub directory structure in the ng-alain project needs optimization t
 
 ### Requirement 7
 
-**User Story:** As a developer, I want support for future multi-payment and dynamic approval workflow features, so that the structure can accommodate planned enhancements without major refactoring.
+**User Story:** As a business user, I want flexible owner management and payment workflow configuration, so that I can adapt the system to different clients and their specific approval processes.
 
 #### Acceptance Criteria
 
-1. WHEN adding payment features THEN the structure SHALL accommodate nested payment components
-2. WHEN implementing workflow features THEN they SHALL integrate cleanly with existing contract structure
-3. WHEN extending contract functionality THEN it SHALL not break existing features
-4. WHEN adding new business domains THEN the structure SHALL support them without architectural changes
+1. WHEN managing owners THEN the system SHALL allow dynamic addition/removal of owner entries
+2. WHEN configuring workflows THEN the system SHALL support custom multi-step approval processes per owner
+3. WHEN setting default owners THEN the system SHALL remember and apply defaults for new contracts
+4. WHEN creating workflow templates THEN they SHALL be reusable across multiple contracts for the same owner
+
+### Requirement 8
+
+**User Story:** As a user, I want a simplified but complete contract management interface, so that I can efficiently handle all contract operations from a single comprehensive view while preserving all existing functionality.
+
+#### Acceptance Criteria
+
+1. WHEN viewing contracts THEN all essential information SHALL be visible in one consolidated interface with inline editing capabilities
+2. WHEN managing payments THEN they SHALL be integrated within the main contract view with full CRUD operations
+3. WHEN tracking workflow progress THEN it SHALL be displayed inline with interactive approval capabilities
+4. WHEN performing contract operations THEN they SHALL not require multiple page transitions but maintain all existing features
+
+### Requirement 9
+
+**User Story:** As a user, I want complete payment request management functionality, so that I can create, edit, submit, and track payment requests with attachments and workflow processing.
+
+#### Acceptance Criteria
+
+1. WHEN creating payment requests THEN the system SHALL support amount input, remarks, and file attachments
+2. WHEN managing payment status THEN the system SHALL support all existing status transitions (draft→submitted→reviewing→approved/rejected→invoiced→countdown)
+3. WHEN uploading attachments THEN the system SHALL support multiple file formats with size and quantity limits
+4. WHEN processing workflows THEN the system SHALL provide interactive approval/rejection with comments
+
+### Requirement 10
+
+**User Story:** As a user, I want complete workflow processing capabilities, so that I can approve or reject payment requests with proper authorization and audit trails.
+
+#### Acceptance Criteria
+
+1. WHEN viewing workflow steps THEN the system SHALL display current progress with visual indicators
+2. WHEN authorized to approve THEN the system SHALL provide approval/rejection actions with comment capability
+3. WHEN processing workflow steps THEN the system SHALL enforce proper authorization and sequence
+4. WHEN workflow is updated THEN the system SHALL reflect changes in real-time across all views

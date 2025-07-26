@@ -158,50 +158,646 @@ export abstract class BaseRepository<T extends BaseModel> {
 
 ### Feature Components Architecture
 
-#### Standalone Component Pattern
+#### Settings Feature - Flexible Owner and Workflow Management
+```typescript
+@Component({
+  selector: 'hub-settings',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NzTabsModule,
+    NzTableModule,
+    NzFormModule,
+    NzButtonModule,
+    NzSelectModule,
+    NzInputModule,
+    NzSwitchModule,
+    NzTagModule,
+    NzCardModule,
+    NzAlertModule,
+    NzPopconfirmModule
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <nz-tabset nzType="card">
+      <!-- Owner Management Tab -->
+      <nz-tab nzTitle="業主管理">
+        <nz-card nzTitle="業主清單管理" [nzLoading]="isLoading()">
+          <!-- Dynamic owner addition/removal -->
+          <!-- Default owner selection -->
+          <!-- Owner list with status -->
+        </nz-card>
+      </nz-tab>
+      
+      <!-- Workflow Template Management Tab -->
+      <nz-tab nzTitle="流程模板">
+        <nz-card nzTitle="工作流程模板管理">
+          <!-- Workflow template CRUD -->
+          <!-- Per-owner workflow configuration -->
+          <!-- Multi-step approval process setup -->
+        </nz-card>
+      </nz-tab>
+    </nz-tabset>
+  `
+})
+export class SettingsComponent {
+  private contractService = inject(ContractService);
+  private workflowService = inject(ContractWorkflowService);
+  
+  // Owner management signals
+  clients = signal<string[]>([]);
+  defaultClient = signal<string>('');
+  clientInput = signal<string>('');
+  
+  // Workflow management signals
+  workflows = signal<WorkflowDefinition[]>([]);
+  showWorkflowForm = signal(false);
+  editingWorkflow = signal<WorkflowDefinition | null>(null);
+  
+  // Dynamic owner management methods
+  async addClient(): Promise<void>;
+  async removeClient(client: string): Promise<void>;
+  async setDefaultClient(client: string): Promise<void>;
+  
+  // Flexible workflow configuration methods
+  async createWorkflowTemplate(template: WorkflowDefinition): Promise<void>;
+  async updateWorkflowTemplate(id: string, template: Partial<WorkflowDefinition>): Promise<void>;
+  async deleteWorkflowTemplate(id: string): Promise<void>;
+}
+```
+
+#### Complete Contract Management - Single Page with Full Functionality
 ```typescript
 @Component({
   selector: 'hub-contract-list',
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
     NzTableModule,
     NzButtonModule,
-    FabComponent
+    NzModalModule,
+    NzFormModule,
+    NzInputModule,
+    NzInputNumberModule,
+    NzSelectModule,
+    NzTagModule,
+    NzDropDownModule,
+    NzUploadModule,
+    NzStepsModule,
+    NzPopconfirmModule,
+    NzIconModule,
+    FabComponent,
+    ContractPaymentFormComponent,
+    ContractWorkflowStepsComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <!-- FAB for new contract creation -->
+    <hub-fab (onAction)="addContract()"></hub-fab>
+    
+    <!-- Main contract table with inline editing -->
     <nz-table 
-      [nzData]="contracts()" 
-      [nzLoading]="loading()"
-      nzSize="small">
-      <!-- Table content -->
+      #editRowTable
+      nzBordered
+      [nzData]="contracts()"
+      [nzLoading]="loading()">
+      
+      <thead>
+        <tr>
+          <th nzWidth="50px"></th>
+          <th>序號</th>
+          <th>業主</th>
+          <th>合約名稱</th>
+          <th>合約案號識別碼</th>
+          <th>合約費用識別碼</th>
+          <th>合約金額</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      
+      <tbody>
+        <tr *ngFor="let contract of contracts()" class="editable-row">
+          <!-- Expand/Collapse button -->
+          <td 
+            [nzExpand]="expandSet().has(contract.key!)" 
+            (nzExpandChange)="onExpandChange(contract.key!, $event)">
+          </td>
+          
+          <!-- Contract Serial (Auto-generated) -->
+          <td>{{ contract.contractSerial }}</td>
+          
+          <!-- Client with dropdown selection -->
+          <td>
+            <div nz-dropdown nzTrigger="click" [nzDropdownMenu]="clientMenu" 
+                 (nzClick)="currentDropdownRow = contract">
+              <a nz-dropdown>
+                {{ contract.client }} 
+                <span nz-icon nzType="down"></span>
+              </a>
+            </div>
+          </td>
+          
+          <!-- Inline editable contract name -->
+          <td>
+            <div class="editable-cell" 
+                 [hidden]="editId() === contract.key" 
+                 (click)="startEdit(contract.key!)">
+              {{ contract.contractName }}
+            </div>
+            <input [hidden]="editId() !== contract.key" 
+                   type="text" 
+                   nz-input 
+                   [(ngModel)]="contract.contractName" 
+                   (blur)="stopEdit(contract)" />
+          </td>
+          
+          <!-- Inline editable contract code -->
+          <td>
+            <div class="editable-cell" 
+                 [hidden]="editId() === contract.key" 
+                 (click)="startEdit(contract.key!)">
+              {{ contract.contractCode }}
+            </div>
+            <input [hidden]="editId() !== contract.key" 
+                   type="text" 
+                   nz-input 
+                   [(ngModel)]="contract.contractCode" 
+                   (blur)="stopEdit(contract)" />
+          </td>
+          
+          <!-- Inline editable fee code -->
+          <td>
+            <div class="editable-cell" 
+                 [hidden]="editId() === contract.key" 
+                 (click)="startEdit(contract.key!)">
+              {{ contract.feeCode }}
+            </div>
+            <input [hidden]="editId() !== contract.key" 
+                   type="text" 
+                   nz-input 
+                   [(ngModel)]="contract.feeCode" 
+                   (blur)="stopEdit(contract)" />
+          </td>
+          
+          <!-- Inline editable amount -->
+          <td>
+            <div class="editable-cell" 
+                 [hidden]="editId() === contract.key" 
+                 (click)="startEdit(contract.key!)">
+              {{ contract.amount | currency:'TWD':'symbol':'1.0-0' }}
+            </div>
+            <input [hidden]="editId() !== contract.key" 
+                   type="number" 
+                   nz-input 
+                   [(ngModel)]="contract.amount" 
+                   (blur)="stopEdit(contract)" />
+          </td>
+          
+          <!-- Actions -->
+          <td>
+            <nz-popconfirm 
+              nzTitle="確定刪除？" 
+              (nzOnConfirm)="deleteContract(contract.key!)">
+              <a nz-popconfirm>刪除</a>
+            </nz-popconfirm>
+          </td>
+        </tr>
+        
+        <!-- Expanded payment management section -->
+        <tr *ngIf="expandSet().has(contract.key!)">
+          <td colspan="8" class="payment-expand-row">
+            <div class="payment-sub-table">
+              <div class="payment-header">
+                <h4>付款請求列表</h4>
+                <button 
+                  nz-button 
+                  nzType="primary" 
+                  nzSize="small"
+                  (click)="addPayment(contract)"
+                  [nzLoading]="paymentLoading().has(contract.key!)">
+                  <span nz-icon nzType="plus"></span>
+                  新增付款請求
+                </button>
+              </div>
+              
+              <!-- Payment requests table -->
+              <nz-table 
+                [nzData]="getContractPayments(contract.key!)" 
+                nzSize="small"
+                [nzShowPagination]="false"
+                [nzLoading]="paymentLoading().has(contract.key!)">
+                
+                <thead>
+                  <tr>
+                    <th>付款金額</th>
+                    <th>狀態</th>
+                    <th>工作流程</th>
+                    <th>創建時間</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  <tr *ngFor="let payment of getContractPayments(contract.key!)">
+                    <td>{{ payment.amount | currency:'TWD':'symbol':'1.0-0' }}</td>
+                    
+                    <!-- Payment status -->
+                    <td>
+                      <nz-tag [nzColor]="getPaymentStatusColor(payment.status)">
+                        {{ getPaymentStatusText(payment.status) }}
+                      </nz-tag>
+                    </td>
+                    
+                    <!-- Workflow steps inline display -->
+                    <td>
+                      <div class="workflow-steps">
+                        <nz-tag 
+                          *ngFor="let step of payment.steps" 
+                          [nzColor]="getStepStatusColor(step.status)"
+                          nzSize="small">
+                          {{ step.name }}
+                        </nz-tag>
+                      </div>
+                    </td>
+                    
+                    <!-- Creation date and attachments -->
+                    <td>
+                      <div>{{ formatPaymentDate(payment.createdAt) }}</div>
+                      <div *ngIf="payment.attachments?.length" class="attachment-info">
+                        <span nz-icon nzType="paper-clip"></span>
+                        {{ payment.attachments.length }} 個附件
+                      </div>
+                    </td>
+                    
+                    <!-- Payment actions -->
+                    <td>
+                      <button 
+                        nz-button 
+                        nzType="link" 
+                        nzSize="small"
+                        (click)="editPayment(payment)"
+                        [disabled]="payment.status === 'approved' || payment.status === 'rejected'">
+                        編輯
+                      </button>
+                      
+                      <button 
+                        *ngIf="payment.status === 'draft'"
+                        nz-button 
+                        nzType="primary" 
+                        nzSize="small"
+                        (click)="submitPayment(payment.key!)"
+                        [nzLoading]="paymentSubmitting().has(payment.key!)">
+                        提交審批
+                      </button>
+                      
+                      <button 
+                        nz-button 
+                        nzType="link" 
+                        nzSize="small"
+                        (click)="toggleWorkflowSteps(payment.key!)">
+                        <span nz-icon [nzType]="workflowStepsExpanded().has(payment.key!) ? 'up' : 'down'"></span>
+                        流程
+                      </button>
+                      
+                      <nz-popconfirm
+                        nzTitle="確定要刪除此付款請求嗎？"
+                        (nzOnConfirm)="deletePayment(payment.key!)">
+                        <button 
+                          nz-button 
+                          nzType="link" 
+                          nzSize="small" 
+                          nzDanger
+                          nz-popconfirm
+                          [disabled]="payment.status === 'approved'">
+                          刪除
+                        </button>
+                      </nz-popconfirm>
+                    </td>
+                  </tr>
+                  
+                  <!-- Expandable workflow steps -->
+                  <tr *ngIf="workflowStepsExpanded().has(payment.key!)">
+                    <td colspan="5" class="workflow-steps-row">
+                      <hub-contract-workflow-steps
+                        [payment]="payment"
+                        (workflowUpdated)="onWorkflowUpdated(contract.key!)">
+                      </hub-contract-workflow-steps>
+                    </td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </div>
+          </td>
+        </tr>
+      </tbody>
     </nz-table>
-    <hub-fab (onAction)="handleFabAction($event)"></hub-fab>
+    
+    <!-- Client dropdown menu -->
+    <nz-dropdown-menu #clientMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item 
+            *ngFor="let client of clients()" 
+            (click)="changeClient(currentDropdownRow, client)">
+          {{ client }}
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+
+    <!-- Payment Form Modal -->
+    <nz-modal
+      [nzVisible]="showPaymentModal()"
+      [nzTitle]="editingPayment() ? '編輯付款請求' : '新增付款請求'"
+      [nzFooter]="null"
+      [nzWidth]="600"
+      (nzOnCancel)="onPaymentModalCancel()">
+      
+      <div *nzModalContent>
+        <hub-contract-payment-form
+          [payment]="editingPayment()"
+          [contractId]="currentContract()?.key || ''"
+          (formSubmit)="onPaymentFormSubmit($event)"
+          (formCancel)="onPaymentModalCancel()">
+        </hub-contract-payment-form>
+      </div>
+    </nz-modal>
   `
 })
-export class ContractListComponent {
+export class ContractListComponent implements OnInit {
   private contractService = inject(ContractService);
+  private paymentService = inject(ContractPaymentService);
+  private hubCrud = inject(HubCrudService);
   
-  // Angular v20 Signals
+  // Core state management
   contracts = signal<Contract[]>([]);
   loading = signal(false);
+  editId = signal<string | null>(null);
+  clients = signal<string[]>([]);
+  currentDropdownRow: Contract | null = null;
   
-  // Lifecycle and methods
-  ngOnInit() {
-    this.loadContracts();
-  }
+  // Payment management state
+  expandSet = signal<Set<string>>(new Set());
+  contractPayments = signal<Map<string, ContractPayment[]>>(new Map());
+  paymentLoading = signal<Set<string>>(new Set());
+  paymentSubmitting = signal<Set<string>>(new Set());
+  workflowStepsExpanded = signal<Set<string>>(new Set());
   
-  private loadContracts() {
-    this.loading.set(true);
-    this.contractService.list().subscribe({
-      next: (contracts) => {
-        this.contracts.set(contracts);
-        this.loading.set(false);
-      },
-      error: () => this.loading.set(false)
-    });
-  }
+  // Modal state
+  showPaymentModal = signal(false);
+  currentContract = signal<Contract | null>(null);
+  editingPayment = signal<ContractPayment | null>(null);
+  
+  // Contract management methods
+  async addContract(): Promise<void>;
+  startEdit(id: string): void;
+  async stopEdit(contract: Contract): Promise<void>;
+  async deleteContract(id: string): Promise<void>;
+  async changeClient(contract: Contract | null, client: string): Promise<void>;
+  
+  // Payment management methods
+  async onExpandChange(contractId: string, expand: boolean): Promise<void>;
+  async loadContractPayments(contractId: string): Promise<void>;
+  getContractPayments(contractId: string): ContractPayment[];
+  addPayment(contract: Contract): void;
+  editPayment(payment: ContractPayment): void;
+  async submitPayment(paymentId: string): Promise<void>;
+  async deletePayment(paymentId: string): Promise<void>;
+  
+  // Workflow management methods
+  toggleWorkflowSteps(paymentId: string): void;
+  async onWorkflowUpdated(contractId: string): Promise<void>;
+  
+  // Utility methods
+  getPaymentStatusColor(status: string): string;
+  getPaymentStatusText(status: string): string;
+  getStepStatusColor(status: string): string;
+  formatPaymentDate(timestamp: any): string;
+}
+```
+
+#### Payment Form Component with File Upload
+```typescript
+@Component({
+  selector: 'hub-contract-payment-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NzFormModule,
+    NzInputModule,
+    NzInputNumberModule,
+    NzButtonModule,
+    NzUploadModule,
+    NzIconModule
+  ],
+  template: `
+    <form nz-form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+      <!-- Amount input -->
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>付款金額</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="請輸入有效的付款金額">
+          <nz-input-number
+            formControlName="amount"
+            [nzMin]="0.01"
+            [nzStep]="0.01"
+            nzPlaceHolder="請輸入付款金額"
+            style="width: 100%">
+          </nz-input-number>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Remark textarea -->
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6">備註</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <textarea
+            nz-input
+            formControlName="remark"
+            rows="3"
+            placeholder="請輸入備註說明">
+          </textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- File upload with restrictions -->
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6">附件</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <nz-upload
+            nzMultiple
+            [nzFileList]="fileList()"
+            [nzBeforeUpload]="beforeUpload"
+            [nzCustomRequest]="customUpload"
+            (nzChange)="handleFileChange($event)"
+            [nzShowUploadList]="{
+              showPreviewIcon: true,
+              showRemoveIcon: true,
+              showDownloadIcon: true
+            }">
+            <button nz-button [nzLoading]="uploading()">
+              <span nz-icon nzType="upload"></span>
+              <span>上傳附件</span>
+            </button>
+          </nz-upload>
+          <div class="upload-hint">
+            支援圖片、PDF、Word、Excel文件，單個文件不超過10MB，最多5個文件
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Form actions -->
+      <nz-form-item>
+        <nz-form-control [nzOffset]="6" [nzSpan]="18">
+          <button
+            nz-button
+            nzType="primary"
+            [nzLoading]="isSubmitting()"
+            [disabled]="!paymentForm.valid || isSubmitting()"
+            type="submit">
+            {{ editMode() ? '更新' : '創建' }}付款請求
+          </button>
+          <button
+            nz-button
+            type="button"
+            (click)="onCancel()">
+            取消
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  `
+})
+export class ContractPaymentFormComponent implements OnInit {
+  @Input() payment: ContractPayment | null = null;
+  @Input() contractId: string = '';
+  @Output() formSubmit = new EventEmitter<PaymentFormData>();
+  @Output() formCancel = new EventEmitter<void>();
+
+  // Form state management
+  paymentForm: FormGroup;
+  isSubmitting = signal(false);
+  editMode = computed(() => !!this.payment);
+  fileList = signal<NzUploadFile[]>([]);
+  uploading = signal(false);
+
+  // File upload methods with validation
+  beforeUpload = (file: NzUploadFile): boolean;
+  customUpload = (item: any): any;
+  handleFileChange(info: NzUploadChangeParam): void;
+}
+```
+
+#### Workflow Steps Component with Interactive Approval
+```typescript
+@Component({
+  selector: 'hub-contract-workflow-steps',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzStepsModule,
+    NzButtonModule,
+    NzInputModule,
+    NzModalModule,
+    NzIconModule,
+    NzPopconfirmModule
+  ],
+  template: `
+    <div class="workflow-steps-container">
+      <h4>審批流程</h4>
+      
+      <!-- Visual workflow progress -->
+      <nz-steps 
+        [nzCurrent]="currentStepIndex()" 
+        [nzStatus]="getStepsStatus()"
+        nzSize="small">
+        <nz-step 
+          *ngFor="let step of payment.steps; let i = index"
+          [nzTitle]="step.name"
+          [nzDescription]="getStepDescription(step)"
+          [nzIcon]="getStepIcon(step.status)">
+        </nz-step>
+      </nz-steps>
+
+      <!-- Interactive approval actions -->
+      <div class="workflow-actions">
+        <div *ngIf="canCurrentUserApprove()" class="approval-actions">
+          <button 
+            nz-button 
+            nzType="primary"
+            nzSize="small"
+            (click)="showApprovalModal(true)"
+            [nzLoading]="isProcessing()">
+            <span nz-icon nzType="check"></span>
+            核准
+          </button>
+          <button 
+            nz-button 
+            nzDanger
+            nzSize="small"
+            (click)="showApprovalModal(false)"
+            [nzLoading]="isProcessing()">
+            <span nz-icon nzType="close"></span>
+            拒絕
+          </button>
+        </div>
+        
+        <div *ngIf="!canCurrentUserApprove() && getCurrentStep()" class="step-info">
+          <span class="waiting-info">
+            <span nz-icon nzType="clock-circle"></span>
+            等待 {{ getCurrentStep()?.approver }} 審批
+          </span>
+        </div>
+      </div>
+
+      <!-- Approval modal with comment input -->
+      <nz-modal
+        [nzVisible]="showModal()"
+        [nzTitle]="modalTitle()"
+        [nzOkText]="isApproving() ? '確認核准' : '確認拒絕'"
+        [nzOkType]="isApproving() ? 'primary' : 'default'"
+        [nzOkLoading]="isProcessing()"
+        (nzOnOk)="handleApproval()"
+        (nzOnCancel)="closeModal()">
+        
+        <div>
+          <p>{{ modalMessage() }}</p>
+          <textarea
+            nz-input
+            [ngModel]="approvalComment()"
+            (ngModelChange)="approvalComment.set($event)"
+            rows="3"
+            placeholder="請輸入審批意見（選填）">
+          </textarea>
+        </div>
+      </nz-modal>
+    </div>
+  `
+})
+export class ContractWorkflowStepsComponent {
+  @Input() payment!: ContractPayment;
+  @Input() currentUser: string = 'current-user';
+  @Output() workflowUpdated = new EventEmitter<void>();
+
+  // Workflow state management
+  isProcessing = signal(false);
+  showModal = signal(false);
+  isApproving = signal(false);
+  approvalComment = signal('');
+  
+  // Workflow processing methods
+  canCurrentUserApprove(): boolean;
+  getCurrentStep(): ContractPaymentStep | null;
+  showApprovalModal(approve: boolean): void;
+  async handleApproval(): Promise<void>;
+  
+  // UI helper methods
+  currentStepIndex(): number;
+  getStepsStatus(): string;
+  getStepDescription(step: ContractPaymentStep): string;
+  getStepIcon(status: StepStatus): string;
 }
 ```
 
