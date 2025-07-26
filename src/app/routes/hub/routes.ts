@@ -2,6 +2,10 @@ import { Routes } from '@angular/router';
 
 export default [
   {
+    path: 'tree',
+    loadChildren: () => import('./features/tree/routes').then(m => m.treeRoutes)
+  },
+  {
     path: 'contracts',
     loadChildren: () => import('./features/contracts/routes').then(m => m.contractRoutes)
   },

@@ -16,6 +16,12 @@
       "hideInBreadcrumb": true,
       "children": [
         {
+          "text": "TreePanel",
+          "link": "/hub/tree",
+          "i18n": "menu.hub.tree",
+          "icon": "anticon-file-text"
+        },
+        {
           "text": "Contracts",
           "link": "/hub/contracts",
           "i18n": "menu.hub.contracts",
