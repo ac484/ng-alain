@@ -61,7 +61,7 @@ import { TreeNode } from '../../models/tree.model';
                 [nzAsyncData]="false"
                 (nzClick)="activeNode($event)"
                 (nzDblClick)="editNode($event)"
-                (nzDrop)="onDrop($event)"
+                (nzDrop)="onDrop($any($event))"
                 (nzContextMenu)="contextMenu($event.event!, contextMenuTemplate, $event.node!)">
                 
                 <ng-template #nzTreeTemplate let-node let-origin="origin">
