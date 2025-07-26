@@ -97,7 +97,7 @@ interface TreeStructure {
           [nzShowUploadList]="{ showPreviewIcon: false, showRemoveIcon: true }">
           
           <p class="ant-upload-drag-icon">
-            <span nz-icon nzType="file-pdf" nzTheme="twoTone"></span>
+            <span nz-icon nzType="file-pdf" nzTheme="twotone"></span>
           </p>
           <p class="ant-upload-text">點擊或拖拽 PDF 文件到此區域上傳</p>
           <p class="ant-upload-hint">

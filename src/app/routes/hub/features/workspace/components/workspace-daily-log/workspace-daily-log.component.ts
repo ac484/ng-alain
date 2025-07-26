@@ -19,38 +19,40 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { FabComponent } from '../../../shared/components/fab/fab.component';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { FabComponent } from '../../../../shared/components/fab/fab.component';
 
 interface WorkspaceLog {
-    id: string;
-    time: string;
-    content: string;
-    type: 'construction' | 'equipment' | 'safety' | 'management';
-    operator: string;
-    status: 'normal' | 'warning' | 'error';
-    date: Date;
+  id: string;
+  time: string;
+  content: string;
+  type: 'construction' | 'equipment' | 'safety' | 'management';
+  operator: string;
+  status: 'normal' | 'warning' | 'error';
+  date: Date;
 }
 
 @Component({
-    selector: 'hub-workspace-daily-log',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NzCardModule,
-        NzTimelineModule,
-        NzButtonModule,
-        NzInputModule,
-        NzTagModule,
-        NzModalModule,
-        NzFormModule,
-        NzSelectModule,
-        NzDatePickerModule,
-        FabComponent
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+  selector: 'hub-workspace-daily-log',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NzCardModule,
+    NzTimelineModule,
+    NzButtonModule,
+    NzInputModule,
+    NzTagModule,
+    NzModalModule,
+    NzFormModule,
+    NzSelectModule,
+    NzDatePickerModule,
+    NzSpaceModule,
+    FabComponent
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <!-- FAB for creating new log -->
     <hub-fab (onAction)="createLog()"></hub-fab>
 
@@ -185,7 +187,7 @@ interface WorkspaceLog {
       </button>
     </ng-template>
   `,
-    styles: [`
+  styles: [`
     .filter-section {
       padding: 16px;
       background: #fafafa;
@@ -226,173 +228,173 @@ interface WorkspaceLog {
   `]
 })
 export class WorkspaceDailyLogComponent implements OnInit {
-    private message = inject(NzMessageService);
-    private fb = inject(FormBuilder);
+  private message = inject(NzMessageService);
+  private fb = inject(FormBuilder);
 
-    // State management
-    dailyLogs = signal<WorkspaceLog[]>([]);
-    filteredLogs = signal<WorkspaceLog[]>([]);
-    showLogModal = signal(false);
+  // State management
+  dailyLogs = signal<WorkspaceLog[]>([]);
+  filteredLogs = signal<WorkspaceLog[]>([]);
+  showLogModal = signal(false);
 
-    // Filter states
-    selectedDate: Date | null = null;
-    selectedType: string | null = null;
+  // Filter states
+  selectedDate: Date | null = null;
+  selectedType: string | null = null;
 
-    // Form
-    logForm: FormGroup;
+  // Form
+  logForm: FormGroup;
 
-    constructor() {
-        this.logForm = this.fb.group({
-            type: ['construction', [Validators.required]],
-            content: ['', [Validators.required]],
-            operator: ['', [Validators.required]],
-            status: ['normal', [Validators.required]],
-            datetime: [new Date(), [Validators.required]]
-        });
+  constructor() {
+    this.logForm = this.fb.group({
+      type: ['construction', [Validators.required]],
+      content: ['', [Validators.required]],
+      operator: ['', [Validators.required]],
+      status: ['normal', [Validators.required]],
+      datetime: [new Date(), [Validators.required]]
+    });
+  }
+
+  ngOnInit() {
+    this.loadLogs();
+  }
+
+  private loadLogs() {
+    const mockLogs: WorkspaceLog[] = [
+      {
+        id: '1',
+        time: '08:00',
+        content: '工地開工，進行安全晨會，確認今日施工計劃和安全注意事項',
+        type: 'management',
+        operator: '張負責人',
+        status: 'normal',
+        date: new Date()
+      },
+      {
+        id: '2',
+        time: '08:30',
+        content: '200噸履帶式起重機開機檢查，制動系統、鋼絲繩、安全裝置正常',
+        type: 'equipment',
+        operator: '王師傅',
+        status: 'normal',
+        date: new Date()
+      },
+      {
+        id: '3',
+        time: '09:00',
+        content: '開始主體結構鋼筋籠吊裝作業，重量約15噸，使用100噸汽車吊配合',
+        type: 'construction',
+        operator: '李師傅',
+        status: 'normal',
+        date: new Date()
+      },
+      {
+        id: '4',
+        time: '14:00',
+        content: '發現鋼筋籠吊裝時重心偏移，立即停止作業進行調整',
+        type: 'safety',
+        operator: '李師傅',
+        status: 'warning',
+        date: new Date()
+      }
+    ];
+
+    this.dailyLogs.set(mockLogs);
+    this.applyFilters();
+  }
+
+  private applyFilters() {
+    let filtered = this.dailyLogs();
+
+    if (this.selectedDate) {
+      const selectedDateStr = this.selectedDate.toDateString();
+      filtered = filtered.filter(log => log.date.toDateString() === selectedDateStr);
     }
 
-    ngOnInit() {
-        this.loadLogs();
+    if (this.selectedType) {
+      filtered = filtered.filter(log => log.type === this.selectedType);
     }
 
-    private loadLogs() {
-        const mockLogs: WorkspaceLog[] = [
-            {
-                id: '1',
-                time: '08:00',
-                content: '工地開工，進行安全晨會，確認今日施工計劃和安全注意事項',
-                type: 'management',
-                operator: '張負責人',
-                status: 'normal',
-                date: new Date()
-            },
-            {
-                id: '2',
-                time: '08:30',
-                content: '200噸履帶式起重機開機檢查，制動系統、鋼絲繩、安全裝置正常',
-                type: 'equipment',
-                operator: '王師傅',
-                status: 'normal',
-                date: new Date()
-            },
-            {
-                id: '3',
-                time: '09:00',
-                content: '開始主體結構鋼筋籠吊裝作業，重量約15噸，使用100噸汽車吊配合',
-                type: 'construction',
-                operator: '李師傅',
-                status: 'normal',
-                date: new Date()
-            },
-            {
-                id: '4',
-                time: '14:00',
-                content: '發現鋼筋籠吊裝時重心偏移，立即停止作業進行調整',
-                type: 'safety',
-                operator: '李師傅',
-                status: 'warning',
-                date: new Date()
-            }
-        ];
+    this.filteredLogs.set(filtered);
+  }
 
-        this.dailyLogs.set(mockLogs);
-        this.applyFilters();
+  onDateFilter() {
+    this.applyFilters();
+  }
+
+  onTypeFilter() {
+    this.applyFilters();
+  }
+
+  createLog() {
+    this.logForm.reset({
+      type: 'construction',
+      content: '',
+      operator: '',
+      status: 'normal',
+      datetime: new Date()
+    });
+    this.showLogModal.set(true);
+  }
+
+  saveLog() {
+    if (this.logForm.valid) {
+      const formValue = this.logForm.value;
+      const logData: WorkspaceLog = {
+        id: Date.now().toString(),
+        time: formValue.datetime.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
+        content: formValue.content,
+        type: formValue.type,
+        operator: formValue.operator,
+        status: formValue.status,
+        date: formValue.datetime
+      };
+
+      const currentLogs = this.dailyLogs();
+      this.dailyLogs.set([logData, ...currentLogs]);
+      this.applyFilters();
+      this.closeLogModal();
+      this.message.success('日誌創建成功');
     }
+  }
 
-    private applyFilters() {
-        let filtered = this.dailyLogs();
+  closeLogModal() {
+    this.showLogModal.set(false);
+  }
 
-        if (this.selectedDate) {
-            const selectedDateStr = this.selectedDate.toDateString();
-            filtered = filtered.filter(log => log.date.toDateString() === selectedDateStr);
-        }
+  getStatusColor(status: string): string {
+    const colors: Record<string, string> = {
+      normal: 'green',
+      warning: 'orange',
+      error: 'red'
+    };
+    return colors[status] || 'blue';
+  }
 
-        if (this.selectedType) {
-            filtered = filtered.filter(log => log.type === this.selectedType);
-        }
+  getStatusText(status: string): string {
+    const texts: Record<string, string> = {
+      normal: '正常',
+      warning: '警告',
+      error: '錯誤'
+    };
+    return texts[status] || '未知';
+  }
 
-        this.filteredLogs.set(filtered);
-    }
+  getTypeColor(type: string): string {
+    const colors: Record<string, string> = {
+      construction: 'blue',
+      equipment: 'purple',
+      safety: 'red',
+      management: 'green'
+    };
+    return colors[type] || 'default';
+  }
 
-    onDateFilter() {
-        this.applyFilters();
-    }
-
-    onTypeFilter() {
-        this.applyFilters();
-    }
-
-    createLog() {
-        this.logForm.reset({
-            type: 'construction',
-            content: '',
-            operator: '',
-            status: 'normal',
-            datetime: new Date()
-        });
-        this.showLogModal.set(true);
-    }
-
-    saveLog() {
-        if (this.logForm.valid) {
-            const formValue = this.logForm.value;
-            const logData: WorkspaceLog = {
-                id: Date.now().toString(),
-                time: formValue.datetime.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
-                content: formValue.content,
-                type: formValue.type,
-                operator: formValue.operator,
-                status: formValue.status,
-                date: formValue.datetime
-            };
-
-            const currentLogs = this.dailyLogs();
-            this.dailyLogs.set([logData, ...currentLogs]);
-            this.applyFilters();
-            this.closeLogModal();
-            this.message.success('日誌創建成功');
-        }
-    }
-
-    closeLogModal() {
-        this.showLogModal.set(false);
-    }
-
-    getStatusColor(status: string): string {
-        const colors: Record<string, string> = {
-            normal: 'green',
-            warning: 'orange',
-            error: 'red'
-        };
-        return colors[status] || 'blue';
-    }
-
-    getStatusText(status: string): string {
-        const texts: Record<string, string> = {
-            normal: '正常',
-            warning: '警告',
-            error: '錯誤'
-        };
-        return texts[status] || '未知';
-    }
-
-    getTypeColor(type: string): string {
-        const colors: Record<string, string> = {
-            construction: 'blue',
-            equipment: 'purple',
-            safety: 'red',
-            management: 'green'
-        };
-        return colors[type] || 'default';
-    }
-
-    getTypeText(type: string): string {
-        const texts: Record<string, string> = {
-            construction: '施工',
-            equipment: '設備',
-            safety: '安全',
-            management: '管理'
-        };
-        return texts[type] || '未知';
-    }
+  getTypeText(type: string): string {
+    const texts: Record<string, string> = {
+      construction: '施工',
+      equipment: '設備',
+      safety: '安全',
+      management: '管理'
+    };
+    return texts[type] || '未知';
+  }
 }

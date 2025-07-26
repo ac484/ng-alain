@@ -20,43 +20,45 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { FabComponent } from '../../../../shared/components/fab/fab.component';
 import { WorkspaceService } from '../../services/workspace.service';
 
 interface WorkspaceTask {
-    id: string;
-    title: string;
-    description: string;
-    priority: 'low' | 'medium' | 'high' | 'urgent';
-    status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
-    assignee: string;
-    dueDate: Date;
-    type: 'equipment' | 'safety' | 'construction' | 'transport';
-    equipment?: string;
-    progress: number;
+  id: string;
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+  assignee: string;
+  dueDate: Date;
+  type: 'equipment' | 'safety' | 'construction' | 'transport';
+  equipment?: string;
+  progress: number;
 }
 
 @Component({
-    selector: 'hub-workspace-tasks',
-    standalone: true,
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        NzTableModule,
-        NzCardModule,
-        NzTagModule,
-        NzButtonModule,
-        NzModalModule,
-        NzFormModule,
-        NzInputModule,
-        NzSelectModule,
-        NzDatePickerModule,
-        NzIconModule,
-        FabComponent
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+  selector: 'hub-workspace-tasks',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NzTableModule,
+    NzCardModule,
+    NzTagModule,
+    NzButtonModule,
+    NzModalModule,
+    NzFormModule,
+    NzInputModule,
+    NzSelectModule,
+    NzDatePickerModule,
+    NzIconModule,
+    NzSpaceModule,
+    FabComponent
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <!-- FAB for creating new task -->
     <hub-fab (onAction)="createTask()"></hub-fab>
 
@@ -294,7 +296,7 @@ interface WorkspaceTask {
       </button>
     </ng-template>
   `,
-    styles: [`
+  styles: [`
     .filter-section {
       padding: 16px;
       background: #fafafa;
@@ -347,290 +349,290 @@ interface WorkspaceTask {
   `]
 })
 export class WorkspaceTasksComponent implements OnInit {
-    private workspaceService = inject(WorkspaceService);
-    private message = inject(NzMessageService);
-    private fb = inject(FormBuilder);
+  private workspaceService = inject(WorkspaceService);
+  private message = inject(NzMessageService);
+  private fb = inject(FormBuilder);
 
-    // State management
-    tasks = signal<WorkspaceTask[]>([]);
-    filteredTasks = signal<WorkspaceTask[]>([]);
-    loading = signal(false);
-    showTaskModal = signal(false);
-    editingTask = signal<WorkspaceTask | null>(null);
+  // State management
+  tasks = signal<WorkspaceTask[]>([]);
+  filteredTasks = signal<WorkspaceTask[]>([]);
+  loading = signal(false);
+  showTaskModal = signal(false);
+  editingTask = signal<WorkspaceTask | null>(null);
 
-    // Filter states
-    selectedType: string | null = null;
-    selectedStatus: string | null = null;
-    selectedPriority: string | null = null;
+  // Filter states
+  selectedType: string | null = null;
+  selectedStatus: string | null = null;
+  selectedPriority: string | null = null;
 
-    // Form
-    taskForm: FormGroup;
+  // Form
+  taskForm: FormGroup;
 
-    constructor() {
-        this.taskForm = this.fb.group({
-            title: ['', [Validators.required]],
-            description: [''],
-            type: ['equipment', [Validators.required]],
-            priority: ['medium', [Validators.required]],
-            assignee: ['', [Validators.required]],
-            equipment: [''],
-            dueDate: [new Date(), [Validators.required]]
-        });
+  constructor() {
+    this.taskForm = this.fb.group({
+      title: ['', [Validators.required]],
+      description: [''],
+      type: ['equipment', [Validators.required]],
+      priority: ['medium', [Validators.required]],
+      assignee: ['', [Validators.required]],
+      equipment: [''],
+      dueDate: [new Date(), [Validators.required]]
+    });
+  }
+
+  ngOnInit() {
+    this.loadTasks();
+  }
+
+  private loadTasks() {
+    this.loading.set(true);
+
+    // 載入模擬任務數據
+    const mockTasks: WorkspaceTask[] = [
+      {
+        id: '1',
+        title: '起重機安全檢查',
+        description: '200噸履帶式起重機每日安全檢查，確認制動系統和鋼絲繩狀態',
+        priority: 'high',
+        status: 'in-progress',
+        assignee: '王師傅',
+        dueDate: new Date(2024, 0, 25),
+        type: 'safety',
+        equipment: '200噸履帶式起重機',
+        progress: 60
+      },
+      {
+        id: '2',
+        title: '鋼筋籠吊裝作業',
+        description: '主體結構鋼筋籠吊裝，重量約15噸，需要100噸汽車吊配合',
+        priority: 'urgent',
+        status: 'pending',
+        assignee: '李師傅',
+        dueDate: new Date(2024, 0, 22),
+        type: 'construction',
+        equipment: '100噸汽車吊',
+        progress: 0
+      },
+      {
+        id: '3',
+        title: '混凝土泵車維護',
+        description: '60米臂長混凝土泵車例行維護，檢查液壓系統和臂架結構',
+        priority: 'medium',
+        status: 'completed',
+        assignee: '陳師傅',
+        dueDate: new Date(2024, 0, 20),
+        type: 'equipment',
+        equipment: '60米混凝土泵車',
+        progress: 100
+      },
+      {
+        id: '4',
+        title: '高空作業平台檢查',
+        description: '20米高空作業平台安全檢查，確認防護網和安全帶配置',
+        priority: 'high',
+        status: 'pending',
+        assignee: '張公安',
+        dueDate: new Date(2024, 0, 26),
+        type: 'safety',
+        equipment: '高空作業平台',
+        progress: 0
+      },
+      {
+        id: '5',
+        title: '設備運輸安排',
+        description: '安排挖掘機和推土機從A工地運輸到B工地',
+        priority: 'medium',
+        status: 'in-progress',
+        assignee: '劉師傅',
+        dueDate: new Date(2024, 0, 28),
+        type: 'transport',
+        equipment: '挖掘機、推土機',
+        progress: 30
+      }
+    ];
+
+    this.tasks.set(mockTasks);
+    this.applyFilters();
+    this.loading.set(false);
+  }
+
+  private applyFilters() {
+    let filtered = this.tasks();
+
+    if (this.selectedType) {
+      filtered = filtered.filter(task => task.type === this.selectedType);
     }
 
-    ngOnInit() {
-        this.loadTasks();
+    if (this.selectedStatus) {
+      filtered = filtered.filter(task => task.status === this.selectedStatus);
     }
 
-    private loadTasks() {
-        this.loading.set(true);
-
-        // 載入模擬任務數據
-        const mockTasks: WorkspaceTask[] = [
-            {
-                id: '1',
-                title: '起重機安全檢查',
-                description: '200噸履帶式起重機每日安全檢查，確認制動系統和鋼絲繩狀態',
-                priority: 'high',
-                status: 'in-progress',
-                assignee: '王師傅',
-                dueDate: new Date(2024, 0, 25),
-                type: 'safety',
-                equipment: '200噸履帶式起重機',
-                progress: 60
-            },
-            {
-                id: '2',
-                title: '鋼筋籠吊裝作業',
-                description: '主體結構鋼筋籠吊裝，重量約15噸，需要100噸汽車吊配合',
-                priority: 'urgent',
-                status: 'pending',
-                assignee: '李師傅',
-                dueDate: new Date(2024, 0, 22),
-                type: 'construction',
-                equipment: '100噸汽車吊',
-                progress: 0
-            },
-            {
-                id: '3',
-                title: '混凝土泵車維護',
-                description: '60米臂長混凝土泵車例行維護，檢查液壓系統和臂架結構',
-                priority: 'medium',
-                status: 'completed',
-                assignee: '陳師傅',
-                dueDate: new Date(2024, 0, 20),
-                type: 'equipment',
-                equipment: '60米混凝土泵車',
-                progress: 100
-            },
-            {
-                id: '4',
-                title: '高空作業平台檢查',
-                description: '20米高空作業平台安全檢查，確認防護網和安全帶配置',
-                priority: 'high',
-                status: 'pending',
-                assignee: '張公安',
-                dueDate: new Date(2024, 0, 26),
-                type: 'safety',
-                equipment: '高空作業平台',
-                progress: 0
-            },
-            {
-                id: '5',
-                title: '設備運輸安排',
-                description: '安排挖掘機和推土機從A工地運輸到B工地',
-                priority: 'medium',
-                status: 'in-progress',
-                assignee: '劉師傅',
-                dueDate: new Date(2024, 0, 28),
-                type: 'transport',
-                equipment: '挖掘機、推土機',
-                progress: 30
-            }
-        ];
-
-        this.tasks.set(mockTasks);
-        this.applyFilters();
-        this.loading.set(false);
+    if (this.selectedPriority) {
+      filtered = filtered.filter(task => task.priority === this.selectedPriority);
     }
 
-    private applyFilters() {
-        let filtered = this.tasks();
+    this.filteredTasks.set(filtered);
+  }
 
-        if (this.selectedType) {
-            filtered = filtered.filter(task => task.type === this.selectedType);
+  onTypeFilter() {
+    this.applyFilters();
+  }
+
+  onStatusFilter() {
+    this.applyFilters();
+  }
+
+  onPriorityFilter() {
+    this.applyFilters();
+  }
+
+  createTask() {
+    this.editingTask.set(null);
+    this.taskForm.reset({
+      title: '',
+      description: '',
+      type: 'equipment',
+      priority: 'medium',
+      assignee: '',
+      equipment: '',
+      dueDate: new Date()
+    });
+    this.showTaskModal.set(true);
+  }
+
+  editTask(task: WorkspaceTask) {
+    this.editingTask.set(task);
+    this.taskForm.patchValue({
+      title: task.title,
+      description: task.description,
+      type: task.type,
+      priority: task.priority,
+      assignee: task.assignee,
+      equipment: task.equipment || '',
+      dueDate: task.dueDate
+    });
+    this.showTaskModal.set(true);
+  }
+
+  viewTask(task: WorkspaceTask) {
+    // TODO: 實現查看任務詳情
+    console.log('查看任務:', task);
+  }
+
+  deleteTask(task: WorkspaceTask) {
+    const currentTasks = this.tasks();
+    const updatedTasks = currentTasks.filter(t => t.id !== task.id);
+    this.tasks.set(updatedTasks);
+    this.applyFilters();
+    this.message.success('任務刪除成功');
+  }
+
+  saveTask() {
+    if (this.taskForm.valid) {
+      const formValue = this.taskForm.value;
+      const taskData: WorkspaceTask = {
+        id: this.editingTask()?.id || Date.now().toString(),
+        title: formValue.title,
+        description: formValue.description,
+        type: formValue.type,
+        priority: formValue.priority,
+        assignee: formValue.assignee,
+        equipment: formValue.equipment,
+        dueDate: formValue.dueDate,
+        status: this.editingTask()?.status || 'pending',
+        progress: this.editingTask()?.progress || 0
+      };
+
+      const currentTasks = this.tasks();
+      if (this.editingTask()) {
+        // 更新現有任務
+        const index = currentTasks.findIndex(t => t.id === this.editingTask()!.id);
+        if (index !== -1) {
+          currentTasks[index] = taskData;
+          this.tasks.set([...currentTasks]);
         }
+        this.message.success('任務更新成功');
+      } else {
+        // 新增任務
+        this.tasks.set([...currentTasks, taskData]);
+        this.message.success('任務創建成功');
+      }
 
-        if (this.selectedStatus) {
-            filtered = filtered.filter(task => task.status === this.selectedStatus);
-        }
-
-        if (this.selectedPriority) {
-            filtered = filtered.filter(task => task.priority === this.selectedPriority);
-        }
-
-        this.filteredTasks.set(filtered);
+      this.applyFilters();
+      this.closeTaskModal();
     }
+  }
 
-    onTypeFilter() {
-        this.applyFilters();
-    }
+  closeTaskModal() {
+    this.showTaskModal.set(false);
+    this.editingTask.set(null);
+  }
 
-    onStatusFilter() {
-        this.applyFilters();
-    }
+  // 工具方法
+  getPriorityColor(priority: string): string {
+    const colors: Record<string, string> = {
+      urgent: 'red',
+      high: 'orange',
+      medium: 'blue',
+      low: 'green'
+    };
+    return colors[priority] || 'default';
+  }
 
-    onPriorityFilter() {
-        this.applyFilters();
-    }
+  getPriorityText(priority: string): string {
+    const texts: Record<string, string> = {
+      urgent: '緊急',
+      high: '高',
+      medium: '中',
+      low: '低'
+    };
+    return texts[priority] || '未知';
+  }
 
-    createTask() {
-        this.editingTask.set(null);
-        this.taskForm.reset({
-            title: '',
-            description: '',
-            type: 'equipment',
-            priority: 'medium',
-            assignee: '',
-            equipment: '',
-            dueDate: new Date()
-        });
-        this.showTaskModal.set(true);
-    }
+  getStatusColor(status: string): string {
+    const colors: Record<string, string> = {
+      pending: 'blue',
+      'in-progress': 'orange',
+      completed: 'green',
+      cancelled: 'red'
+    };
+    return colors[status] || 'default';
+  }
 
-    editTask(task: WorkspaceTask) {
-        this.editingTask.set(task);
-        this.taskForm.patchValue({
-            title: task.title,
-            description: task.description,
-            type: task.type,
-            priority: task.priority,
-            assignee: task.assignee,
-            equipment: task.equipment || '',
-            dueDate: task.dueDate
-        });
-        this.showTaskModal.set(true);
-    }
+  getStatusText(status: string): string {
+    const texts: Record<string, string> = {
+      pending: '待處理',
+      'in-progress': '進行中',
+      completed: '已完成',
+      cancelled: '已取消'
+    };
+    return texts[status] || '未知';
+  }
 
-    viewTask(task: WorkspaceTask) {
-        // TODO: 實現查看任務詳情
-        console.log('查看任務:', task);
-    }
+  getTypeColor(type: string): string {
+    const colors: Record<string, string> = {
+      equipment: 'purple',
+      safety: 'red',
+      construction: 'blue',
+      transport: 'orange'
+    };
+    return colors[type] || 'default';
+  }
 
-    deleteTask(task: WorkspaceTask) {
-        const currentTasks = this.tasks();
-        const updatedTasks = currentTasks.filter(t => t.id !== task.id);
-        this.tasks.set(updatedTasks);
-        this.applyFilters();
-        this.message.success('任務刪除成功');
-    }
+  getTypeText(type: string): string {
+    const texts: Record<string, string> = {
+      equipment: '設備',
+      safety: '安全',
+      construction: '施工',
+      transport: '運輸'
+    };
+    return texts[type] || '未知';
+  }
 
-    saveTask() {
-        if (this.taskForm.valid) {
-            const formValue = this.taskForm.value;
-            const taskData: WorkspaceTask = {
-                id: this.editingTask()?.id || Date.now().toString(),
-                title: formValue.title,
-                description: formValue.description,
-                type: formValue.type,
-                priority: formValue.priority,
-                assignee: formValue.assignee,
-                equipment: formValue.equipment,
-                dueDate: formValue.dueDate,
-                status: this.editingTask()?.status || 'pending',
-                progress: this.editingTask()?.progress || 0
-            };
-
-            const currentTasks = this.tasks();
-            if (this.editingTask()) {
-                // 更新現有任務
-                const index = currentTasks.findIndex(t => t.id === this.editingTask()!.id);
-                if (index !== -1) {
-                    currentTasks[index] = taskData;
-                    this.tasks.set([...currentTasks]);
-                }
-                this.message.success('任務更新成功');
-            } else {
-                // 新增任務
-                this.tasks.set([...currentTasks, taskData]);
-                this.message.success('任務創建成功');
-            }
-
-            this.applyFilters();
-            this.closeTaskModal();
-        }
-    }
-
-    closeTaskModal() {
-        this.showTaskModal.set(false);
-        this.editingTask.set(null);
-    }
-
-    // 工具方法
-    getPriorityColor(priority: string): string {
-        const colors: Record<string, string> = {
-            urgent: 'red',
-            high: 'orange',
-            medium: 'blue',
-            low: 'green'
-        };
-        return colors[priority] || 'default';
-    }
-
-    getPriorityText(priority: string): string {
-        const texts: Record<string, string> = {
-            urgent: '緊急',
-            high: '高',
-            medium: '中',
-            low: '低'
-        };
-        return texts[priority] || '未知';
-    }
-
-    getStatusColor(status: string): string {
-        const colors: Record<string, string> = {
-            pending: 'blue',
-            'in-progress': 'orange',
-            completed: 'green',
-            cancelled: 'red'
-        };
-        return colors[status] || 'default';
-    }
-
-    getStatusText(status: string): string {
-        const texts: Record<string, string> = {
-            pending: '待處理',
-            'in-progress': '進行中',
-            completed: '已完成',
-            cancelled: '已取消'
-        };
-        return texts[status] || '未知';
-    }
-
-    getTypeColor(type: string): string {
-        const colors: Record<string, string> = {
-            equipment: 'purple',
-            safety: 'red',
-            construction: 'blue',
-            transport: 'orange'
-        };
-        return colors[type] || 'default';
-    }
-
-    getTypeText(type: string): string {
-        const texts: Record<string, string> = {
-            equipment: '設備',
-            safety: '安全',
-            construction: '施工',
-            transport: '運輸'
-        };
-        return texts[type] || '未知';
-    }
-
-    getProgressColor(progress: number): string {
-        if (progress >= 80) return '#52c41a';
-        if (progress >= 60) return '#1890ff';
-        if (progress >= 40) return '#faad14';
-        return '#f5222d';
-    }
+  getProgressColor(progress: number): string {
+    if (progress >= 80) return '#52c41a';
+    if (progress >= 60) return '#1890ff';
+    if (progress >= 40) return '#faad14';
+    return '#f5222d';
+  }
 }

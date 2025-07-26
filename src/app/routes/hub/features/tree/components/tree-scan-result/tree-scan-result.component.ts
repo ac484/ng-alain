@@ -99,7 +99,7 @@ interface ScanResult {
                 <nz-list-item-meta-avatar>
                   <span nz-icon 
                         [nzType]="result.fileType === 'pdf' ? 'file-pdf' : 'file-text'"
-                        [nzTheme]="'twoTone'">
+                        [nzTheme]="'twotone'">
                   </span>
                 </nz-list-item-meta-avatar>
                 

@@ -17,48 +17,50 @@ import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { WorkspaceService } from '../../services/workspace.service';
 
 interface ConstructionProject {
-    name: string;
-    progress: number;
-    dueDate: string;
-    safetyLevel: 'high' | 'medium' | 'low';
-    status: 'active' | 'completed' | 'delayed';
+  name: string;
+  progress: number;
+  dueDate: string;
+  safetyLevel: 'high' | 'medium' | 'low';
+  status: 'active' | 'completed' | 'delayed';
 }
 
 interface SafetyRecord {
-    title: string;
-    inspector: string;
-    time: string;
-    status: 'passed' | 'failed' | 'pending';
-    type: 'safety' | 'quality' | 'environment';
+  title: string;
+  inspector: string;
+  time: string;
+  status: 'passed' | 'failed' | 'pending';
+  type: 'safety' | 'quality' | 'environment';
 }
 
 interface SitePersonnel {
-    role: 'safety' | 'supervisor' | 'manager' | 'worker';
-    name: string;
-    phone: string;
-    status: 'on-site' | 'off-site';
+  role: 'safety' | 'supervisor' | 'manager' | 'worker';
+  name: string;
+  phone: string;
+  status: 'on-site' | 'off-site';
 }
 
 @Component({
-    selector: 'hub-workspace-overview',
-    standalone: true,
-    imports: [
-        CommonModule,
-        NzCardModule,
-        NzStatisticModule,
-        NzGridModule,
-        NzProgressModule,
-        NzListModule,
-        NzTagModule,
-        NzAvatarModule,
-        NzButtonModule,
-        NzIconModule
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+  selector: 'hub-workspace-overview',
+  standalone: true,
+  imports: [
+    CommonModule,
+    NzCardModule,
+    NzStatisticModule,
+    NzGridModule,
+    NzProgressModule,
+    NzListModule,
+    NzTagModule,
+    NzAvatarModule,
+    NzButtonModule,
+    NzIconModule,
+    NzSpaceModule
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <div class="overview-container">
       <!-- 統計卡片 -->
       <nz-row [nzGutter]="16" class="stats-row">
@@ -170,7 +172,7 @@ interface SitePersonnel {
                     <nz-avatar 
                       [nzSize]="48" 
                       [nzText]="person.name.charAt(0)"
-                      [nzStyle]="{ backgroundColor: getPersonnelAvatarColor(person.role) }">
+                      [style.background-color]="getPersonnelAvatarColor(person.role)">
                     </nz-avatar>
                     <nz-tag [nzColor]="person.status === 'on-site' ? 'green' : 'red'">
                       {{ person.status === 'on-site' ? '在場' : '離場' }}
@@ -211,7 +213,7 @@ interface SitePersonnel {
       </button>
     </ng-template>
   `,
-    styles: [`
+  styles: [`
     .overview-container {
       padding: 16px;
     }
@@ -338,155 +340,155 @@ interface SitePersonnel {
   `]
 })
 export class WorkspaceOverviewComponent implements OnInit {
-    private workspaceService = inject(WorkspaceService);
+  private workspaceService = inject(WorkspaceService);
 
-    // State management
-    overviewStats = signal({
-        constructionProgress: 68,
-        safetyScore: 95,
-        onSitePersonnel: 42,
-        safetyIncidents: 0
-    });
+  // State management
+  overviewStats = signal({
+    constructionProgress: 68,
+    safetyScore: 95,
+    onSitePersonnel: 42,
+    safetyIncidents: 0
+  });
 
-    constructionProjects = signal<ConstructionProject[]>([]);
-    safetyRecords = signal<SafetyRecord[]>([]);
-    sitePersonnel = signal<SitePersonnel[]>([]);
+  constructionProjects = signal<ConstructionProject[]>([]);
+  safetyRecords = signal<SafetyRecord[]>([]);
+  sitePersonnel = signal<SitePersonnel[]>([]);
 
-    ngOnInit() {
-        this.loadOverviewData();
-    }
+  ngOnInit() {
+    this.loadOverviewData();
+  }
 
-    private loadOverviewData() {
-        // 載入施工項目數據
-        this.constructionProjects.set([
-            { name: '主體結構施工', progress: 75, dueDate: '2024-03-15', safetyLevel: 'high', status: 'active' },
-            { name: '機電設備安裝', progress: 45, dueDate: '2024-04-01', safetyLevel: 'medium', status: 'active' },
-            { name: '外牆裝修', progress: 90, dueDate: '2024-02-28', safetyLevel: 'high', status: 'completed' },
-            { name: '室內裝修', progress: 30, dueDate: '2024-05-15', safetyLevel: 'low', status: 'delayed' }
-        ]);
+  private loadOverviewData() {
+    // 載入施工項目數據
+    this.constructionProjects.set([
+      { name: '主體結構施工', progress: 75, dueDate: '2024-03-15', safetyLevel: 'high', status: 'active' },
+      { name: '機電設備安裝', progress: 45, dueDate: '2024-04-01', safetyLevel: 'medium', status: 'active' },
+      { name: '外牆裝修', progress: 90, dueDate: '2024-02-28', safetyLevel: 'high', status: 'completed' },
+      { name: '室內裝修', progress: 30, dueDate: '2024-05-15', safetyLevel: 'low', status: 'delayed' }
+    ]);
 
-        // 載入安全檢查記錄
-        this.safetyRecords.set([
-            { title: '高空作業安全檢查', inspector: '王公安', time: '2小時前', status: 'passed', type: 'safety' },
-            { title: '鋼筋綁紮品質檢查', inspector: '李監工', time: '4小時前', status: 'passed', type: 'quality' },
-            { title: '環境噪音檢測', inspector: '張環保', time: '1天前', status: 'pending', type: 'environment' },
-            { title: '起重機安全檢查', inspector: '陳公安', time: '2天前', status: 'failed', type: 'safety' }
-        ]);
+    // 載入安全檢查記錄
+    this.safetyRecords.set([
+      { title: '高空作業安全檢查', inspector: '王公安', time: '2小時前', status: 'passed', type: 'safety' },
+      { title: '鋼筋綁紮品質檢查', inspector: '李監工', time: '4小時前', status: 'passed', type: 'quality' },
+      { title: '環境噪音檢測', inspector: '張環保', time: '1天前', status: 'pending', type: 'environment' },
+      { title: '起重機安全檢查', inspector: '陳公安', time: '2天前', status: 'failed', type: 'safety' }
+    ]);
 
-        // 載入工地人員數據
-        this.sitePersonnel.set([
-            { role: 'safety', name: '王公安', phone: '0912-345-678', status: 'on-site' },
-            { role: 'supervisor', name: '李監工', phone: '0923-456-789', status: 'on-site' },
-            { role: 'manager', name: '張負責人', phone: '0934-567-890', status: 'on-site' },
-            { role: 'safety', name: '陳公安', phone: '0945-678-901', status: 'off-site' },
-            { role: 'supervisor', name: '劉監工', phone: '0956-789-012', status: 'on-site' },
-            { role: 'worker', name: '黃師傅', phone: '0967-890-123', status: 'on-site' }
-        ]);
-    }
+    // 載入工地人員數據
+    this.sitePersonnel.set([
+      { role: 'safety', name: '王公安', phone: '0912-345-678', status: 'on-site' },
+      { role: 'supervisor', name: '李監工', phone: '0923-456-789', status: 'on-site' },
+      { role: 'manager', name: '張負責人', phone: '0934-567-890', status: 'on-site' },
+      { role: 'safety', name: '陳公安', phone: '0945-678-901', status: 'off-site' },
+      { role: 'supervisor', name: '劉監工', phone: '0956-789-012', status: 'on-site' },
+      { role: 'worker', name: '黃師傅', phone: '0967-890-123', status: 'on-site' }
+    ]);
+  }
 
-    // 工具方法
-    getSafetyColor(level: string): string {
-        const colors: Record<string, string> = {
-            high: 'green',
-            medium: 'orange',
-            low: 'red'
-        };
-        return colors[level] || 'default';
-    }
+  // 工具方法
+  getSafetyColor(level: string): string {
+    const colors: Record<string, string> = {
+      high: 'green',
+      medium: 'orange',
+      low: 'red'
+    };
+    return colors[level] || 'default';
+  }
 
-    getSafetyText(level: string): string {
-        const texts: Record<string, string> = {
-            high: '安全',
-            medium: '注意',
-            low: '危險'
-        };
-        return texts[level] || '未知';
-    }
+  getSafetyText(level: string): string {
+    const texts: Record<string, string> = {
+      high: '安全',
+      medium: '注意',
+      low: '危險'
+    };
+    return texts[level] || '未知';
+  }
 
-    getProjectStatusColor(status: string): string {
-        const colors: Record<string, string> = {
-            active: 'blue',
-            completed: 'green',
-            delayed: 'red'
-        };
-        return colors[status] || 'default';
-    }
+  getProjectStatusColor(status: string): string {
+    const colors: Record<string, string> = {
+      active: 'blue',
+      completed: 'green',
+      delayed: 'red'
+    };
+    return colors[status] || 'default';
+  }
 
-    getProjectStatusText(status: string): string {
-        const texts: Record<string, string> = {
-            active: '進行中',
-            completed: '已完成',
-            delayed: '延遲'
-        };
-        return texts[status] || '未知';
-    }
+  getProjectStatusText(status: string): string {
+    const texts: Record<string, string> = {
+      active: '進行中',
+      completed: '已完成',
+      delayed: '延遲'
+    };
+    return texts[status] || '未知';
+  }
 
-    getProgressStatus(progress: number): 'success' | 'exception' | 'active' | undefined {
-        if (progress >= 100) return 'success';
-        if (progress < 30) return 'exception';
-        return 'active';
-    }
+  getProgressStatus(progress: number): 'success' | 'exception' | 'active' | undefined {
+    if (progress >= 100) return 'success';
+    if (progress < 30) return 'exception';
+    return 'active';
+  }
 
-    getProgressColor(progress: number): string {
-        if (progress >= 80) return '#52c41a';
-        if (progress >= 60) return '#1890ff';
-        if (progress >= 40) return '#faad14';
-        return '#f5222d';
-    }
+  getProgressColor(progress: number): string {
+    if (progress >= 80) return '#52c41a';
+    if (progress >= 60) return '#1890ff';
+    if (progress >= 40) return '#faad14';
+    return '#f5222d';
+  }
 
-    getStatusColor(status: string): string {
-        const colors: Record<string, string> = {
-            passed: 'green',
-            failed: 'red',
-            pending: 'orange'
-        };
-        return colors[status] || 'default';
-    }
+  getStatusColor(status: string): string {
+    const colors: Record<string, string> = {
+      passed: 'green',
+      failed: 'red',
+      pending: 'orange'
+    };
+    return colors[status] || 'default';
+  }
 
-    getStatusText(status: string): string {
-        const texts: Record<string, string> = {
-            passed: '通過',
-            failed: '不合格',
-            pending: '待檢查'
-        };
-        return texts[status] || '未知';
-    }
+  getStatusText(status: string): string {
+    const texts: Record<string, string> = {
+      passed: '通過',
+      failed: '不合格',
+      pending: '待檢查'
+    };
+    return texts[status] || '未知';
+  }
 
-    getTypeColor(type: string): string {
-        const colors: Record<string, string> = {
-            safety: 'red',
-            quality: 'blue',
-            environment: 'green'
-        };
-        return colors[type] || 'default';
-    }
+  getTypeColor(type: string): string {
+    const colors: Record<string, string> = {
+      safety: 'red',
+      quality: 'blue',
+      environment: 'green'
+    };
+    return colors[type] || 'default';
+  }
 
-    getTypeText(type: string): string {
-        const texts: Record<string, string> = {
-            safety: '安全',
-            quality: '品質',
-            environment: '環保'
-        };
-        return texts[type] || '未知';
-    }
+  getTypeText(type: string): string {
+    const texts: Record<string, string> = {
+      safety: '安全',
+      quality: '品質',
+      environment: '環保'
+    };
+    return texts[type] || '未知';
+  }
 
-    getRoleText(role: string): string {
-        const texts: Record<string, string> = {
-            safety: '公安',
-            supervisor: '監工',
-            manager: '負責人',
-            worker: '工人'
-        };
-        return texts[role] || '未知';
-    }
+  getRoleText(role: string): string {
+    const texts: Record<string, string> = {
+      safety: '公安',
+      supervisor: '監工',
+      manager: '負責人',
+      worker: '工人'
+    };
+    return texts[role] || '未知';
+  }
 
-    getPersonnelAvatarColor(role: string): string {
-        const colors: Record<string, string> = {
-            safety: '#f5222d',
-            supervisor: '#1890ff',
-            manager: '#722ed1',
-            worker: '#52c41a'
-        };
-        return colors[role] || '#1890ff';
-    }
+  getPersonnelAvatarColor(role: string): string {
+    const colors: Record<string, string> = {
+      safety: '#f5222d',
+      supervisor: '#1890ff',
+      manager: '#722ed1',
+      worker: '#52c41a'
+    };
+    return colors[role] || '#1890ff';
+  }
 }
