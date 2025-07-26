@@ -1,4 +1,5 @@
 import { BaseModel } from '../../../core/models';
+import { ContractPayment } from './contract-payment.model';
 
 export interface Contract extends BaseModel {
     contractSerial: string;
@@ -7,4 +8,5 @@ export interface Contract extends BaseModel {
     contractCode?: string;
     feeCode?: string;
     amount: number;
+    payments: ContractPayment[]; // 付款請求數組
 }

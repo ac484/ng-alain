@@ -1,13 +1,15 @@
-import { Component, TemplateRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, TemplateRef, ViewChild, Output, EventEmitter, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NzFloatButtonModule } from 'ng-zorro-antd/float-button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { FabAction } from './fab.models';
 
 @Component({
-    selector: 'hub-fab',
-    standalone: true,
-    imports: [NzFloatButtonModule, NzIconModule, DragDropModule],
-    template: `
+  selector: 'hub-fab',
+  standalone: true,
+  imports: [CommonModule, NzFloatButtonModule, NzIconModule, DragDropModule],
+  template: `
     <div
       class="fab-drag-anchor"
       cdkDrag
@@ -21,17 +23,21 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
         nzTrigger="click"
         [nzPlacement]="smartPlacement"
       >
-        <nz-float-button [nzIcon]="actionIcon" (click)="onAction.emit('add')"></nz-float-button>
+        <nz-float-button 
+          *ngFor="let action of actions"
+          [nzIcon]="action.icon" 
+          [disabled]="action.disabled"
+          (click)="onAction.emit(action.type)">
+        </nz-float-button>
       </nz-float-button-group>
 
       <ng-template #upIcon><nz-icon nzType="up" nzTheme="outline" /></ng-template>
       <ng-template #downIcon><nz-icon nzType="down" nzTheme="outline" /></ng-template>
       <ng-template #leftIcon><nz-icon nzType="left" nzTheme="outline" /></ng-template>
       <ng-template #rightIcon><nz-icon nzType="right" nzTheme="outline" /></ng-template>
-      <ng-template #actionIcon><nz-icon nzType="plus" nzTheme="outline" /></ng-template>
     </div>
   `,
-    styles: [`
+  styles: [`
     .fab-drag-anchor {
       position: fixed;
       z-index: 1000;
@@ -45,46 +51,43 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
   `]
 })
 export class FabComponent {
-    dragX = 0;
-    dragY = 0;
-    smartPlacement: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  @Input() actions: FabAction[] = [{ id: 'add', type: 'add', icon: 'plus' }];
+  @Output() onAction = new EventEmitter<string>();
 
-    @ViewChild('upIcon', { static: true }) upIcon!: TemplateRef<any>;
-    @ViewChild('downIcon', { static: true }) downIcon!: TemplateRef<any>;
-    @ViewChild('leftIcon', { static: true }) leftIcon!: TemplateRef<any>;
-    @ViewChild('rightIcon', { static: true }) rightIcon!: TemplateRef<any>;
-    @ViewChild('actionIcon', { static: true }) actionIcon!: TemplateRef<any>;
+  dragX = 0;
+  dragY = 0;
+  smartPlacement: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  private currentX = 0;
+  private currentY = 0;
 
-    @Output() onAction = new EventEmitter<string>();
+  @ViewChild('upIcon', { static: true }) upIcon!: TemplateRef<any>;
+  @ViewChild('downIcon', { static: true }) downIcon!: TemplateRef<any>;
+  @ViewChild('leftIcon', { static: true }) leftIcon!: TemplateRef<any>;
+  @ViewChild('rightIcon', { static: true }) rightIcon!: TemplateRef<any>;
 
-    get currentIcon(): TemplateRef<any> {
-        const iconMap = {
-            top: this.upIcon,
-            bottom: this.downIcon,
-            left: this.leftIcon,
-            right: this.rightIcon
-        };
-        return iconMap[this.smartPlacement];
-    }
+  get currentIcon(): TemplateRef<any> {
+    return { top: this.upIcon, bottom: this.downIcon, left: this.leftIcon, right: this.rightIcon }[this.smartPlacement];
+  }
 
-    onDragMove(event: any): void {
-        const rect = event.source.element.nativeElement.getBoundingClientRect();
-        this.smartPlacement = this.calculateSmartPlacement(rect.left, rect.top);
-    }
+  onDragMove(event: any): void {
+    const rect = event.source.element.nativeElement.getBoundingClientRect();
+    this.currentX = rect.left;
+    this.currentY = rect.top;
+    this.smartPlacement = this.calculateSmartPlacement(this.currentX, this.currentY);
+  }
 
-    onDragEnd(event: any): void {
-        this.dragX = event.source.getFreeDragPosition().x;
-        this.dragY = event.source.getFreeDragPosition().y;
-    }
+  onDragEnd(event: any): void {
+    this.dragX = event.source.getFreeDragPosition().x;
+    this.dragY = event.source.getFreeDragPosition().y;
+    this.smartPlacement = this.calculateSmartPlacement(this.currentX, this.currentY);
+  }
 
-    private calculateSmartPlacement(x: number, y: number): 'top' | 'bottom' | 'left' | 'right' {
-        const centerX = x + 28; // fab size / 2
-        const centerY = y + 28;
-        const deltaX = centerX - window.innerWidth / 2;
-        const deltaY = centerY - window.innerHeight / 2;
-
-        return Math.abs(deltaX) > Math.abs(deltaY)
-            ? (deltaX > 0 ? 'left' : 'right')
-            : (deltaY > 0 ? 'top' : 'bottom');
-    }
+  private calculateSmartPlacement(x: number, y: number): 'top' | 'bottom' | 'left' | 'right' {
+    const fabSize = 56;
+    const centerX = x + fabSize / 2;
+    const centerY = y + fabSize / 2;
+    const deltaX = centerX - window.innerWidth / 2;
+    const deltaY = centerY - window.innerHeight / 2;
+    return Math.abs(deltaX) > Math.abs(deltaY) ? (deltaX > 0 ? 'left' : 'right') : (deltaY > 0 ? 'top' : 'bottom');
+  }
 }
