@@ -1,12 +1,13 @@
 import { BaseModel } from '../../../core/models';
+import { Timestamp } from '@angular/fire/firestore';
 
 export interface WorkflowDefinition extends BaseModel {
     name: string;
     clientId: string;
     steps: WorkflowStepDefinition[];
     isActive: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: Date | Timestamp;
+    updatedAt?: Date | Timestamp;
 }
 
 export interface WorkflowStepDefinition {
