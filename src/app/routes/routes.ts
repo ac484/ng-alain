@@ -106,9 +106,6 @@ export const routes: Routes = [
       // 專業版功能模組 - 懶載入
       { path: 'pro', loadChildren: () => import('./pro/routes').then(m => m.routes) },
 
-      // 工作區模組 - 懶載入
-      { path: 'workspace', loadChildren: () => import('./workspace/routes').then(m => m.default) },
-
       // Hub 模組 - 懶載入
       { path: 'hub', loadChildren: () => import('./hub/routes').then(m => m.default) },
 
