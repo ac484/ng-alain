@@ -2,7 +2,18 @@
 
 ## Introduction
 
-本專案需要將原始 `routes/tree` 模組的完整功能遷移到新的 `hub/features/tree` 架構中。經過詳細分析，發現原始模組包含豐富的功能，包括 Firebase CRUD 操作、完整的樹狀面板、PDF 掃描、任務管理、權限控制等，而目前的 hub 版本只實現了基礎功能。此遷移將確保功能完整性並結合 Redis 快取優化效能。
+本專案需要將原始 `routes/tree` 模組的完整功能遷移到新的 `hub/features/tree` 架構中。經過詳細分析，發現原始模組包含豐富的功能，包括：
+
+**原始 routes/tree 功能清單：**
+- Firebase CRUD 操作（firebase-crud.component.ts + firebase-crud.service.ts）
+- 完整的樹狀面板（panel.component.ts + panel.component.html + panel.component.less）
+- PDF 掃描功能（pdf-scan.component.ts）
+- 掃描結果管理（scan-result.component.ts）
+- 樹狀列表展示（list.component.ts）
+- 完整的數據模型定義（models/models.ts）
+- 路由配置（routes.ts）
+
+而目前的 hub/features/tree 版本只實現了基礎功能。此遷移將確保所有原始功能完整移植到新架構中。
 
 ## Requirements
 
