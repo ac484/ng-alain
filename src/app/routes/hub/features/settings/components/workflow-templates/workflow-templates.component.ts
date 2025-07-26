@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, input, output, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -61,7 +61,7 @@ import { WorkflowDefinition } from '../../../contracts/models';
             </nz-switch>
           </td>
           <td>
-            <button nz-button nzType="link" nzSize="small" (click)="editWorkflow(workflow)">
+            <button nz-button nzType="link" nzSize="small" (click)="onEditWorkflow(workflow)">
               編輯
             </button>
             <nz-popconfirm nzTitle="確定要刪除此流程模板嗎？" (nzOnConfirm)="deleteWorkflow(workflow.key!)">
@@ -76,7 +76,9 @@ import { WorkflowDefinition } from '../../../contracts/models';
   `
 })
 export class WorkflowTemplatesComponent implements OnInit {
-  @Input() clients: string[] = [];
+  clients = input<string[]>([]);
+  createWorkflow = output<void>();
+  editWorkflow = output<WorkflowDefinition>();
 
   private workflowService = inject(ContractWorkflowService);
   private message = inject(NzMessageService);
@@ -84,7 +86,7 @@ export class WorkflowTemplatesComponent implements OnInit {
   workflows = signal<WorkflowDefinition[]>([]);
   isLoading = signal(false);
 
-  hasClients = computed(() => this.clients.length > 0);
+  hasClients = computed(() => this.clients().length > 0);
 
   ngOnInit(): void {
     this.loadWorkflows();
@@ -104,11 +106,11 @@ export class WorkflowTemplatesComponent implements OnInit {
   }
 
   showCreateForm(): void {
-    // Emit event to parent to show form
+    this.createWorkflow.emit();
   }
 
-  editWorkflow(workflow: WorkflowDefinition): void {
-    // Emit event to parent to edit workflow
+  onEditWorkflow(workflow: WorkflowDefinition): void {
+    this.editWorkflow.emit(workflow);
   }
 
   async toggleStatus(workflowId: string, isActive: boolean): Promise<void> {

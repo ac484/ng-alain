@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -81,6 +81,8 @@ import { ContractService } from '../../../contracts/services';
   `
 })
 export class ClientSettingsComponent implements OnInit {
+  @Output() clientsChanged = new EventEmitter<string[]>();
+
   private contractService = inject(ContractService);
   private message = inject(NzMessageService);
 
@@ -95,8 +97,10 @@ export class ClientSettingsComponent implements OnInit {
   async loadClients(): Promise<void> {
     try {
       const settings = await this.contractService.getClientsSettings();
-      this.clients.set(settings?.list || []);
+      const clientsList = settings?.list || [];
+      this.clients.set(clientsList);
       this.defaultClient.set(settings?.default || '');
+      this.clientsChanged.emit(clientsList);
     } catch (error) {
       this.message.error('載入業主清單失敗');
     }
@@ -134,6 +138,7 @@ export class ClientSettingsComponent implements OnInit {
         list: this.clients(),
         default: this.defaultClient()
       });
+      this.clientsChanged.emit(this.clients());
       this.message.success('業主設定已保存');
     } catch (error) {
       this.message.error('保存失敗');
