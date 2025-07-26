@@ -13,11 +13,7 @@ import { PdfUploadComponent, PdfUploadResult } from '../../../../shared/componen
 import { PdfPageRangeComponent, PageRange } from '../../../../shared/components/pdf-page-range';
 import { PdfTextExtractorComponent, TextExtractionRequest, TextExtractionResult } from '../../../../shared/components/pdf-text-extractor';
 
-interface PdfScanResponse {
-  status: 'DONE' | 'ERROR';
-  extractedText?: string;
-  error?: string;
-}
+
 
 @Component({
   selector: 'hub-tree-pdf-scan',
