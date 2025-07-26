@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
@@ -98,9 +99,41 @@ export interface PaymentFormData {
               <input [hidden]="editId() !== c.key" type="number" nz-input [(ngModel)]="c.amount" (blur)="stopEdit(c)" />
             </td>
             <td>
-              <nz-popconfirm nzTitle="確定刪除？" (nzOnConfirm)="deleteContract(c.key!)">
-                <a nz-popconfirm>刪除</a>
-              </nz-popconfirm>
+              <div class="action-buttons">
+                <button 
+                  nz-button 
+                  nzType="link" 
+                  nzSize="small"
+                  (click)="viewContract(c.key!)">
+                  <span nz-icon nzType="eye"></span>
+                  查看
+                </button>
+                <button 
+                  nz-button 
+                  nzType="link" 
+                  nzSize="small"
+                  (click)="startEdit(c.key!)">
+                  <span nz-icon nzType="edit"></span>
+                  編輯
+                </button>
+                <nz-popconfirm 
+                  nzTitle="確定要刪除此合約嗎？" 
+                  nzDescription="刪除後將無法恢復，相關的付款請求也會一併刪除。"
+                  nzOkText="確定刪除"
+                  nzCancelText="取消"
+                  nzOkType="danger"
+                  (nzOnConfirm)="deleteContract(c.key!)">
+                  <button 
+                    nz-button 
+                    nzType="link" 
+                    nzSize="small" 
+                    nzDanger
+                    nz-popconfirm>
+                    <span nz-icon nzType="delete"></span>
+                    刪除
+                  </button>
+                </nz-popconfirm>
+              </div>
             </td>
           </tr>
           @if (expandSet().has(c.key!)) {
@@ -314,11 +347,25 @@ export interface PaymentFormData {
     .workflow-steps-row {
       padding: 0 !important;
     }
+    .action-buttons {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .action-buttons button {
+      min-width: auto;
+      padding: 0 8px;
+    }
+    .action-buttons button span[nz-icon] {
+      margin-right: 4px;
+    }
   `]
 })
 export class ContractListComponent implements OnInit {
   private contractService = inject(ContractService);
   private paymentService = inject(ContractPaymentService);
+  private router = inject(Router);
 
   // Core state
   contracts = signal<Contract[]>([]);
@@ -397,6 +444,10 @@ export class ContractListComponent implements OnInit {
   async deleteContract(id: string) {
     await this.contractService.delete(id);
     this.loadContracts();
+  }
+
+  viewContract(id: string) {
+    this.router.navigate(['/hub/contracts', id]);
   }
 
   async changeClient(contract: Contract | null, client: string) {

@@ -22,16 +22,16 @@
           "icon": "anticon-file-text"
         },
         {
-          "text": "Settings",
-          "link": "/hub/settings",
-          "i18n": "menu.hub.settings",
-          "icon": "anticon-setting"
-        },
-        {
           "text": "Workspace",
           "link": "/hub/workspace",
           "i18n": "menu.hub.workspace",
           "icon": "anticon-dashboard"
+        },
+        {
+          "text": "Settings",
+          "link": "/hub/settings",
+          "i18n": "menu.hub.settings",
+          "icon": "anticon-setting"
         }
       ]
     },
