@@ -67,18 +67,6 @@
 
 ### Requirement 6
 
-**User Story:** 作為系統管理員，我希望整合 Redis 快取機制，以便提升樹狀結構的查詢和操作效能
-
-#### Acceptance Criteria
-
-1. WHEN 系統載入樹狀結構 THEN 系統 SHALL 優先從 Redis 快取讀取數據
-2. WHEN 系統更新節點 THEN 系統 SHALL 同步更新 Redis 快取和 Firebase 數據
-3. WHEN 系統需要搜尋 THEN 系統 SHALL 使用 Redis 索引提升搜尋效能
-4. WHEN 系統處理大量節點 THEN 系統 SHALL 使用 Redis 分頁快取優化載入
-5. WHEN 快取過期 THEN 系統 SHALL 自動重新載入並更新快取
-
-### Requirement 7
-
 **User Story:** 作為開發者，我希望保持向後相容性，以便現有的路由和功能不受影響
 
 #### Acceptance Criteria

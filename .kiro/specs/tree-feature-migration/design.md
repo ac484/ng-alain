@@ -2,7 +2,7 @@
 
 ## Overview
 
-本設計文件描述如何將原始 `routes/tree` 模組的完整功能遷移到新的 `hub/features/tree` 架構中。設計採用分層架構，結合 Firebase 數據持久化和 Redis 快取優化，確保功能完整性和高效能。
+本設計文件描述如何將原始 `routes/tree` 模組的完整功能遷移到新的 `hub/features/tree` 架構中。設計採用分層架構，使用 Firebase 作為數據持久化層，確保功能完整性和良好的用戶體驗。
 
 遷移策略採用漸進式方法，保持向後相容性的同時，逐步增強 hub 版本的功能。整個設計遵循 Angular 最佳實踐和 ng-zorro-antd 設計規範。
 
@@ -13,41 +13,41 @@
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        A[Tree Components]
-        B[Tree Panel]
-        C[PDF Scan]
-        D[Scan Result]
+        A[Tree CRUD Component]
+        B[Tree Panel Component]
+        C[PDF Scan Component]
+        D[Scan Result Component]
+        E[Tree List Component]
     end
     
     subgraph "Service Layer"
-        E[Tree Service]
-        F[Firebase CRUD Service]
-        G[Redis Cache Service]
+        F[Enhanced Tree Service]
+        G[Firebase CRUD Service]
         H[PDF Processing Service]
+        I[Task Management Service]
     end
     
     subgraph "Repository Layer"
-        I[Tree Repository]
-        J[Task Repository]
-        K[Operation Repository]
+        J[Tree Repository]
+        K[Base Repository]
     end
     
     subgraph "Data Layer"
         L[Firebase Firestore]
-        M[Redis Cache]
-        N[Google Cloud Storage]
+        M[Google Cloud Storage]
     end
     
-    A --> E
-    B --> E
+    A --> F
+    B --> F
     C --> H
     D --> H
     E --> F
-    E --> G
+    F --> G
     F --> I
-    G --> M
-    I --> L
-    H --> N
+    G --> J
+    J --> K
+    K --> L
+    H --> M
 ```
 
 ### 數據流架構
@@ -57,21 +57,16 @@ sequenceDiagram
     participant U as User
     participant C as Component
     participant S as Service
-    participant R as Redis
     participant F as Firebase
     
     U->>C: 請求樹狀數據
     C->>S: 調用服務方法
-    S->>R: 檢查快取
-    alt 快取命中
-        R-->>S: 返回快取數據
-    else 快取未命中
-        S->>F: 查詢 Firebase
-        F-->>S: 返回數據
-        S->>R: 更新快取
-    end
+    S->>F: 查詢 Firebase
+    F-->>S: 返回數據
     S-->>C: 返回數據
     C-->>U: 顯示界面
+    
+    Note over U,F: 簡化的數據流，專注於核心功能
 ```
 
 ## Components and Interfaces
@@ -189,30 +184,7 @@ interface EnhancedTreeService {
 }
 ```
 
-#### 2. Redis Cache Service
-```typescript
-interface RedisCacheService {
-  // 基礎快取操作
-  get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T, ttl?: number): Promise<void>;
-  delete(key: string): Promise<void>;
-  
-  // 樹狀結構快取
-  cacheTreeData(treeId: string, data: SpaceNode[]): Promise<void>;
-  getCachedTreeData(treeId: string): Promise<SpaceNode[] | null>;
-  invalidateTreeCache(treeId: string): Promise<void>;
-  
-  // 搜尋索引快取
-  buildSearchIndex(nodes: SpaceNode[]): Promise<void>;
-  searchFromIndex(keyword: string): Promise<string[]>;
-  
-  // 統計快取
-  cacheStatistics(treeId: string, stats: TreeStatistics): Promise<void>;
-  getCachedStatistics(treeId: string): Promise<TreeStatistics | null>;
-}
-```
-
-#### 3. Task Management Service
+#### 2. Task Management Service
 ```typescript
 interface TaskManagementService {
   // 任務 CRUD
