@@ -26,5 +26,14 @@ export const treeRoutes: Routes = [
         loadComponent: () =>
             import('./components/tree-form').then(m => m.TreeFormComponent)
     },
-
+    {
+        path: 'pdf-scan',
+        loadComponent: () =>
+            import('./components/tree-pdf-scan').then(m => m.TreePdfScanComponent)
+    },
+    {
+        path: 'scan-result',
+        loadComponent: () =>
+            import('./components/tree-scan-result').then(m => m.TreeScanResultComponent)
+    }
 ];

@@ -10,6 +10,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzUploadModule, NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
@@ -21,42 +22,51 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { TreeService } from '../../services/tree.service';
 
 interface ScanResult {
-    fileName: string;
-    fileSize: number;
-    pageCount: number;
-    extractedText: string;
-    suggestedStructure: TreeStructure[];
-    confidence: number;
+  fileName: string;
+  fileSize: number;
+  pageCount: number;
+  extractedText: string;
+  suggestedStructure: TreeStructure[];
+  confidence: number;
 }
 
 interface TreeStructure {
-    title: string;
-    level: number;
-    children: TreeStructure[];
-    content: string;
+  title: string;
+  level: number;
+  children: TreeStructure[];
+  content: string;
 }
 
 @Component({
-    selector: 'hub-tree-pdf-scan',
-    standalone: true,
-    imports: [
-        CommonModule,
-        NzCardModule,
-        NzUploadModule,
-        NzStepsModule,
-        NzProgressModule,
-        NzResultModule,
-        NzListModule,
-        NzTagModule,
-        NzButtonModule,
-        NzIconModule,
-        NzAlertModule
-    ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    template: `
+  selector: 'hub-tree-pdf-scan',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzCardModule,
+    NzUploadModule,
+    NzStepsModule,
+    NzProgressModule,
+    NzResultModule,
+    NzListModule,
+    NzTagModule,
+    NzButtonModule,
+    NzIconModule,
+    NzAlertModule,
+    NzInputNumberModule,
+    NzFormModule,
+    NzDividerModule,
+    NzSpinModule
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     <nz-card title="PDF 文件掃描" subtitle="上傳 PDF 文件自動生成樹狀結構">
       <!-- 步驟指示器 -->
       <nz-steps [nzCurrent]="currentStep()" class="steps-container">
@@ -95,11 +105,75 @@ interface TreeStructure {
           </p>
         </nz-upload>
 
+        <!-- 頁面範圍選擇 -->
+        <div *ngIf="totalPages() > 0" class="page-range-section">
+          <nz-divider nzText="頁面範圍選擇"></nz-divider>
+          
+          <div class="page-info">
+            <nz-alert
+              nzType="info"
+              [nzMessage]="'PDF 文件共 ' + totalPages() + ' 頁'"
+              nzShowIcon>
+            </nz-alert>
+          </div>
+
+          <form nz-form class="page-range-form">
+            <div class="range-controls">
+              <div class="range-input">
+                <label>起始頁：</label>
+                <nz-input-number
+                  [(ngModel)]="startPage"
+                  [nzMin]="1"
+                  [nzMax]="totalPages()"
+                  [nzStep]="1"
+                  name="startPage">
+                </nz-input-number>
+              </div>
+              
+              <div class="range-separator">至</div>
+              
+              <div class="range-input">
+                <label>結束頁：</label>
+                <nz-input-number
+                  [(ngModel)]="endPage"
+                  [nzMin]="startPage()"
+                  [nzMax]="totalPages()"
+                  [nzStep]="1"
+                  name="endPage">
+                </nz-input-number>
+              </div>
+            </div>
+
+            <div class="range-actions">
+              <button 
+                nz-button 
+                nzType="default" 
+                nzSize="small"
+                (click)="selectAllPages()">
+                選擇全部頁面
+              </button>
+              
+              <span class="page-count-info">
+                將掃描 {{ getSelectedPageCount() }} 頁
+              </span>
+            </div>
+
+            <div *ngIf="!isValidPageRange()" class="range-error">
+              <nz-alert
+                nzType="error"
+                nzMessage="頁面範圍無效"
+                nzDescription="請確保起始頁不大於結束頁，且在有效範圍內"
+                nzShowIcon>
+              </nz-alert>
+            </div>
+          </form>
+        </div>
+
         <div class="step-actions">
           <button 
             nz-button 
             nzType="primary" 
-            [disabled]="fileList().length === 0"
+            [disabled]="fileList().length === 0 || !isValidPageRange()"
             (click)="startScan()">
             開始掃描
           </button>
@@ -212,7 +286,7 @@ interface TreeStructure {
       </div>
     </nz-card>
   `,
-    styles: [`
+  styles: [`
     .steps-container {
       margin-bottom: 32px;
     }
@@ -316,225 +390,336 @@ interface TreeStructure {
       flex: 1;
       font-size: 14px;
     }
+    
+    .page-range-section {
+      margin-top: 24px;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 6px;
+    }
+    
+    .page-info {
+      margin-bottom: 16px;
+    }
+    
+    .page-range-form {
+      margin-top: 16px;
+    }
+    
+    .range-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .range-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .range-input label {
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    
+    .range-separator {
+      font-weight: 500;
+      color: #666;
+    }
+    
+    .range-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .page-count-info {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .range-error {
+      margin-top: 16px;
+    }
   `]
 })
 export class TreePdfScanComponent {
-    private treeService = inject(TreeService);
-    private router = inject(Router);
-    private message = inject(NzMessageService);
+  private treeService = inject(TreeService);
+  private router = inject(Router);
+  private message = inject(NzMessageService);
 
-    // State management
-    currentStep = signal(0);
-    fileList = signal<NzUploadFile[]>([]);
-    scanProgress = signal(0);
-    scanStatus = signal('準備開始掃描...');
-    scanResult = signal<ScanResult | null>(null);
-    createdTreeId = signal<string | null>(null);
+  // State management
+  currentStep = signal(0);
+  fileList = signal<NzUploadFile[]>([]);
+  scanProgress = signal(0);
+  scanStatus = signal('準備開始掃描...');
+  scanResult = signal<ScanResult | null>(null);
+  createdTreeId = signal<string | null>(null);
 
-    // 掃描步驟
-    scanSteps = [
-        { name: '文件上傳', completed: false, active: false },
-        { name: '文件解析', completed: false, active: false },
-        { name: '內容提取', completed: false, active: false },
-        { name: '結構分析', completed: false, active: false },
-        { name: '樹狀生成', completed: false, active: false }
-    ];
+  // PDF 頁面相關
+  totalPages = signal(0);
+  startPage = signal(1);
+  endPage = signal(1);
+  currentFile: File | null = null;
 
-    beforeUpload = (file: NzUploadFile): boolean => {
-        // 檢查文件類型
-        if (file.type !== 'application/pdf') {
-            this.message.error('只能上傳 PDF 格式的文件！');
-            return false;
+  // 掃描步驟
+  scanSteps = [
+    { name: '文件上傳', completed: false, active: false },
+    { name: '文件解析', completed: false, active: false },
+    { name: '內容提取', completed: false, active: false },
+    { name: '結構分析', completed: false, active: false },
+    { name: '樹狀生成', completed: false, active: false }
+  ];
+
+  beforeUpload = (file: NzUploadFile): boolean => {
+    // 檢查文件類型
+    if (file.type !== 'application/pdf') {
+      this.message.error('只能上傳 PDF 格式的文件！');
+      return false;
+    }
+
+    // 檢查文件大小 (10MB)
+    const isLt10M = file.size! / 1024 / 1024 < 10;
+    if (!isLt10M) {
+      this.message.error('文件大小不能超過 10MB！');
+      return false;
+    }
+
+    return false; // 阻止自動上傳，手動處理
+  };
+
+  handleUploadChange(info: NzUploadChangeParam): void {
+    const fileList = [...info.fileList];
+
+    // 只保留最新的一個文件
+    if (fileList.length > 1) {
+      fileList.splice(0, fileList.length - 1);
+    }
+
+    this.fileList.set(fileList);
+
+    // 如果有文件，載入 PDF 以獲取頁數
+    if (fileList.length > 0) {
+      this.currentFile = fileList[0] as any;
+      this.loadPdfDocument();
+    }
+  }
+
+  async loadPdfDocument(): Promise<void> {
+    if (!this.currentFile) return;
+
+    try {
+      // 模擬 PDF 載入和頁數獲取
+      // 在實際實現中，這裡會使用 pdf-lib 或類似庫來解析 PDF
+      const mockPageCount = Math.floor(Math.random() * 50) + 10; // 10-60頁
+      this.totalPages.set(mockPageCount);
+      this.endPage.set(mockPageCount);
+
+      this.message.success(`PDF 載入成功，共 ${mockPageCount} 頁`);
+    } catch (error) {
+      console.error('PDF 載入失敗:', error);
+      this.message.error('PDF 檔案載入失敗');
+      this.totalPages.set(0);
+    }
+  }
+
+  isValidPageRange(): boolean {
+    const start = this.startPage();
+    const end = this.endPage();
+    const total = this.totalPages();
+    return start > 0 && end > 0 && start <= end && end <= total;
+  }
+
+  selectAllPages(): void {
+    this.startPage.set(1);
+    this.endPage.set(this.totalPages());
+  }
+
+  getSelectedPageCount(): number {
+    if (!this.isValidPageRange()) return 0;
+    return this.endPage() - this.startPage() + 1;
+  }
+
+  startScan(): void {
+    if (this.fileList().length === 0) {
+      this.message.error('請先上傳 PDF 文件');
+      return;
+    }
+
+    this.currentStep.set(1);
+    this.simulateScanProcess();
+  }
+
+  private simulateScanProcess(): void {
+    let progress = 0;
+    let stepIndex = 0;
+
+    const interval = setInterval(() => {
+      progress += Math.random() * 15 + 5; // 隨機增加 5-20%
+
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        this.completeScan();
+      }
+
+      // 更新當前步驟
+      const currentStepIndex = Math.floor((progress / 100) * this.scanSteps.length);
+      if (currentStepIndex !== stepIndex && currentStepIndex < this.scanSteps.length) {
+        if (stepIndex < this.scanSteps.length) {
+          this.scanSteps[stepIndex].completed = true;
+          this.scanSteps[stepIndex].active = false;
         }
-
-        // 檢查文件大小 (10MB)
-        const isLt10M = file.size! / 1024 / 1024 < 10;
-        if (!isLt10M) {
-            this.message.error('文件大小不能超過 10MB！');
-            return false;
+        stepIndex = currentStepIndex;
+        if (stepIndex < this.scanSteps.length) {
+          this.scanSteps[stepIndex].active = true;
+          this.scanStatus.set(`正在執行：${this.scanSteps[stepIndex].name}`);
         }
+      }
 
-        return false; // 阻止自動上傳，手動處理
+      this.scanProgress.set(Math.min(progress, 100));
+    }, 300);
+  }
+
+  private completeScan(): void {
+    // 標記所有步驟完成
+    this.scanSteps.forEach(step => {
+      step.completed = true;
+      step.active = false;
+    });
+
+    this.scanStatus.set('掃描完成！');
+
+    // 生成模擬掃描結果
+    const mockResult: ScanResult = {
+      fileName: this.fileList()[0].name,
+      fileSize: this.fileList()[0].size || 0,
+      pageCount: Math.floor(Math.random() * 50) + 10,
+      extractedText: '模擬提取的文本內容...',
+      confidence: Math.floor(Math.random() * 20) + 80, // 80-100%
+      suggestedStructure: [
+        {
+          title: '第一章 概述',
+          level: 1,
+          content: '章節內容...',
+          children: [
+            {
+              title: '1.1 背景介紹',
+              level: 2,
+              content: '背景內容...',
+              children: []
+            },
+            {
+              title: '1.2 目標說明',
+              level: 2,
+              content: '目標內容...',
+              children: []
+            }
+          ]
+        },
+        {
+          title: '第二章 詳細說明',
+          level: 1,
+          content: '章節內容...',
+          children: [
+            {
+              title: '2.1 技術規範',
+              level: 2,
+              content: '技術內容...',
+              children: []
+            }
+          ]
+        }
+      ]
     };
 
-    handleUploadChange(info: NzUploadChangeParam): void {
-        const fileList = [...info.fileList];
+    this.scanResult.set(mockResult);
 
-        // 只保留最新的一個文件
-        if (fileList.length > 1) {
-            fileList.splice(0, fileList.length - 1);
-        }
+    setTimeout(() => {
+      this.currentStep.set(2);
+    }, 1000);
+  }
 
-        this.fileList.set(fileList);
+  async createTreeStructure(): Promise<void> {
+    try {
+      const result = this.scanResult();
+      if (!result) return;
+
+      // 創建樹狀結構
+      const treeData = {
+        name: result.fileName.replace('.pdf', ''),
+        description: `從 PDF 文件 "${result.fileName}" 自動生成的樹狀結構`,
+        type: '其他' as const,
+        status: 'active' as const,
+        level: 0,
+        maxLevel: Math.max(...result.suggestedStructure.map(s => s.level)),
+        nodeCount: this.countNodes(result.suggestedStructure)
+      };
+
+      const treeId = await this.treeService.createTree(treeData);
+      this.createdTreeId.set(treeId);
+      this.currentStep.set(3);
+      this.message.success('樹狀結構創建成功！');
+    } catch (error) {
+      console.error('創建樹狀結構失敗:', error);
+      this.message.error('創建樹狀結構失敗');
     }
+  }
 
-    startScan(): void {
-        if (this.fileList().length === 0) {
-            this.message.error('請先上傳 PDF 文件');
-            return;
-        }
+  private countNodes(structure: TreeStructure[]): number {
+    let count = structure.length;
+    structure.forEach(node => {
+      count += this.countNodes(node.children);
+    });
+    return count;
+  }
 
-        this.currentStep.set(1);
-        this.simulateScanProcess();
+  goBack(): void {
+    this.currentStep.set(0);
+    this.fileList.set([]);
+    this.scanProgress.set(0);
+    this.scanResult.set(null);
+    this.scanStatus.set('準備開始掃描...');
+    this.createdTreeId.set(null);
+
+    // 重置 PDF 頁面相關狀態
+    this.totalPages.set(0);
+    this.startPage.set(1);
+    this.endPage.set(1);
+    this.currentFile = null;
+
+    // 重置掃描步驟
+    this.scanSteps.forEach(step => {
+      step.completed = false;
+      step.active = false;
+    });
+  }
+
+  viewCreatedTree(): void {
+    const treeId = this.createdTreeId();
+    if (treeId) {
+      this.router.navigate(['/hub/tree/panel'], { queryParams: { id: treeId } });
     }
+  }
 
-    private simulateScanProcess(): void {
-        let progress = 0;
-        let stepIndex = 0;
+  scanAnother(): void {
+    this.goBack();
+  }
 
-        const interval = setInterval(() => {
-            progress += Math.random() * 15 + 5; // 隨機增加 5-20%
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
 
-            if (progress >= 100) {
-                progress = 100;
-                clearInterval(interval);
-                this.completeScan();
-            }
-
-            // 更新當前步驟
-            const currentStepIndex = Math.floor((progress / 100) * this.scanSteps.length);
-            if (currentStepIndex !== stepIndex && currentStepIndex < this.scanSteps.length) {
-                if (stepIndex < this.scanSteps.length) {
-                    this.scanSteps[stepIndex].completed = true;
-                    this.scanSteps[stepIndex].active = false;
-                }
-                stepIndex = currentStepIndex;
-                if (stepIndex < this.scanSteps.length) {
-                    this.scanSteps[stepIndex].active = true;
-                    this.scanStatus.set(`正在執行：${this.scanSteps[stepIndex].name}`);
-                }
-            }
-
-            this.scanProgress.set(Math.min(progress, 100));
-        }, 300);
-    }
-
-    private completeScan(): void {
-        // 標記所有步驟完成
-        this.scanSteps.forEach(step => {
-            step.completed = true;
-            step.active = false;
-        });
-
-        this.scanStatus.set('掃描完成！');
-
-        // 生成模擬掃描結果
-        const mockResult: ScanResult = {
-            fileName: this.fileList()[0].name,
-            fileSize: this.fileList()[0].size || 0,
-            pageCount: Math.floor(Math.random() * 50) + 10,
-            extractedText: '模擬提取的文本內容...',
-            confidence: Math.floor(Math.random() * 20) + 80, // 80-100%
-            suggestedStructure: [
-                {
-                    title: '第一章 概述',
-                    level: 1,
-                    content: '章節內容...',
-                    children: [
-                        {
-                            title: '1.1 背景介紹',
-                            level: 2,
-                            content: '背景內容...',
-                            children: []
-                        },
-                        {
-                            title: '1.2 目標說明',
-                            level: 2,
-                            content: '目標內容...',
-                            children: []
-                        }
-                    ]
-                },
-                {
-                    title: '第二章 詳細說明',
-                    level: 1,
-                    content: '章節內容...',
-                    children: [
-                        {
-                            title: '2.1 技術規範',
-                            level: 2,
-                            content: '技術內容...',
-                            children: []
-                        }
-                    ]
-                }
-            ]
-        };
-
-        this.scanResult.set(mockResult);
-
-        setTimeout(() => {
-            this.currentStep.set(2);
-        }, 1000);
-    }
-
-    async createTreeStructure(): Promise<void> {
-        try {
-            const result = this.scanResult();
-            if (!result) return;
-
-            // 創建樹狀結構
-            const treeData = {
-                name: result.fileName.replace('.pdf', ''),
-                description: `從 PDF 文件 "${result.fileName}" 自動生成的樹狀結構`,
-                type: '其他' as const,
-                status: 'active' as const,
-                level: 0,
-                maxLevel: Math.max(...result.suggestedStructure.map(s => s.level)),
-                nodeCount: this.countNodes(result.suggestedStructure)
-            };
-
-            const treeId = await this.treeService.createTree(treeData);
-            this.createdTreeId.set(treeId);
-            this.currentStep.set(3);
-            this.message.success('樹狀結構創建成功！');
-        } catch (error) {
-            console.error('創建樹狀結構失敗:', error);
-            this.message.error('創建樹狀結構失敗');
-        }
-    }
-
-    private countNodes(structure: TreeStructure[]): number {
-        let count = structure.length;
-        structure.forEach(node => {
-            count += this.countNodes(node.children);
-        });
-        return count;
-    }
-
-    goBack(): void {
-        this.currentStep.set(0);
-        this.fileList.set([]);
-        this.scanProgress.set(0);
-        this.scanResult.set(null);
-        this.scanSteps.forEach(step => {
-            step.completed = false;
-            step.active = false;
-        });
-    }
-
-    viewCreatedTree(): void {
-        const treeId = this.createdTreeId();
-        if (treeId) {
-            this.router.navigate(['/hub/tree/panel'], { queryParams: { id: treeId } });
-        }
-    }
-
-    scanAnother(): void {
-        this.goBack();
-    }
-
-    formatFileSize(bytes: number): string {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    }
-
-    getConfidenceColor(confidence: number): string {
-        if (confidence >= 90) return 'green';
-        if (confidence >= 70) return 'orange';
-        return 'red';
-    }
+  getConfidenceColor(confidence: number): string {
+    if (confidence >= 90) return 'green';
+    if (confidence >= 70) return 'orange';
+    return 'red';
+  }
 }

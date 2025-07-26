@@ -119,6 +119,21 @@ import { TreeNode } from '../../models/tree.model';
       <nz-space>
         <button 
           nz-button 
+          nzType="primary" 
+          nzGhost
+          (click)="goToPdfScan()">
+          <span nz-icon nzType="file-pdf"></span>
+          PDF 掃描
+        </button>
+        <button 
+          nz-button 
+          nzType="default" 
+          (click)="goToScanResults()">
+          <span nz-icon nzType="history"></span>
+          掃描結果
+        </button>
+        <button 
+          nz-button 
           nzType="default" 
           (click)="refreshTrees()"
           [nzLoading]="loading()">
@@ -194,5 +209,13 @@ export class TreeListComponent implements OnInit {
 
   async refreshTrees(): Promise<void> {
     await this.loadTrees();
+  }
+
+  goToPdfScan(): void {
+    this.router.navigate(['/hub/tree/pdf-scan']);
+  }
+
+  goToScanResults(): void {
+    this.router.navigate(['/hub/tree/scan-result']);
   }
 }

@@ -1,0 +1,1 @@
+export * from './tree-pdf-scan.component';
