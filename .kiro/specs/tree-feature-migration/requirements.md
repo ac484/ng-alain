@@ -2,7 +2,7 @@
 
 ## Introduction
 
-本專案需要將原始 `routes/tree` 模組的完整功能遷移到新的 `hub/features/tree` 架構中。經過詳細分析，發現原始模組包含豐富的功能，包括：
+本專案需要將原始 `routes/tree` 模組的完整功能遷移到新的 `hub/features/tree` 架構中，使其成為 hub 生態系統的自然擴展。
 
 **原始 routes/tree 功能清單：**
 - Firebase CRUD 操作（firebase-crud.component.ts + firebase-crud.service.ts）
@@ -13,7 +13,14 @@
 - 完整的數據模型定義（models/models.ts）
 - 路由配置（routes.ts）
 
-而目前的 hub/features/tree 版本只實現了基礎功能。此遷移將確保所有原始功能完整移植到新架構中。
+**目前 hub/features/tree 已有功能：**
+- 基礎的 TreeService（簡化版）
+- 基礎的 TreeListComponent（簡化版）
+- 基礎的 TreePanelComponent（簡化版）
+- 基礎的 TreeFormComponent
+- 基礎的路由配置
+
+**遷移目標：** 將所有原始功能完整移植到 hub 架構中，讓 hub/features/tree 擁有完整的樹狀結構管理能力。
 
 ## Requirements
 
@@ -24,9 +31,9 @@
 #### Acceptance Criteria
 
 1. WHEN 用戶需要創建樹狀節點 THEN 系統 SHALL 提供 Firebase CRUD 組件支援模態框操作
-2. WHEN 用戶需要編輯節點 THEN 系統 SHALL 提供表單驗證和 Firebase 更新功能
-3. WHEN 用戶需要刪除節點 THEN 系統 SHALL 提供安全的刪除確認和 Firebase 刪除操作
-4. WHEN 用戶需要批量移動節點 THEN 系統 SHALL 支援 Firebase 事務操作確保數據一致性
+2. WHEN 用戶需要編輯節點 THEN 系統 SHALL 提供表單驗證和更新功能
+3. WHEN 用戶需要刪除節點 THEN 系統 SHALL 提供安全的刪除確認和操作
+4. WHEN 用戶需要批量移動節點 THEN 系統 SHALL 支援事務操作確保數據一致性
 
 ### Requirement 2
 
@@ -86,4 +93,16 @@
 2. WHEN 用戶訪問舊路由 THEN 系統 SHALL 提供重定向或並行支援
 3. WHEN 數據結構變更 THEN 系統 SHALL 提供數據遷移工具
 4. WHEN 新功能上線 THEN 系統 SHALL 支援漸進式遷移策略
-5. WHEN 測試新功能 THEN 系統 SHALL 提供 A/B 測試機制
+5. WHEN 測試新功能 THEN 系統 SHALL 提供功能對比驗證機制
+
+### Requirement 7
+
+**User Story:** 作為開發者，我希望遷移後的功能完全整合到 hub 架構中，以便維持系統的一致性
+
+#### Acceptance Criteria
+
+1. WHEN 使用遷移後的功能 THEN 系統 SHALL 使用 hub 的統一服務架構
+2. WHEN 處理數據操作 THEN 系統 SHALL 使用 hub-crud.service 和 base.repository
+3. WHEN 顯示 UI 組件 THEN 系統 SHALL 使用 hub 的統一樣式和主題
+4. WHEN 處理錯誤 THEN 系統 SHALL 使用 hub 的統一錯誤處理機制
+5. WHEN 導航功能 THEN 系統 SHALL 整合到 hub 的主導航系統中
