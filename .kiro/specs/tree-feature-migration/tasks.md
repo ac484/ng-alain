@@ -1,6 +1,9 @@
 # Implementation Plan
 
-- [ ] 1. 遷移數據模型到 hub 架構
+- [x] 1. 遷移數據模型到 hub 架構
+
+
+
   - 將 `routes/tree/models/models.ts` 拆分並遷移到 `hub/features/tree/models/`
   - 創建 space-node.model.ts、task.model.ts、tree-operation.model.ts
   - 整合到 hub 的 BaseModel 和 AuditableModel

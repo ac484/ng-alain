@@ -1,47 +1,31 @@
 /**
  * 樹狀結構 PDF 掃描元件
- * 
- * 功能：
- * - PDF 文件上傳和掃描
- * - 文件內容解析和結構化
- * - 自動生成樹狀結構
- * - 使用 ng-zorro-antd upload 和 steps 組件
+ * 基於原始 routes/tree/pdf-scan 實現，先求能上傳
  */
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { Functions, httpsCallable } from '@angular/fire/functions';
+import { Storage, ref, uploadBytes } from '@angular/fire/storage';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzUploadModule, NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
-import { NzStepsModule } from 'ng-zorro-antd/steps';
-import { NzProgressModule } from 'ng-zorro-antd/progress';
-import { NzResultModule } from 'ng-zorro-antd/result';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
-import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { TreeService } from '../../services/tree.service';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzUploadModule, NzUploadFile, NzUploadChangeParam } from 'ng-zorro-antd/upload';
+import { PDFDocument } from 'pdf-lib';
+import { Observable } from 'rxjs';
 
-interface ScanResult {
-  fileName: string;
-  fileSize: number;
-  pageCount: number;
-  extractedText: string;
-  suggestedStructure: TreeStructure[];
-  confidence: number;
-}
-
-interface TreeStructure {
-  title: string;
-  level: number;
-  children: TreeStructure[];
-  content: string;
+interface PdfScanResponse {
+  status: 'DONE' | 'ERROR';
+  extractedText?: string;
+  error?: string;
 }
 
 @Component({
@@ -50,676 +34,422 @@ interface TreeStructure {
   imports: [
     CommonModule,
     FormsModule,
-    NzCardModule,
     NzUploadModule,
-    NzStepsModule,
-    NzProgressModule,
-    NzResultModule,
-    NzListModule,
-    NzTagModule,
     NzButtonModule,
-    NzIconModule,
-    NzAlertModule,
-    NzInputNumberModule,
-    NzFormModule,
+    NzCardModule,
+    NzSpinModule,
+    NzResultModule,
     NzDividerModule,
-    NzSpinModule
+    NzTypographyModule,
+    NzIconModule,
+    NzFormModule,
+    NzInputNumberModule,
+    NzInputModule
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <nz-card title="PDF 文件掃描" subtitle="上傳 PDF 文件自動生成樹狀結構">
-      <!-- 步驟指示器 -->
-      <nz-steps [nzCurrent]="currentStep()" class="steps-container">
-        <nz-step nzTitle="上傳文件" nzDescription="選擇 PDF 文件"></nz-step>
-        <nz-step nzTitle="掃描解析" nzDescription="分析文件內容"></nz-step>
-        <nz-step nzTitle="結構預覽" nzDescription="確認樹狀結構"></nz-step>
-        <nz-step nzTitle="完成創建" nzDescription="生成樹狀結構"></nz-step>
-      </nz-steps>
+    <nz-card nzTitle="PDF 文字提取">
+      <div class="pdf-scan-container">
+        <!-- Upload Section -->
+        <nz-card nzSize="small" nzTitle="上傳 PDF 文件">
+          <nz-upload
+            nzType="drag"
+            [nzMultiple]="false"
+            [nzAccept]="'.pdf'"
+            [nzBeforeUpload]="beforeUpload"
+            (nzChange)="handleUploadChange($event)"
+            [nzFileList]="fileList"
+          >
+            <p class="ant-upload-drag-icon">
+              <span nz-icon nzType="inbox"></span>
+            </p>
+            <p class="ant-upload-text">點擊或拖拽 PDF 文件到此區域上傳</p>
+            <p class="ant-upload-hint">支援單個 PDF 文件上傳，文件將使用 Google Cloud Vision API 進行文字提取</p>
+          </nz-upload>
+        </nz-card>
 
-      <!-- 步驟 1: 文件上傳 -->
-      <div *ngIf="currentStep() === 0" class="step-content">
-        <nz-alert
-          nzType="info"
-          nzMessage="支援的文件格式"
-          nzDescription="請上傳 PDF 格式的文件，文件大小不超過 10MB"
-          nzShowIcon
-          class="upload-alert">
-        </nz-alert>
-
-        <nz-upload
-          class="upload-area"
-          nzType="drag"
-          [nzMultiple]="false"
-          [nzAccept]="'.pdf'"
-          [nzBeforeUpload]="beforeUpload"
-          (nzChange)="handleUploadChange($event)"
-          [nzFileList]="fileList()"
-          [nzShowUploadList]="{ showPreviewIcon: false, showRemoveIcon: true }">
-          
-          <p class="ant-upload-drag-icon">
-            <span nz-icon nzType="file-pdf" nzTheme="twotone"></span>
-          </p>
-          <p class="ant-upload-text">點擊或拖拽 PDF 文件到此區域上傳</p>
-          <p class="ant-upload-hint">
-            支援單個文件上傳，文件大小限制 10MB
-          </p>
-        </nz-upload>
-
-        <!-- 頁面範圍選擇 -->
-        <div *ngIf="totalPages() > 0" class="page-range-section">
-          <nz-divider nzText="頁面範圍選擇"></nz-divider>
-          
-          <div class="page-info">
-            <nz-alert
-              nzType="info"
-              [nzMessage]="'PDF 文件共 ' + totalPages() + ' 頁'"
-              nzShowIcon>
-            </nz-alert>
-          </div>
-
-          <form nz-form class="page-range-form">
-            <div class="range-controls">
-              <div class="range-input">
-                <label>起始頁：</label>
-                <nz-input-number
-                  [(ngModel)]="startPage"
-                  [nzMin]="1"
-                  [nzMax]="totalPages()"
-                  [nzStep]="1"
-                  name="startPage">
-                </nz-input-number>
-              </div>
-              
-              <div class="range-separator">至</div>
-              
-              <div class="range-input">
-                <label>結束頁：</label>
-                <nz-input-number
-                  [(ngModel)]="endPage"
-                  [nzMin]="startPage()"
-                  [nzMax]="totalPages()"
-                  [nzStep]="1"
-                  name="endPage">
-                </nz-input-number>
-              </div>
+        <!-- Page Range Selection -->
+        <div *ngIf="pdfDocument && !isProcessing" class="page-range-section">
+          <nz-card nzSize="small" nzTitle="頁數範圍設定">
+            <div class="pdf-info">
+              <p>總頁數：{{ totalPages }} 頁</p>
             </div>
 
-            <div class="range-actions">
-              <button 
-                nz-button 
-                nzType="default" 
-                nzSize="small"
-                (click)="selectAllPages()">
-                選擇全部頁面
-              </button>
-              
-              <span class="page-count-info">
-                將掃描 {{ getSelectedPageCount() }} 頁
+            <nz-form-item>
+              <nz-form-label>選擇頁數範圍</nz-form-label>
+              <nz-form-control>
+                <div class="page-range-inputs">
+                  <nz-input-number
+                    [(ngModel)]="startPage"
+                    [nzMin]="1"
+                    [nzMax]="totalPages"
+                    placeholder="起始頁"
+                    style="width: 120px;">
+                  </nz-input-number>
+                  <span class="page-range-separator">至</span>
+                  <nz-input-number
+                    [(ngModel)]="endPage"
+                    [nzMin]="1"
+                    [nzMax]="totalPages"
+                    placeholder="結束頁"
+                    style="width: 120px;">
+                  </nz-input-number>
+                </div>
+              </nz-form-control>
+            </nz-form-item>
+
+            <div class="page-range-info">
+              <span *ngIf="startPage && endPage">
+                將提取第 {{ startPage }} 至 {{ endPage }} 頁 (共 {{ endPage - startPage + 1 }} 頁)
               </span>
             </div>
 
-            <div *ngIf="!isValidPageRange()" class="range-error">
-              <nz-alert
-                nzType="error"
-                nzMessage="頁面範圍無效"
-                nzDescription="請確保起始頁不大於結束頁，且在有效範圍內"
-                nzShowIcon>
-              </nz-alert>
+            <div class="extract-actions">
+              <button nz-button nzType="primary" (click)="extractSelectedPages()"
+                      [disabled]="!isValidPageRange()">
+                <span nz-icon nzType="file-text"></span>
+                提取選中頁面文字
+              </button>
+              <button nz-button (click)="selectAllPages()">
+                <span nz-icon nzType="check-square"></span>
+                全選
+              </button>
             </div>
-          </form>
+          </nz-card>
         </div>
 
-        <div class="step-actions">
-          <button 
-            nz-button 
-            nzType="primary" 
-            [disabled]="fileList().length === 0 || !isValidPageRange()"
-            (click)="startScan()">
-            開始掃描
-          </button>
-        </div>
-      </div>
-
-      <!-- 步驟 2: 掃描進度 -->
-      <div *ngIf="currentStep() === 1" class="step-content">
-        <div class="scan-progress">
-          <div class="progress-info">
-            <h3>正在掃描文件...</h3>
-            <p>{{ scanStatus() }}</p>
-          </div>
-          
-          <nz-progress 
-            [nzPercent]="scanProgress()" 
-            nzStatus="active"
-            [nzShowInfo]="true">
-          </nz-progress>
-
-          <div class="scan-details" *ngIf="scanProgress() > 0">
-            <nz-list [nzDataSource]="scanSteps" [nzSize]="'small'">
-              <ng-template #item let-step>
-                <nz-list-item>
-                  <span nz-icon [nzType]="step.completed ? 'check-circle' : 'loading'" 
-                        [style.color]="step.completed ? '#52c41a' : '#1890ff'"></span>
-                  <span style="margin-left: 8px;">{{ step.name }}</span>
-                  <nz-tag *ngIf="step.completed" nzColor="green">完成</nz-tag>
-                  <nz-tag *ngIf="!step.completed && step.active" nzColor="blue">進行中</nz-tag>
-                </nz-list-item>
-              </ng-template>
-            </nz-list>
-          </div>
-        </div>
-      </div>
-
-      <!-- 步驟 3: 結構預覽 -->
-      <div *ngIf="currentStep() === 2" class="step-content">
-        <div class="preview-container" *ngIf="scanResult()">
-          <div class="scan-summary">
-            <h3>掃描結果摘要</h3>
-            <div class="summary-stats">
-              <div class="stat-item">
-                <span class="stat-label">文件名稱：</span>
-                <span class="stat-value">{{ scanResult()?.fileName }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">文件大小：</span>
-                <span class="stat-value">{{ formatFileSize(scanResult()?.fileSize || 0) }}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">頁數：</span>
-                <span class="stat-value">{{ scanResult()?.pageCount }} 頁</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">識別信心度：</span>
-                <span class="stat-value">
-                  <nz-tag [nzColor]="getConfidenceColor(scanResult()?.confidence || 0)">
-                    {{ scanResult()?.confidence }}%
-                  </nz-tag>
-                </span>
-              </div>
+        <!-- Processing Section -->
+        <div *ngIf="isProcessing" class="processing-section">
+          <nz-card nzSize="small">
+            <div class="text-center">
+              <nz-spin nzSize="large" [nzTip]="processingTip">
+                <div class="processing-content">
+                  <span nz-icon nzType="file-text" nzTheme="outline" class="processing-icon"></span>
+                  <p>正在處理您的 PDF 文件...</p>
+                  <p class="processing-detail">{{ processingTip }}</p>
+                </div>
+              </nz-spin>
             </div>
-          </div>
+          </nz-card>
+        </div>
 
-          <div class="structure-preview">
-            <h3>建議的樹狀結構</h3>
-            <div class="tree-preview">
-              <div 
-                *ngFor="let node of scanResult()?.suggestedStructure" 
-                class="tree-node"
-                [style.margin-left.px]="node.level * 20">
-                <span nz-icon nzType="folder" *ngIf="node.children.length > 0"></span>
-                <span nz-icon nzType="file-text" *ngIf="node.children.length === 0"></span>
-                <span class="node-title">{{ node.title }}</span>
-                <nz-tag nzSize="small">層級 {{ node.level }}</nz-tag>
-              </div>
+        <!-- Results Section -->
+        <div *ngIf="extractedText && !isProcessing" class="results-section">
+          <nz-card nzSize="small" nzTitle="提取結果">
+            <div class="extracted-text-container">
+              <nz-typography>
+                <pre nz-typography nzCopyable [nzContent]="extractedText" class="extracted-text">{{ extractedText }}</pre>
+              </nz-typography>
             </div>
-          </div>
+            <nz-divider></nz-divider>
+            <div class="result-actions">
+              <button nz-button nzType="primary" (click)="downloadText()">
+                <span nz-icon nzType="download"></span>
+                下載文字
+              </button>
+              <button nz-button (click)="reset()" class="ml-2">
+                <span nz-icon nzType="reload"></span>
+                重新開始
+              </button>
+            </div>
+          </nz-card>
         </div>
 
-        <div class="step-actions">
-          <button nz-button (click)="goBack()">重新上傳</button>
-          <button 
-            nz-button 
-            nzType="primary" 
-            (click)="createTreeStructure()"
-            style="margin-left: 8px;">
-            創建樹狀結構
-          </button>
+        <!-- Error Section -->
+        <div *ngIf="errorMessage && !isProcessing" class="error-section">
+          <nz-result nzStatus="error" nzTitle="處理失敗" [nzSubTitle]="errorMessage">
+            <div nz-result-extra>
+              <button nz-button nzType="primary" (click)="reset()">重試</button>
+            </div>
+          </nz-result>
         </div>
-      </div>
-
-      <!-- 步驟 4: 完成 -->
-      <div *ngIf="currentStep() === 3" class="step-content">
-        <nz-result
-          nzStatus="success"
-          nzTitle="樹狀結構創建成功！"
-          nzSubTitle="PDF 文件已成功解析並生成樹狀結構">
-          
-          <div nz-result-extra>
-            <button nz-button nzType="primary" (click)="viewCreatedTree()">
-              查看樹狀結構
-            </button>
-            <button nz-button (click)="scanAnother()" style="margin-left: 8px;">
-              掃描其他文件
-            </button>
-          </div>
-        </nz-result>
       </div>
     </nz-card>
   `,
   styles: [`
-    .steps-container {
-      margin-bottom: 32px;
-    }
-    
-    .step-content {
-      min-height: 400px;
-      padding: 24px 0;
-    }
-    
-    .upload-alert {
-      margin-bottom: 24px;
-    }
-    
-    .upload-area {
-      margin-bottom: 24px;
-    }
-    
-    .step-actions {
-      text-align: center;
-      margin-top: 32px;
-    }
-    
-    .scan-progress {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    
-    .progress-info {
-      margin-bottom: 24px;
-    }
-    
-    .progress-info h3 {
-      margin-bottom: 8px;
-      color: #1890ff;
-    }
-    
-    .scan-details {
-      margin-top: 32px;
-      text-align: left;
-    }
-    
-    .preview-container {
+    .pdf-scan-container {
       max-width: 800px;
       margin: 0 auto;
     }
-    
-    .scan-summary {
-      background: #fafafa;
-      padding: 16px;
-      border-radius: 6px;
-      margin-bottom: 24px;
-    }
-    
-    .summary-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+
+    .page-range-section,
+    .processing-section,
+    .results-section,
+    .error-section {
       margin-top: 16px;
     }
-    
-    .stat-item {
-      display: flex;
-      align-items: center;
-    }
-    
-    .stat-label {
-      font-weight: 500;
-      margin-right: 8px;
-    }
-    
-    .stat-value {
+
+    .pdf-info {
+      margin-bottom: 16px;
       color: #666;
     }
-    
-    .structure-preview {
-      border: 1px solid #f0f0f0;
-      border-radius: 6px;
-      padding: 16px;
+
+    .page-range-inputs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-    
-    .tree-preview {
-      max-height: 300px;
+
+    .page-range-separator {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .page-range-info {
+      margin: 16px 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .extract-actions {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .extract-actions button {
+      margin: 0 4px;
+    }
+
+    .processing-content {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .processing-icon {
+      font-size: 48px;
+      color: #1890ff;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .processing-detail {
+      color: #666;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .extracted-text-container {
+      max-height: 400px;
       overflow-y: auto;
-      margin-top: 16px;
-    }
-    
-    .tree-node {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 0;
-      border-bottom: 1px solid #f5f5f5;
-    }
-    
-    .tree-node:last-child {
-      border-bottom: none;
-    }
-    
-    .node-title {
-      flex: 1;
-      font-size: 14px;
-    }
-    
-    .page-range-section {
-      margin-top: 24px;
-      padding: 16px;
-      background: #fafafa;
+      border: 1px solid #d9d9d9;
       border-radius: 6px;
+      padding: 12px;
+      background-color: #fafafa;
     }
-    
-    .page-info {
-      margin-bottom: 16px;
-    }
-    
-    .page-range-form {
-      margin-top: 16px;
-    }
-    
-    .range-controls {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-    
-    .range-input {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .range-input label {
-      font-weight: 500;
-      white-space: nowrap;
-    }
-    
-    .range-separator {
-      font-weight: 500;
-      color: #666;
-    }
-    
-    .range-actions {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    
-    .page-count-info {
-      color: #666;
+
+    .extracted-text {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin: 0;
+      font-family: 'Courier New', monospace;
       font-size: 14px;
+      line-height: 1.6;
+      color: #333;
     }
-    
-    .range-error {
-      margin-top: 16px;
+
+    .result-actions {
+      text-align: center;
+    }
+
+    .ml-2 {
+      margin-left: 8px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    :host ::ng-deep .ant-upload.ant-upload-drag {
+      background-color: #fafafa;
+      border: 2px dashed #d9d9d9;
+      transition: all 0.3s;
+    }
+
+    :host ::ng-deep .ant-upload.ant-upload-drag:hover {
+      border-color: #40a9ff;
+      background-color: #f0f8ff;
+    }
+
+    :host ::ng-deep .ant-upload.ant-upload-drag .ant-upload-drag-icon {
+      color: #1890ff;
     }
   `]
 })
-export class TreePdfScanComponent {
-  private treeService = inject(TreeService);
-  private router = inject(Router);
+export class TreePdfScanComponent implements OnInit {
+  private functions = inject(Functions);
+  private storage = inject(Storage);
   private message = inject(NzMessageService);
 
-  // State management
-  currentStep = signal(0);
-  fileList = signal<NzUploadFile[]>([]);
-  scanProgress = signal(0);
-  scanStatus = signal('準備開始掃描...');
-  scanResult = signal<ScanResult | null>(null);
-  createdTreeId = signal<string | null>(null);
-
-  // PDF 頁面相關
-  totalPages = signal(0);
-  startPage = signal(1);
-  endPage = signal(1);
+  fileList: NzUploadFile[] = [];
+  isProcessing = false;
+  processingTip = '正在上傳文件...';
+  extractedText = '';
+  errorMessage = '';
   currentFile: File | null = null;
+  pdfDocument: PDFDocument | null = null;
+  totalPages = 0;
+  startPage = 1;
+  endPage = 1;
 
-  // 掃描步驟
-  scanSteps = [
-    { name: '文件上傳', completed: false, active: false },
-    { name: '文件解析', completed: false, active: false },
-    { name: '內容提取', completed: false, active: false },
-    { name: '結構分析', completed: false, active: false },
-    { name: '樹狀生成', completed: false, active: false }
-  ];
+  ngOnInit(): void {
+    // Component initialization
+  }
 
-  beforeUpload = (file: NzUploadFile): boolean => {
-    // 檢查文件類型
+  beforeUpload = (file: NzUploadFile, _fileList: NzUploadFile[]): boolean | Observable<boolean> => {
+    console.log('beforeUpload called with file:', file);
+
     if (file.type !== 'application/pdf') {
-      this.message.error('只能上傳 PDF 格式的文件！');
+      this.message.error('只能上傳 PDF 文件！');
       return false;
     }
 
-    // 檢查文件大小 (10MB)
-    const isLt10M = file.size! / 1024 / 1024 < 10;
-    if (!isLt10M) {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size! > maxSize) {
       this.message.error('文件大小不能超過 10MB！');
       return false;
     }
 
-    return false; // 阻止自動上傳，手動處理
+    this.currentFile = file as any;
+    this.fileList = [file];
+    this.loadPdfDocument();
+
+    return false; // Prevent default upload
   };
 
   handleUploadChange(info: NzUploadChangeParam): void {
-    const fileList = [...info.fileList];
-
-    // 只保留最新的一個文件
-    if (fileList.length > 1) {
-      fileList.splice(0, fileList.length - 1);
-    }
-
-    this.fileList.set(fileList);
-
-    // 如果有文件，載入 PDF 以獲取頁數
-    if (fileList.length > 0) {
-      this.currentFile = fileList[0] as any;
-      this.loadPdfDocument();
-    }
+    console.log('handleUploadChange called with info:', info);
+    // Handle upload change events if needed
   }
 
   async loadPdfDocument(): Promise<void> {
+    console.log('loadPdfDocument called with currentFile:', this.currentFile);
     if (!this.currentFile) return;
 
     try {
-      // 模擬 PDF 載入和頁數獲取
-      // 在實際實現中，這裡會使用 pdf-lib 或類似庫來解析 PDF
-      const mockPageCount = Math.floor(Math.random() * 50) + 10; // 10-60頁
-      this.totalPages.set(mockPageCount);
-      this.endPage.set(mockPageCount);
+      const arrayBuffer = await this.currentFile.arrayBuffer();
+      this.pdfDocument = await PDFDocument.load(arrayBuffer);
+      this.totalPages = this.pdfDocument.getPageCount();
+      this.endPage = this.totalPages;
 
-      this.message.success(`PDF 載入成功，共 ${mockPageCount} 頁`);
+      console.log('PDF loaded successfully, pages:', this.totalPages);
+      this.message.success(`PDF 載入成功，共 ${this.totalPages} 頁`);
     } catch (error) {
       console.error('PDF 載入失敗:', error);
       this.message.error('PDF 檔案載入失敗');
-      this.totalPages.set(0);
     }
   }
 
   isValidPageRange(): boolean {
-    const start = this.startPage();
-    const end = this.endPage();
-    const total = this.totalPages();
-    return start > 0 && end > 0 && start <= end && end <= total;
+    return this.startPage > 0 && this.endPage > 0 && this.startPage <= this.endPage && this.endPage <= this.totalPages;
   }
 
   selectAllPages(): void {
-    this.startPage.set(1);
-    this.endPage.set(this.totalPages());
+    this.startPage = 1;
+    this.endPage = this.totalPages;
   }
 
-  getSelectedPageCount(): number {
-    if (!this.isValidPageRange()) return 0;
-    return this.endPage() - this.startPage() + 1;
-  }
-
-  startScan(): void {
-    if (this.fileList().length === 0) {
-      this.message.error('請先上傳 PDF 文件');
+  async extractSelectedPages(): Promise<void> {
+    if (!this.isValidPageRange()) {
+      this.message.error('請選擇有效的頁數範圍');
       return;
     }
 
-    this.currentStep.set(1);
-    this.simulateScanProcess();
-  }
+    if (!this.currentFile || !this.pdfDocument) {
+      this.message.error('沒有可處理的PDF檔案');
+      return;
+    }
 
-  private simulateScanProcess(): void {
-    let progress = 0;
-    let stepIndex = 0;
+    this.isProcessing = true;
+    this.errorMessage = '';
+    this.extractedText = '';
+    this.processingTip = '正在裁切PDF頁面...';
 
-    const interval = setInterval(() => {
-      progress += Math.random() * 15 + 5; // 隨機增加 5-20%
-
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-        this.completeScan();
-      }
-
-      // 更新當前步驟
-      const currentStepIndex = Math.floor((progress / 100) * this.scanSteps.length);
-      if (currentStepIndex !== stepIndex && currentStepIndex < this.scanSteps.length) {
-        if (stepIndex < this.scanSteps.length) {
-          this.scanSteps[stepIndex].completed = true;
-          this.scanSteps[stepIndex].active = false;
-        }
-        stepIndex = currentStepIndex;
-        if (stepIndex < this.scanSteps.length) {
-          this.scanSteps[stepIndex].active = true;
-          this.scanStatus.set(`正在執行：${this.scanSteps[stepIndex].name}`);
-        }
-      }
-
-      this.scanProgress.set(Math.min(progress, 100));
-    }, 300);
-  }
-
-  private completeScan(): void {
-    // 標記所有步驟完成
-    this.scanSteps.forEach(step => {
-      step.completed = true;
-      step.active = false;
-    });
-
-    this.scanStatus.set('掃描完成！');
-
-    // 生成模擬掃描結果
-    const mockResult: ScanResult = {
-      fileName: this.fileList()[0].name,
-      fileSize: this.fileList()[0].size || 0,
-      pageCount: Math.floor(Math.random() * 50) + 10,
-      extractedText: '模擬提取的文本內容...',
-      confidence: Math.floor(Math.random() * 20) + 80, // 80-100%
-      suggestedStructure: [
-        {
-          title: '第一章 概述',
-          level: 1,
-          content: '章節內容...',
-          children: [
-            {
-              title: '1.1 背景介紹',
-              level: 2,
-              content: '背景內容...',
-              children: []
-            },
-            {
-              title: '1.2 目標說明',
-              level: 2,
-              content: '目標內容...',
-              children: []
-            }
-          ]
-        },
-        {
-          title: '第二章 詳細說明',
-          level: 1,
-          content: '章節內容...',
-          children: [
-            {
-              title: '2.1 技術規範',
-              level: 2,
-              content: '技術內容...',
-              children: []
-            }
-          ]
-        }
-      ]
-    };
-
-    this.scanResult.set(mockResult);
-
-    setTimeout(() => {
-      this.currentStep.set(2);
-    }, 1000);
-  }
-
-  async createTreeStructure(): Promise<void> {
     try {
-      const result = this.scanResult();
-      if (!result) return;
+      // 1. 裁切PDF頁面
+      const croppedPdfBytes = await this.cropPdfPages(this.startPage, this.endPage);
 
-      // 創建樹狀結構
-      const treeData = {
-        name: result.fileName.replace('.pdf', ''),
-        description: `從 PDF 文件 "${result.fileName}" 自動生成的樹狀結構`,
-        type: '其他' as const,
-        status: 'active' as const,
-        level: 0,
-        maxLevel: Math.max(...result.suggestedStructure.map(s => s.level)),
-        nodeCount: this.countNodes(result.suggestedStructure)
-      };
+      // 2. 上傳裁切後的PDF
+      const timestamp = Date.now();
+      const pdfFileName = `pdf-uploads/${timestamp}_pages-${this.startPage}-${this.endPage}.pdf`;
+      const storageRef = ref(this.storage, pdfFileName);
+      const blob = new Blob([croppedPdfBytes], { type: 'application/pdf' });
 
-      const treeId = await this.treeService.createTree(treeData);
-      this.createdTreeId.set(treeId);
-      this.currentStep.set(3);
-      this.message.success('樹狀結構創建成功！');
-    } catch (error) {
-      console.error('創建樹狀結構失敗:', error);
-      this.message.error('創建樹狀結構失敗');
+      this.processingTip = '正在上傳裁切後的PDF...';
+      await uploadBytes(storageRef, blob);
+
+      // 3. 調用Cloud Function
+      const gcsUri = `gs://${storageRef.bucket}/${storageRef.fullPath}`;
+      const extractPdfText = httpsCallable<{ gcsUri: string }, PdfScanResponse>(this.functions, 'extractPdfText');
+
+      this.processingTip = '正在提取文字內容...';
+      const result = await extractPdfText({ gcsUri });
+
+      if (result.data.status === 'DONE' && result.data.extractedText) {
+        this.extractedText = result.data.extractedText;
+
+        // 4. 保存提取的文字到Storage
+        const textFileName = `pdf-uploads/${timestamp}_pages-${this.startPage}-${this.endPage}.txt`;
+        const textStorageRef = ref(this.storage, textFileName);
+        const textBlob = new Blob([this.extractedText], { type: 'text/plain;charset=utf-8' });
+
+        this.processingTip = '正在保存文字內容...';
+        await uploadBytes(textStorageRef, textBlob);
+
+        this.message.success(`成功提取並保存第 ${this.startPage} 至 ${this.endPage} 頁文字內容！`);
+      } else if (result.data.status === 'ERROR') {
+        throw new Error(result.data.error || '提取過程中發生錯誤');
+      } else {
+        throw new Error('未知的處理狀態');
+      }
+    } catch (error: any) {
+      console.error('PDF processing error:', error);
+      this.errorMessage = error.message || '處理 PDF 時發生錯誤，請重試。';
+      this.message.error(this.errorMessage);
+    } finally {
+      this.isProcessing = false;
     }
   }
 
-  private countNodes(structure: TreeStructure[]): number {
-    let count = structure.length;
-    structure.forEach(node => {
-      count += this.countNodes(node.children);
-    });
-    return count;
+  async cropPdfPages(startPage: number, endPage: number): Promise<Uint8Array> {
+    if (!this.pdfDocument) {
+      throw new Error('PDF 文件未載入');
+    }
+
+    const newPdfDoc = await PDFDocument.create();
+    const pageIndices = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i - 1);
+
+    const copiedPages = await newPdfDoc.copyPages(this.pdfDocument, pageIndices);
+    copiedPages.forEach((page: any) => newPdfDoc.addPage(page));
+
+    return await newPdfDoc.save();
   }
 
-  goBack(): void {
-    this.currentStep.set(0);
-    this.fileList.set([]);
-    this.scanProgress.set(0);
-    this.scanResult.set(null);
-    this.scanStatus.set('準備開始掃描...');
-    this.createdTreeId.set(null);
+  downloadText(): void {
+    if (!this.extractedText) return;
 
-    // 重置 PDF 頁面相關狀態
-    this.totalPages.set(0);
-    this.startPage.set(1);
-    this.endPage.set(1);
+    const blob = new Blob([this.extractedText], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `extracted-text-${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    this.message.success('文字文件已下載');
+  }
+
+  reset(): void {
+    this.fileList = [];
     this.currentFile = null;
-
-    // 重置掃描步驟
-    this.scanSteps.forEach(step => {
-      step.completed = false;
-      step.active = false;
-    });
-  }
-
-  viewCreatedTree(): void {
-    const treeId = this.createdTreeId();
-    if (treeId) {
-      this.router.navigate(['/hub/tree/panel'], { queryParams: { id: treeId } });
-    }
-  }
-
-  scanAnother(): void {
-    this.goBack();
-  }
-
-  formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-
-  getConfidenceColor(confidence: number): string {
-    if (confidence >= 90) return 'green';
-    if (confidence >= 70) return 'orange';
-    return 'red';
+    this.pdfDocument = null;
+    this.isProcessing = false;
+    this.extractedText = '';
+    this.errorMessage = '';
+    this.processingTip = '正在上傳文件...';
+    this.totalPages = 0;
+    this.startPage = 1;
+    this.endPage = 1;
   }
 }

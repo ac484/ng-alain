@@ -35,5 +35,10 @@ export const treeRoutes: Routes = [
         path: 'scan-result',
         loadComponent: () =>
             import('./components/tree-scan-result').then(m => m.TreeScanResultComponent)
+    },
+    {
+        path: 'document-viewer',
+        loadComponent: () =>
+            import('./components/tree-document-viewer').then(m => m.TreeDocumentViewerComponent)
     }
 ];

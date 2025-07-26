@@ -10,6 +10,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Storage, ref, listAll, getMetadata, getDownloadURL, deleteObject } from '@angular/fire/storage';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
@@ -214,6 +215,7 @@ interface ScanResult {
 export class TreeScanResultComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly message = inject(NzMessageService);
+  private readonly storage = inject(Storage);
 
   protected readonly isLoading = signal(true);
   protected readonly error = signal('');
@@ -229,8 +231,31 @@ export class TreeScanResultComponent implements OnInit {
     this.error.set('');
 
     try {
-      // 模擬載入掃描結果
-      await this.simulateLoadResults();
+      const storageRef = ref(this.storage, 'pdf-uploads');
+      const result = await listAll(storageRef);
+      const results: ScanResult[] = [];
+
+      for (const itemRef of result.items) {
+        const metadata = await getMetadata(itemRef);
+        const downloadUrl = await getDownloadURL(itemRef);
+        const fileName = metadata.name;
+        const fileType: 'pdf' | 'txt' = fileName.endsWith('.pdf') ? 'pdf' : 'txt';
+        const match = fileName.match(/(\d+)_pages-(\d+)-(\d+)\.(pdf|txt)$/);
+        const createdAt = match ? new Date(parseInt(match[1])) : new Date();
+
+        results.push({
+          id: fileName,
+          fileName,
+          fileType,
+          createdAt,
+          fileSize: metadata.size,
+          url: downloadUrl,
+          status: 'completed'
+        });
+      }
+
+      results.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      this.scanResults.set(results);
     } catch (error: any) {
       console.error('Error loading scan results:', error);
       this.error.set('載入掃描結果失敗');
@@ -238,44 +263,6 @@ export class TreeScanResultComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  private async simulateLoadResults(): Promise<void> {
-    // 模擬 API 延遲
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // 模擬掃描結果數據
-    const mockResults: ScanResult[] = [
-      {
-        id: '1',
-        fileName: 'document_pages-1-10.pdf',
-        fileType: 'pdf',
-        createdAt: new Date(Date.now() - 86400000), // 1天前
-        fileSize: 2048576, // 2MB
-        url: '#',
-        status: 'completed'
-      },
-      {
-        id: '2',
-        fileName: 'document_pages-1-10.txt',
-        fileType: 'txt',
-        createdAt: new Date(Date.now() - 86400000),
-        fileSize: 51200, // 50KB
-        url: '#',
-        status: 'completed'
-      },
-      {
-        id: '3',
-        fileName: 'manual_pages-5-15.pdf',
-        fileType: 'pdf',
-        createdAt: new Date(Date.now() - 172800000), // 2天前
-        fileSize: 1536000, // 1.5MB
-        url: '#',
-        status: 'processing'
-      }
-    ];
-
-    this.scanResults.set(mockResults);
   }
 
   public formatFileSize(bytes: number): string {
@@ -309,24 +296,43 @@ export class TreeScanResultComponent implements OnInit {
   }
 
   public downloadFile(result: ScanResult): void {
-    // 模擬下載功能
+    const link = document.createElement('a');
+    link.href = result.url;
+    link.download = result.fileName;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     this.message.success(`${result.fileType.toUpperCase()} 文件已下載`);
   }
 
   public deleteFile(result: ScanResult): void {
-    const currentResults = this.scanResults();
-    const updatedResults = currentResults.filter(r => r.id !== result.id);
-    this.scanResults.set(updatedResults);
-    this.message.success('檔案已刪除');
+    const fileRef = ref(this.storage, `pdf-uploads/${result.fileName}`);
+    deleteObject(fileRef)
+      .then(() => {
+        this.message.success('檔案已刪除');
+        this.loadScanResults();
+      })
+      .catch(error => {
+        console.error('刪除檔案失敗:', error);
+        this.message.error('刪除檔案失敗');
+      });
   }
 
   public previewFile(result: ScanResult): void {
     if (result.fileType === 'pdf') {
-      // 模擬 PDF 預覽
-      this.message.info('PDF 預覽功能開發中...');
+      const encodedUrl = encodeURIComponent(result.url);
+      const googleDocsUrl = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
+
+      // 使用路由導航到內嵌檢視器
+      this.router.navigate(['/hub/tree/document-viewer'], {
+        queryParams: {
+          url: googleDocsUrl,
+          fileName: result.fileName
+        }
+      });
     } else {
-      // 模擬文字預覽
-      this.message.info('文字預覽功能開發中...');
+      window.open(result.url, '_blank');
     }
   }
 

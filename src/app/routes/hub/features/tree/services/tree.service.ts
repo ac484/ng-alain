@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HubCrudService } from '../../../core/services/hub-crud.service';
-import { TreeNode, TreeConfig, TreeOperation, TreeSearchCriteria, TreeStatistics } from '../models/tree.model';
+import { TreeNode, TreeConfig, TreeSearchCriteria, TreeStatistics } from '../models/tree.model';
+import { TreeOperation } from '../models/tree-operation.model';
 
 /**
  * 樹狀結構服務
@@ -112,7 +113,8 @@ export class TreeService {
                 '分類': 0,
                 '權限': 0,
                 '流程': 0,
-                '其他': 0
+                '其他': 0,
+                'space': 0
             },
             nodesByLevel: {}
         };
@@ -223,6 +225,7 @@ export class TreeService {
             {
                 key: '1',
                 name: '組織架構樹',
+                title: '組織架構樹',
                 description: '公司組織架構管理',
                 type: '組織',
                 status: 'active',
@@ -235,6 +238,7 @@ export class TreeService {
             {
                 key: '2',
                 name: '產品分類樹',
+                title: '產品分類樹',
                 description: '產品分類管理系統',
                 type: '分類',
                 status: 'active',
@@ -247,6 +251,7 @@ export class TreeService {
             {
                 key: '3',
                 name: '權限管理樹',
+                title: '權限管理樹',
                 description: '系統權限分級管理',
                 type: '權限',
                 status: 'active',
@@ -259,6 +264,7 @@ export class TreeService {
             {
                 key: '4',
                 name: '工作流程樹',
+                title: '工作流程樹',
                 description: '業務流程管理',
                 type: '流程',
                 status: 'active',
@@ -271,6 +277,7 @@ export class TreeService {
             {
                 key: '5',
                 name: '地區分布樹',
+                title: '地區分布樹',
                 description: '地理區域分類',
                 type: '其他',
                 status: 'inactive',

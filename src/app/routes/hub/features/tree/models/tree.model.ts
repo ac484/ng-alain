@@ -1,33 +1,56 @@
 import { BaseModel, AuditableModel } from '../../../core/models';
+import { SpaceNodeType, NodeStatus } from './space-node.model';
+import { TaskStatistics } from './task.model';
 
 /**
- * 樹狀節點基礎介面
+ * 樹狀節點基礎介面 - 擴展版
+ * 整合原有功能與新的 SpaceNode 功能
  */
 export interface TreeNode extends AuditableModel {
     name: string;
+    title: string; // 對應 SpaceNode 的 title
     description?: string;
     type: TreeType;
+    nodeType?: SpaceNodeType; // 新增：對應 SpaceNode 的 type
     status: TreeStatus;
+    nodeStatus?: NodeStatus; // 新增：對應 SpaceNode 的 status
     parentId?: string;
     level: number;
     maxLevel: number;
     nodeCount: number;
     children?: TreeNode[];
     metadata?: TreeNodeMetadata;
+
+    // 新增：ng-zorro-antd 相容屬性
+    icon?: string;
+    isLeaf?: boolean;
+    checked?: boolean;
+    selected?: boolean;
+    selectable?: boolean;
+    disabled?: boolean;
+    disableCheckbox?: boolean;
+    expanded?: boolean;
+
+    // 新增：任務相關屬性
+    isTask?: boolean;
+    taskCount?: number;
+    completedTaskCount?: number;
+    taskStatistics?: TaskStatistics;
+    order?: number;
 }
 
 /**
- * 樹狀結構類型
+ * 樹狀結構類型 - 擴展版
  */
-export type TreeType = '組織' | '分類' | '權限' | '流程' | '其他';
+export type TreeType = '組織' | '分類' | '權限' | '流程' | '其他' | 'space';
 
 /**
- * 樹狀結構狀態
+ * 樹狀結構狀態 - 擴展版
  */
-export type TreeStatus = 'active' | 'inactive' | 'draft';
+export type TreeStatus = 'active' | 'inactive' | 'draft' | 'archived';
 
 /**
- * 樹狀節點元數據
+ * 樹狀節點元數據 - 擴展版
  */
 export interface TreeNodeMetadata {
     icon?: string;
@@ -35,6 +58,14 @@ export interface TreeNodeMetadata {
     order?: number;
     permissions?: string[];
     attributes?: Record<string, any>;
+    // 新增：SpaceNode 相容屬性
+    nodePermissions?: {
+        canView: boolean;
+        canEdit: boolean;
+        canDelete: boolean;
+        canAddChildren: boolean;
+        canAddTasks: boolean;
+    };
 }
 
 /**
@@ -50,29 +81,7 @@ export interface TreeConfig extends BaseModel {
     nodeTemplate?: string;
 }
 
-/**
- * 樹狀操作記錄
- */
-export interface TreeOperation extends AuditableModel {
-    treeId: string;
-    nodeId: string;
-    operation: TreeOperationType;
-    oldValue?: any;
-    newValue?: any;
-    operatorId: string;
-}
-
-/**
- * 樹狀操作類型
- */
-export type TreeOperationType =
-    | 'create'
-    | 'update'
-    | 'delete'
-    | 'move'
-    | 'copy'
-    | 'activate'
-    | 'deactivate';
+// TreeOperation 和 TreeOperationType 已在 tree-operation.model.ts 中定義
 
 /**
  * 樹狀搜尋條件
