@@ -1,0 +1,1 @@
+export * from './workspace-daily-log.component';
