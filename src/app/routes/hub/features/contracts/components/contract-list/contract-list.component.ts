@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, signal, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,6 +10,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { ContractService, ContractPaymentService } from '../../services';
 import { Contract, ContractPayment } from '../../models';
 import { FabComponent } from '../../../../shared/components';
@@ -366,6 +367,8 @@ export class ContractListComponent implements OnInit {
   private contractService = inject(ContractService);
   private paymentService = inject(ContractPaymentService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  private message = inject(NzMessageService);
 
   // Core state
   contracts = signal<Contract[]>([]);
@@ -477,11 +480,17 @@ export class ContractListComponent implements OnInit {
 
     try {
       const payments = await this.paymentService.listByContract(contractId);
-      const currentPayments = this.contractPayments();
-      currentPayments.set(contractId, payments);
-      this.contractPayments.set(new Map(currentPayments));
+
+      // 創建新的 Map 實例以確保 signal 檢測到變更
+      const newPaymentsMap = new Map(this.contractPayments());
+      newPaymentsMap.set(contractId, payments);
+      this.contractPayments.set(newPaymentsMap);
+
+      // 手動觸發變更檢測
+      this.cdr.markForCheck();
     } catch (error) {
       console.error('Failed to load payments:', error);
+      this.message.error('載入付款請求失敗');
     } finally {
       const updatedLoading = this.paymentLoading();
       updatedLoading.delete(contractId);
@@ -511,35 +520,44 @@ export class ContractListComponent implements OnInit {
   }
 
   async onPaymentFormSubmit(formData: PaymentFormData): Promise<void> {
+    const contractId = this.currentContract()?.key;
+    if (!contractId) {
+      this.message.error('合約資訊缺失');
+      return;
+    }
+
     try {
-      if (this.editingPayment()) {
+      const isEditing = !!this.editingPayment();
+
+      if (isEditing) {
         await this.paymentService.update(this.editingPayment()!.key!, {
           amount: formData.amount,
           remark: formData.remark,
           attachments: formData.attachments
         });
+        this.message.success('付款請求更新成功');
       } else {
-        const currentContract = this.currentContract();
-        if (!currentContract?.key) {
-          throw new Error('合約資訊缺失');
-        }
-
         await this.paymentService.add(
-          currentContract.key,
+          contractId,
           formData.amount,
           formData.remark,
-          currentContract.client
+          this.currentContract()!.client
         );
+        this.message.success('付款請求新增成功');
       }
 
+      // 關閉模態框
       this.onPaymentModalCancel();
 
-      const contractId = this.currentContract()?.key;
-      if (contractId) {
-        await this.loadContractPayments(contractId);
-      }
+      // 立即重新載入付款列表並觸發變更檢測
+      await this.loadContractPayments(contractId);
+
+      // 手動觸發變更檢測以確保 UI 更新
+      this.cdr.detectChanges();
+
     } catch (error) {
       console.error('操作失敗：', error);
+      this.message.error(`操作失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
     }
   }
 
