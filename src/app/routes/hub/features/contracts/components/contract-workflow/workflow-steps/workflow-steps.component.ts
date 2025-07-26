@@ -192,7 +192,7 @@ export class WorkflowStepsComponent {
     return this.payment.steps.findIndex(step => step.status === 'pending');
   }
 
-  getStepsStatus(): string {
+  getStepsStatus(): 'wait' | 'process' | 'finish' | 'error' {
     const hasRejected = this.payment.steps.some(step => step.status === 'rejected');
     if (hasRejected) return 'error';
 

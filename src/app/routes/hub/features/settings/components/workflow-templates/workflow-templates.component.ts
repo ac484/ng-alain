@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
@@ -13,21 +13,21 @@ import { ContractWorkflowService } from '../../../contracts/services';
 import { WorkflowDefinition } from '../../../contracts/models';
 
 @Component({
-    selector: 'hub-workflow-templates',
-    standalone: true,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        NzTableModule,
-        NzButtonModule,
-        NzSwitchModule,
-        NzTagModule,
-        NzPopconfirmModule,
-        NzAlertModule,
-        NzIconModule
-    ],
-    template: `
+  selector: 'hub-workflow-templates',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    NzTableModule,
+    NzButtonModule,
+    NzSwitchModule,
+    NzTagModule,
+    NzPopconfirmModule,
+    NzAlertModule,
+    NzIconModule
+  ],
+  template: `
     <div style="margin-bottom: 16px;">
       <button nz-button nzType="primary" (click)="showCreateForm()" [disabled]="!hasClients()">
         <span nz-icon nzType="plus"></span>
@@ -76,58 +76,58 @@ import { WorkflowDefinition } from '../../../contracts/models';
   `
 })
 export class WorkflowTemplatesComponent implements OnInit {
-    @Input() clients: string[] = [];
+  @Input() clients: string[] = [];
 
-    private workflowService = inject(ContractWorkflowService);
-    private message = inject(NzMessageService);
+  private workflowService = inject(ContractWorkflowService);
+  private message = inject(NzMessageService);
 
-    workflows = signal<WorkflowDefinition[]>([]);
-    isLoading = signal(false);
+  workflows = signal<WorkflowDefinition[]>([]);
+  isLoading = signal(false);
 
-    hasClients = computed(() => this.clients.length > 0);
+  hasClients = computed(() => this.clients.length > 0);
 
-    ngOnInit(): void {
-        this.loadWorkflows();
+  ngOnInit(): void {
+    this.loadWorkflows();
+  }
+
+  async loadWorkflows(): Promise<void> {
+    this.isLoading.set(true);
+    try {
+      this.workflowService.listTemplates().subscribe(workflows => {
+        this.workflows.set(workflows);
+        this.isLoading.set(false);
+      });
+    } catch (error) {
+      this.message.error('載入流程模板失敗');
+      this.isLoading.set(false);
     }
+  }
 
-    async loadWorkflows(): Promise<void> {
-        this.isLoading.set(true);
-        try {
-            this.workflowService.listTemplates().subscribe(workflows => {
-                this.workflows.set(workflows);
-                this.isLoading.set(false);
-            });
-        } catch (error) {
-            this.message.error('載入流程模板失敗');
-            this.isLoading.set(false);
-        }
-    }
+  showCreateForm(): void {
+    // Emit event to parent to show form
+  }
 
-    showCreateForm(): void {
-        // Emit event to parent to show form
-    }
+  editWorkflow(workflow: WorkflowDefinition): void {
+    // Emit event to parent to edit workflow
+  }
 
-    editWorkflow(workflow: WorkflowDefinition): void {
-        // Emit event to parent to edit workflow
+  async toggleStatus(workflowId: string, isActive: boolean): Promise<void> {
+    try {
+      await this.workflowService.updateTemplate(workflowId, { isActive });
+      this.message.success(`流程模板已${isActive ? '啟用' : '停用'}`);
+      this.loadWorkflows();
+    } catch (error) {
+      this.message.error('狀態更新失敗');
     }
+  }
 
-    async toggleStatus(workflowId: string, isActive: boolean): Promise<void> {
-        try {
-            await this.workflowService.updateTemplate(workflowId, { isActive });
-            this.message.success(`流程模板已${isActive ? '啟用' : '停用'}`);
-            this.loadWorkflows();
-        } catch (error) {
-            this.message.error('狀態更新失敗');
-        }
+  async deleteWorkflow(workflowId: string): Promise<void> {
+    try {
+      await this.workflowService.deleteTemplate(workflowId);
+      this.message.success('流程模板刪除成功');
+      this.loadWorkflows();
+    } catch (error) {
+      this.message.error('刪除失敗：' + (error as Error).message);
     }
-
-    async deleteWorkflow(workflowId: string): Promise<void> {
-        try {
-            await this.workflowService.deleteTemplate(workflowId);
-            this.message.success('流程模板刪除成功');
-            this.loadWorkflows();
-        } catch (error) {
-            this.message.error('刪除失敗：' + (error as Error).message);
-        }
-    }
+  }
 }

@@ -16,28 +16,22 @@
       "hideInBreadcrumb": true,
       "children": [
         {
-          "text": "Contract",
-          "link": "/hub/contract",
-          "i18n": "menu.contract",
+          "text": "Contracts",
+          "link": "/hub/contracts",
+          "i18n": "menu.hub.contracts",
           "icon": "anticon-file-text"
-        },
-        {
-          "text": "Tree",
-          "link": "/hub/tree",
-          "i18n": "menu.tree",
-          "icon": "anticon-fork"
-        },
-        {
-          "text": "Workspace",
-          "link": "/hub/workspace",
-          "i18n": "menu.workspace",
-          "icon": "anticon-team"
         },
         {
           "text": "Settings",
           "link": "/hub/settings",
           "i18n": "menu.hub.settings",
           "icon": "anticon-setting"
+        },
+        {
+          "text": "Workspace",
+          "link": "/hub/workspace",
+          "i18n": "menu.hub.workspace",
+          "icon": "anticon-dashboard"
         }
       ]
     },
@@ -47,58 +41,6 @@
       "group": true,
       "hideInBreadcrumb": true,
       "children": [
-        {
-          "text": "Contract",
-          "i18n": "menu.contract",
-          "icon": "anticon-file-text",
-          "children": [
-            {
-              "text": "Contract List",
-              "link": "/contract/list",
-              "i18n": "menu.contract.list"
-            },
-            {
-              "text": "Create Contract",
-              "link": "/contract/create",
-              "i18n": "menu.contract.create"
-            },
-            {
-              "text": "Contract Panel",
-              "link": "/contract/panel",
-              "i18n": "menu.contract.panel"
-            },
-            {
-              "text": "Contract Detail",
-              "link": "/contract/detail",
-              "i18n": "menu.contract.detail"
-            },
-            {
-              "text": "Edit Contract",
-              "link": "/contract/edit",
-              "i18n": "menu.contract.edit"
-            },
-            {
-              "text": "Contract Review",
-              "link": "/contract/review",
-              "i18n": "menu.contract.review"
-            },
-            {
-              "text": "Contract Payment",
-              "link": "/contract/payment/1",
-              "i18n": "menu.contract.payment"
-            },
-            {
-              "text": "Contract Change",
-              "link": "/contract/change/1",
-              "i18n": "menu.contract.change"
-            },
-            {
-              "text": "Contract Attachment",
-              "link": "/contract/attachment/1",
-              "i18n": "menu.contract.attachment"
-            }
-          ]
-        },
         {
           "text": "Tree",
           "i18n": "menu.tree",
@@ -517,9 +459,7 @@
           "i18n": "menu.report",
           "icon": "anticon-cloud",
           "children": [
-            {
-
-            }
+            {}
           ]
         },
         {
